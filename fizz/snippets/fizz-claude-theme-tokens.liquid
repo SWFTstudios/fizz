@@ -1,34 +1,29 @@
 {% comment %}
   Global colorway design tokens — presets, semantic colors, typography, section surfaces.
+  Preset data: snippets/fizz-colorway-preset-data.liquid (sync with design/colorway-presets/presets.json)
 {% endcomment %}
 {% liquid
   assign preset = settings.fizz_claude_colorway_preset | default: 'lime_fizz'
-  assign accent = '#c6f24e'
-  assign ink = '#080a0d'
-  assign paper = '#f2efe7'
 
-  case preset
-    when 'steel_navy'
-      assign accent = '#6b9fd4'
-      assign ink = '#0f1a2e'
-      assign paper = '#e8edf5'
-    when 'citrus_burst'
-      assign accent = '#f07a2e'
-      assign ink = '#1a0f08'
-      assign paper = '#f5ebe0'
-    when 'berry_night'
-      assign accent = '#c86bff'
-      assign ink = '#120818'
-      assign paper = '#f0e8f5'
-    when 'electric_pool'
-      assign accent = '#2f6fd6'
-      assign ink = '#061018'
-      assign paper = '#e6f0fa'
-    when 'arctic_light'
-      assign accent = '#9ed12f'
-      assign ink = '#f2efe7'
-      assign paper = '#080a0d'
-  endcase
+  capture preset_raw
+    render 'fizz-colorway-preset-data', preset: preset
+  endcapture
+  assign preset_parts = preset_raw | strip | split: '|'
+
+  assign accent = preset_parts[0]
+  assign ink = preset_parts[1]
+  assign paper = preset_parts[2]
+  assign preset_hero_bg = preset_parts[3]
+  assign preset_hero_text = preset_parts[4]
+  assign preset_hero_accent = preset_parts[5]
+  assign preset_statement_bg = preset_parts[6]
+  assign preset_statement_text = preset_parts[7]
+  assign preset_how_bg = preset_parts[8]
+  assign preset_how_text = preset_parts[9]
+  assign preset_how_stroke = preset_parts[10]
+  assign preset_footer_bg = preset_parts[11]
+  assign preset_footer_text = preset_parts[12]
+  assign preset_footer_stroke = preset_parts[13]
 
   if settings.fizz_claude_colorway_custom_enabled
     assign accent = settings.fizz_claude_colorway_accent | default: accent
@@ -66,9 +61,9 @@
     assign link_hover = settings.fizz_claude_colorway_link_hover
   endif
 
-  assign hero_bg = ink
-  assign hero_text = paper
-  assign hero_accent = accent
+  assign hero_bg = preset_hero_bg
+  assign hero_text = preset_hero_text
+  assign hero_accent = preset_hero_accent
   unless settings.fizz_claude_colorway_hero_use_global
     if settings.fizz_claude_colorway_hero_bg != blank
       assign hero_bg = settings.fizz_claude_colorway_hero_bg
@@ -81,8 +76,8 @@
     endif
   endunless
 
-  assign statement_bg = paper
-  assign statement_text = ink
+  assign statement_bg = preset_statement_bg
+  assign statement_text = preset_statement_text
   unless settings.fizz_claude_colorway_statement_use_global
     if settings.fizz_claude_colorway_statement_bg != blank
       assign statement_bg = settings.fizz_claude_colorway_statement_bg
@@ -92,9 +87,9 @@
     endif
   endunless
 
-  assign how_bg = ink
-  assign how_text = paper
-  assign how_stroke = accent
+  assign how_bg = preset_how_bg
+  assign how_text = preset_how_text
+  assign how_stroke = preset_how_stroke
   unless settings.fizz_claude_colorway_how_use_global
     if settings.fizz_claude_colorway_how_bg != blank
       assign how_bg = settings.fizz_claude_colorway_how_bg
@@ -107,9 +102,9 @@
     endif
   endunless
 
-  assign footer_bg = ink
-  assign footer_text = paper
-  assign footer_stroke = accent
+  assign footer_bg = preset_footer_bg
+  assign footer_text = preset_footer_text
+  assign footer_stroke = preset_footer_stroke
   unless settings.fizz_claude_colorway_footer_use_global
     if settings.fizz_claude_colorway_footer_bg != blank
       assign footer_bg = settings.fizz_claude_colorway_footer_bg

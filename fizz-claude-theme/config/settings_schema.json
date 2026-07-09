@@ -57,7 +57,11 @@
       },
       {
         "type": "paragraph",
-        "content": "Lime Fizz: high-contrast brand default. Steel Navy: cool monochromatic. Citrus Burst: warm analogous. Berry Night: purple complement. Electric Pool: triadic blue-forward. Arctic Light: inverted light-surface mode."
+        "content": "Lime Fizz: high-contrast brand default. Steel Navy: cool monochromatic. Citrus Burst: warm analogous. Berry Night: purple complement. Electric Pool: triadic blue-forward. Arctic Light: inverted light-surface mode (select only — not a Theme style; Shopify allows max 5 native presets)."
+      },
+      {
+        "type": "paragraph",
+        "content": "Storefront colors apply from the preset select on save. For matching color pickers in this panel, switch Theme style (top of theme editor) to Lime Fizz, Steel Navy, etc. Enable Custom colors to fine-tune individual tokens."
       },
       {
         "type": "checkbox",
@@ -73,45 +77,53 @@
         "type": "color",
         "id": "colorway_accent",
         "label": "Accent",
-        "default": "#c6f24e"
+        "default": "#c6f24e",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "colorway_ink",
         "label": "Ink",
-        "default": "#080a0d"
+        "default": "#080a0d",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "colorway_paper",
         "label": "Paper",
-        "default": "#f2efe7"
+        "default": "#f2efe7",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "colorway_accent_contrast",
         "label": "Accent contrast (text on buttons)",
-        "info": "Leave blank for auto (ink on light accent, paper on dark)"
+        "info": "Leave blank for auto (ink on light accent, paper on dark)",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "colorway_muted_text",
-        "label": "Muted text"
+        "label": "Muted text",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "colorway_surface_elevated",
-        "label": "Elevated surface (cards, PDP stage)"
+        "label": "Elevated surface (cards, PDP stage)",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "colorway_border",
-        "label": "Border / divider"
+        "label": "Border / divider",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "colorway_link_hover",
-        "label": "Link hover"
+        "label": "Link hover",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "header",
@@ -127,19 +139,22 @@
         "type": "color",
         "id": "colorway_hero_bg",
         "label": "Hero background",
-        "default": "#080a0d"
+        "default": "#080a0d",
+        "visible_if": "{{ settings.colorway_hero_use_global == false }}"
       },
       {
         "type": "color",
         "id": "colorway_hero_text",
         "label": "Hero text",
-        "default": "#f2efe7"
+        "default": "#f2efe7",
+        "visible_if": "{{ settings.colorway_hero_use_global == false }}"
       },
       {
         "type": "color",
         "id": "colorway_hero_accent",
         "label": "Hero accent",
-        "default": "#c6f24e"
+        "default": "#c6f24e",
+        "visible_if": "{{ settings.colorway_hero_use_global == false }}"
       },
       {
         "type": "checkbox",
@@ -151,13 +166,15 @@
         "type": "color",
         "id": "colorway_statement_bg",
         "label": "Statement background",
-        "default": "#f2efe7"
+        "default": "#f2efe7",
+        "visible_if": "{{ settings.colorway_statement_use_global == false }}"
       },
       {
         "type": "color",
         "id": "colorway_statement_text",
         "label": "Statement text",
-        "default": "#080a0d"
+        "default": "#080a0d",
+        "visible_if": "{{ settings.colorway_statement_use_global == false }}"
       },
       {
         "type": "checkbox",
@@ -169,19 +186,22 @@
         "type": "color",
         "id": "colorway_how_bg",
         "label": "How background",
-        "default": "#080a0d"
+        "default": "#080a0d",
+        "visible_if": "{{ settings.colorway_how_use_global == false }}"
       },
       {
         "type": "color",
         "id": "colorway_how_text",
         "label": "How text",
-        "default": "#f2efe7"
+        "default": "#f2efe7",
+        "visible_if": "{{ settings.colorway_how_use_global == false }}"
       },
       {
         "type": "color",
         "id": "colorway_how_stroke",
         "label": "How step stroke",
-        "default": "#c6f24e"
+        "default": "#c6f24e",
+        "visible_if": "{{ settings.colorway_how_use_global == false }}"
       },
       {
         "type": "checkbox",
@@ -193,19 +213,22 @@
         "type": "color",
         "id": "colorway_footer_bg",
         "label": "Footer background",
-        "default": "#080a0d"
+        "default": "#080a0d",
+        "visible_if": "{{ settings.colorway_footer_use_global == false }}"
       },
       {
         "type": "color",
         "id": "colorway_footer_text",
         "label": "Footer text",
-        "default": "#f2efe7"
+        "default": "#f2efe7",
+        "visible_if": "{{ settings.colorway_footer_use_global == false }}"
       },
       {
         "type": "color",
         "id": "colorway_footer_stroke",
         "label": "Footer outline stroke",
-        "default": "#c6f24e"
+        "default": "#c6f24e",
+        "visible_if": "{{ settings.colorway_footer_use_global == false }}"
       },
       {
         "type": "header",
@@ -301,22 +324,26 @@
       {
         "type": "color",
         "id": "btn_primary_bg",
-        "label": "Primary button background"
+        "label": "Primary button background",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "btn_primary_text",
-        "label": "Primary button text"
+        "label": "Primary button text",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "btn_outline_border",
-        "label": "Outline button border"
+        "label": "Outline button border",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "btn_outline_text",
-        "label": "Outline button text"
+        "label": "Outline button text",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "select",

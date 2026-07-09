@@ -1,0 +1,16 @@
+---
+description: Require Shopify doc research before architecture plans; maintain research report
+alwaysApply: true
+---
+
+# Shopify research-backed planning
+
+Before proposing theme architecture, preset systems, or merchant workflows:
+
+1. **Verify** against Shopify developer documentation (shopify.dev) via Shopify Dev MCP `search_docs_chunks` or official docs — not training data alone.
+2. **Record** findings in `fizz-claude-theme/design/colorway-presets/SHOPIFY-COLORWAY-RESEARCH.md` (or a topic-specific report in `design/`).
+3. **Never suggest** features documented as impossible, unsupported, or deprecated without stating the limitation and source.
+4. **Distinguish** storefront runtime behavior (Liquid) from theme editor UI behavior (settings_schema / settings_data).
+5. **Note hard limits** explicitly (e.g. max 5 theme presets in `settings_data.json`, no JSON parse in Liquid).
+
+When the user asks for a plan, include a **Research** section citing doc URLs and a **Limitations** section for anything not feasible in theme-only code.

@@ -29,6 +29,9 @@ Legacy aliases `--acc`, `--ink`, `--paper` map to semantic tokens for backward c
 
 Presets apply when **Use custom colors** is off. Enable custom mode to override individual tokens.
 
+**Research & platform limits:** [design/colorway-presets/SHOPIFY-COLORWAY-RESEARCH.md](../colorway-presets/SHOPIFY-COLORWAY-RESEARCH.md)  
+**Preset registry:** [design/colorway-presets/presets.json](../colorway-presets/presets.json)
+
 ## Semantic tokens
 
 | CSS variable | Role |
