@@ -1,0 +1,93 @@
+{
+  "sections": {
+    "main": {
+      "type": "fizz-lifestyle-gallery",
+      "blocks": {
+        "thumb_1": {
+          "type": "thumbnail",
+          "settings": {
+            "fallback_image": "fizz-lifestyle-gallery-poolside"
+          }
+        },
+        "thumb_2": {
+          "type": "thumbnail",
+          "settings": {
+            "fallback_image": "fizz-lifestyle-gallery-commute"
+          }
+        },
+        "thumb_3": {
+          "type": "thumbnail",
+          "settings": {
+            "fallback_image": "fizz-lifestyle-gallery-studio"
+          }
+        },
+        "thumb_4": {
+          "type": "thumbnail",
+          "settings": {
+            "fallback_image": "fizz-lifestyle-gallery-outdoor"
+          }
+        },
+        "row_1": {
+          "type": "gallery_row",
+          "settings": {
+            "label": "Poolside",
+            "title": "Arctic White at golden hour",
+            "body": "A sun-drenched afternoon with crisp bubbles, citrus, and the Fizz bottle in its element.",
+            "link_label": "View more",
+            "fallback_1": "fizz-lifestyle-gallery-poolside",
+            "fallback_2": "fizz-lifestyle-gallery-hero",
+            "fallback_3": "fizz-lifestyle-gallery-outdoor"
+          }
+        },
+        "row_2": {
+          "type": "gallery_row",
+          "settings": {
+            "label": "Commute",
+            "title": "Everyday sparkle on the go",
+            "body": "From desk to trail — hydration that moves with you.",
+            "image_layout": "duo",
+            "fallback_1": "fizz-lifestyle-gallery-commute",
+            "fallback_2": "fizz-lifestyle-gallery-studio"
+          }
+        },
+        "row_3": {
+          "type": "gallery_row",
+          "settings": {
+            "label": "Studio",
+            "title": "The science of sparkle",
+            "body": "Editorial still life exploring texture, light, and carbonation.",
+            "image_layout": "single",
+            "fallback_1": "fizz-lifestyle-gallery-studio"
+          }
+        }
+      },
+      "block_order": [
+        "thumb_1",
+        "thumb_2",
+        "thumb_3",
+        "thumb_4",
+        "row_1",
+        "row_2",
+        "row_3"
+      ],
+      "settings": {
+        "eyebrow": "Lifestyle",
+        "heading": "Fizz culture, rituals, and everyday sparkle",
+        "subheading": "Moments from our community — poolside rituals, commutes, studio shoots, and the stories behind the bubbles.",
+        "hero_fallback": "fizz-lifestyle-gallery-hero",
+        "hero_cta_label": "See more",
+        "mission_text": "We inspire, engage, and challenge creative excellence in contemporary hydration culture, and beyond.",
+        "collection_heading": "Photoshoot collection",
+        "show_filters": true,
+        "show_subscribe": true,
+        "subscribe_heading": "Subscribe now",
+        "subscribe_placeholder": "Email address",
+        "subscribe_button": "Subscribe",
+        "subscribe_fallback": "fizz-lifestyle-gallery-social"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

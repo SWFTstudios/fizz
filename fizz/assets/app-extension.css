@@ -1,0 +1,32 @@
+:root {
+  --nextfil-background-color: #0a1628;
+  --nextfil-success-color: #22c55e;
+  --nextfil-success-background-color: hsl(142deg 66% 95%);
+  --nextfil-warning-color: #faca15;
+  --nextfil-warning-background-color: hsl(47deg 96% 95%);
+  --nextfil-error-color: #ef4444;
+  --nextfil-error-background-color: hsl(0deg 74% 95%);
+  --nextfil-border-width: 1px;
+  --nextfil-border-color: #1e3a5f;
+  --nextfil-border-radius: 8px;
+  --nextfil-button-background-color: #3b82f6;
+  --nextfil-button-background-color-hover: #2563eb;
+  --nextfil-button-text-color: #ffffff;
+  --nextfil-button-text-color-hover: #ffffff;
+  --nextfil-button-border-color: #3b82f6;
+  --nextfil-button-border-color-hover: #2563eb;
+  --nextfil-button-border-width: 0px;
+}
+
+.section--app {
+  color: #e2e8f0;
+}
+
+.section--app .btn-contained {
+  border-radius: 9999px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

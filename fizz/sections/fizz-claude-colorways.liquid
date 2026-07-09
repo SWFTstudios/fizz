@@ -1,0 +1,308 @@
+{% liquid
+  assign product = section.settings.product | default: settings.fizz_claude_bottle_product
+  assign pack_query = section.settings.addon_pack_query | default: 'co2,flavor'
+  assign first_slug = 'steel-navy'
+  assign first_name = 'Navy'
+  assign first_shop_url = routes.all_products_collection_url
+  assign scene_style = section.settings.scene_bg_style | default: 'gradient'
+  assign gradient_angle = section.settings.gradient_angle | default: 165
+  assign sync_scene = section.settings.sync_scene_colors
+  if sync_scene == nil
+    assign sync_scene = true
+  endif
+
+  if product != blank
+    assign first_variant = product.selected_or_first_available_variant
+    assign first_name = first_variant.title
+    assign first_shop_url = product.url | append: '?variant=' | append: first_variant.id
+    if pack_query != blank
+      assign first_shop_url = first_shop_url | append: '&pack=' | append: pack_query
+    endif
+    capture first_slug
+      render 'fizz-color-slug', variant: first_variant
+    endcapture
+    assign first_slug = first_slug | strip
+  endif
+
+  assign cw_bg = section.settings.bg_color | default: '#26344f'
+  assign cw_bg_end = section.settings.bg_gradient_end | default: '#1d2a44'
+  assign cw_btn = section.settings.fallback_btn_color | default: '#c6f24e'
+  assign cw_text = section.settings.text_color | default: '#f2efe7'
+  assign cw_btn_text = '#080a0d'
+
+  if sync_scene
+    assign scene_slug = first_slug
+    assign scene_variant = first_variant
+    assign block_bg = ''
+    assign block_bg_end = ''
+    assign block_btn = ''
+    assign block_text = ''
+    for block in section.blocks
+      if block.type == 'colorway' and block.settings.slug == scene_slug
+        assign block_bg = block.settings.bg_color
+        assign block_bg_end = block.settings.bg_gradient_end
+        assign block_btn = block.settings.btn_color
+        assign block_text = block.settings.text_color
+        break
+      endif
+    endfor
+    capture scene_raw
+      render 'fizz-colorway-scene', slug: scene_slug, variant: scene_variant
+    endcapture
+    assign scene_parts = scene_raw | strip | split: '|'
+    assign cw_bg = block_bg | default: scene_parts[0]
+    assign cw_bg_end = block_bg_end | default: scene_parts[1]
+    assign cw_btn = block_btn | default: scene_parts[2]
+    assign cw_text = block_text | default: scene_parts[3]
+    assign cw_btn_text = scene_parts[5]
+  endif
+
+  if scene_style == 'gradient'
+    assign ways_bg = 'linear-gradient(' | append: gradient_angle | append: 'deg, ' | append: cw_bg | append: ', ' | append: cw_bg_end | append: ')'
+  else
+    assign ways_bg = cw_bg
+  endif
+
+  assign ways_accent = 'var(--color-accent)'
+  unless section.settings.use_theme_accent
+    assign ways_accent = cw_btn
+  endunless
+%}
+
+<div
+  class="ways"
+  id="colors"
+  data-way
+  data-screen-label="Colorways"
+  data-scene-style="{{ scene_style }}"
+  data-gradient-angle="{{ gradient_angle }}"
+  data-sync-scene="{% if sync_scene %}true{% else %}false{% endif %}"
+  style="background:{{ ways_bg }};color:{{ cw_text }};--ways-accent:{{ ways_accent }};--ways-btn-bg:{{ cw_btn }};--ways-btn-text:{{ cw_btn_text }}"
+>
+  <p class="mono wayhead">{{ section.settings.eyebrow }}</p>
+  <p class="anton wayname" data-way-name>{{ first_name }}</p>
+
+  <div class="waybotr" data-way-bg-wrap>
+    {% render 'fizz-bottle-product-img',
+      color_slug: first_slug,
+      alt: first_name,
+      class: 'botimg',
+      data_photo: true,
+      loading: 'eager',
+      width: 170,
+      height: 430
+    %}
+  </div>
+
+  <div class="wayui">
+    <div class="swrow">
+      {% if product != blank %}
+        {% for variant in product.variants %}
+          {% capture slug %}
+            {% render 'fizz-color-slug', variant: variant %}
+          {% endcapture %}
+          {% assign slug = slug | strip %}
+          {% assign variant_url = product.url | append: '?variant=' | append: variant.id %}
+          {% if pack_query != blank %}
+            {% assign variant_url = variant_url | append: '&pack=' | append: pack_query %}
+          {% endif %}
+
+          {% liquid
+            assign sw_bg = ''
+            assign sw_bg_end = ''
+            assign sw_btn = ''
+            assign sw_text = ''
+            for block in section.blocks
+              if block.type == 'colorway' and block.settings.slug == slug
+                assign sw_bg = block.settings.bg_color
+                assign sw_bg_end = block.settings.bg_gradient_end
+                assign sw_btn = block.settings.btn_color
+                assign sw_text = block.settings.text_color
+                break
+              endif
+            endfor
+            capture sw_scene_raw
+              render 'fizz-colorway-scene', slug: slug, variant: variant
+            endcapture
+            assign sw_parts = sw_scene_raw | strip | split: '|'
+            assign sw_bg = sw_bg | default: sw_parts[0]
+            assign sw_bg_end = sw_bg_end | default: sw_parts[1]
+            assign sw_btn = sw_btn | default: sw_parts[2]
+            assign sw_text = sw_text | default: sw_parts[3]
+            assign sw_swatch = sw_parts[4]
+            assign sw_btn_text = sw_parts[5]
+          %}
+
+          <a
+            href="{{ variant_url }}"
+            class="sw {% if forloop.first %}on{% endif %}"
+            data-way-swatch
+            data-target="#colors"
+            data-name="{{ variant.title }}"
+            data-color="{{ sw_swatch }}"
+            data-scene-bg="{{ sw_bg }}"
+            data-scene-bg-end="{{ sw_bg_end }}"
+            data-scene-btn="{{ sw_btn }}"
+            data-scene-btn-text="{{ sw_btn_text }}"
+            data-scene-text="{{ sw_text }}"
+            data-image="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}"
+            data-variant-id="{{ variant.id }}"
+            data-shop-url="{{ variant_url }}"
+            style="background:{{ sw_swatch }}"
+            title="{{ variant.title }}"
+            aria-label="{{ variant.title }}"
+          ></a>
+        {% endfor %}
+      {% else %}
+        {% assign demo = "Navy,steel-navy|Ocean,electric-blue|Citrus,coral-orange|Fern,sage-green|Onyx,charcoal-black|Cloud,arctic-white" | split: "|" %}
+        {% for c in demo %}
+          {% assign parts = c | split: "," %}
+          {% assign demo_slug = parts[1] %}
+          {% capture sw_scene_raw %}
+            {% render 'fizz-colorway-scene', slug: demo_slug %}
+          {% endcapture %}
+          {% assign sw_parts = sw_scene_raw | strip | split: '|' %}
+          <button
+            type="button"
+            class="sw {% if forloop.first %}on{% endif %}"
+            data-way-swatch
+            data-target="#colors"
+            data-name="{{ parts[0] }}"
+            data-color="{{ sw_parts[4] }}"
+            data-scene-bg="{{ sw_parts[0] }}"
+            data-scene-bg-end="{{ sw_parts[1] }}"
+            data-scene-btn="{{ sw_parts[2] }}"
+            data-scene-btn-text="{{ sw_parts[5] }}"
+            data-scene-text="{{ sw_parts[3] }}"
+            data-image="{{ 'fizz-bottle-product-' | append: demo_slug | append: '.png' | asset_url }}"
+            data-shop-url="{{ first_shop_url }}"
+            style="background:{{ sw_parts[4] }}"
+            title="{{ parts[0] }}"
+            aria-label="{{ parts[0] }}"
+          ></button>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <p class="waylabel">
+      <span data-way-bigname>{{ first_name }}</span>
+      — {% if product %}{{ product.price | money }}{% else %}$89{% endif %} · free shipping
+    </p>
+
+    <a class="waycta bigcta" data-way-cta href="{{ first_shop_url }}" style="background:var(--ways-btn-bg);color:var(--ways-btn-text)">
+      {{ section.settings.cta_label | default: 'Shop this colorway' }}
+    </a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Colorways",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The bottle — six colorways" },
+    { "type": "product", "id": "product", "label": "Bottle product" },
+    { "type": "text", "id": "cta_label", "label": "CTA label", "default": "Shop this colorway" },
+    { "type": "text", "id": "addon_pack_query", "label": "PDP add-on highlight (URL param)", "default": "co2,flavor", "info": "Matches data-addon-key on Product section blocks. Example: co2,flavor" },
+    {
+      "type": "header",
+      "content": "Scene colors"
+    },
+    {
+      "type": "checkbox",
+      "id": "sync_scene_colors",
+      "label": "Match background and CTA to active colorway",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "scene_bg_style",
+      "label": "Background style",
+      "options": [
+        { "value": "gradient", "label": "Gradient" },
+        { "value": "solid", "label": "Solid" }
+      ],
+      "default": "gradient"
+    },
+    {
+      "type": "range",
+      "id": "gradient_angle",
+      "min": 0,
+      "max": 360,
+      "step": 15,
+      "unit": "deg",
+      "label": "Gradient angle",
+      "default": 165
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fallback background (when sync off)",
+      "default": "#26344f"
+    },
+    {
+      "type": "color",
+      "id": "bg_gradient_end",
+      "label": "Fallback gradient end",
+      "default": "#1d2a44"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Fallback text color",
+      "default": "#f2efe7"
+    },
+    {
+      "type": "color",
+      "id": "fallback_btn_color",
+      "label": "Fallback CTA color",
+      "default": "#c6f24e"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_theme_accent",
+      "label": "Use theme accent for swatch rings",
+      "default": false,
+      "info": "When off, active swatch ring matches the colorway CTA color"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "colorway",
+      "name": "Colorway scene override",
+      "settings": [
+        {
+          "type": "select",
+          "id": "slug",
+          "label": "Bottle colorway",
+          "options": [
+            { "value": "steel-navy", "label": "Steel Navy" },
+            { "value": "electric-blue", "label": "Electric Blue" },
+            { "value": "coral-orange", "label": "Coral Orange" },
+            { "value": "sage-green", "label": "Sage Green" },
+            { "value": "charcoal-black", "label": "Charcoal Black" },
+            { "value": "arctic-white", "label": "Arctic White" }
+          ],
+          "default": "steel-navy"
+        },
+        { "type": "color", "id": "bg_color", "label": "Background start" },
+        { "type": "color", "id": "bg_gradient_end", "label": "Background end (gradient)" },
+        { "type": "color", "id": "btn_color", "label": "CTA button color" },
+        { "type": "color", "id": "text_color", "label": "Section text color" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Colorways",
+      "blocks": [
+        { "type": "colorway", "settings": { "slug": "steel-navy", "bg_color": "#0f1a2e", "bg_gradient_end": "#26344f", "btn_color": "#1d2a44" } },
+        { "type": "colorway", "settings": { "slug": "electric-blue", "bg_color": "#061018", "bg_gradient_end": "#2f6fd6", "btn_color": "#2f6fd6" } },
+        { "type": "colorway", "settings": { "slug": "coral-orange", "bg_color": "#1a0f08", "bg_gradient_end": "#f07a2e", "btn_color": "#f07a2e" } },
+        { "type": "colorway", "settings": { "slug": "sage-green", "bg_color": "#0a1a12", "bg_gradient_end": "#2e8b57", "btn_color": "#2e8b57" } },
+        { "type": "colorway", "settings": { "slug": "charcoal-black", "bg_color": "#080a0d", "bg_gradient_end": "#16161a", "btn_color": "#c6f24e" } },
+        { "type": "colorway", "settings": { "slug": "arctic-white", "bg_color": "#d4d3cc", "bg_gradient_end": "#efeee8", "btn_color": "#080a0d", "text_color": "#080a0d" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

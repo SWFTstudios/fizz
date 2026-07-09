@@ -1,0 +1,278 @@
+{% liquid
+  assign co2_collection_url = '/collections/co2-canisters'
+%}
+<div class="nextfil-flex nextfil-flex-1 nextfil-flex-col nextfil-pt-6 nextfil-px-4 laptop:nextfil-pt-8 laptop:nextfil-px-10 nextfil-pb-12">
+  <div class="nextfil-grid nextfil-grid-cols-12 nextfil-gap-x-4 laptop:nextfil-gap-x-8 nextfil-gap-y-16">
+    {% if customer.orders.size == 0 %}
+      <div class="nextfil-col-span-12">
+        <div class="nextfil-flex nextfil-flex-col nextfil-items-center nextfil-max-w-80 nextfil-mx-auto nextfil-text-center nextfil-mt-12">
+          {% if section.settings.no_orders_image != blank %}
+            {{
+              section.settings.no_orders_image
+              | image_url: width: 96, height: 96
+              | image_tag
+            }}
+          {% endif %}
+          <h1 class="text-blue-900 text-paragraph-l font-semibold mb-2">{{ section.settings.no_orders_title }}</h1>
+          <p class="text-center text-gray-600 text-sm mb-6">
+            {{ section.settings.no_orders_description }}
+          </p>
+          <a
+            href="{% if section.settings.no_orders_button_link != blank %}{{ section.settings.no_orders_button_link }}{% else %}{{ co2_collection_url }}{% endif %}"
+            class="btn btn-lg btn-contained w-full"
+          >
+            {{ section.settings.no_orders_button_text }}
+          </a>
+        </div>
+      </div>
+    {% else %}
+      {% for block in section.blocks %}
+        {% render block %}
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    background-color: {{ section.settings.color_background }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-right: {{ section.settings.padding_right }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    padding-left: {{ section.settings.padding_left }}px;
+    --nextfil-background-color: {{ section.settings.color_background }};
+    --nextfil-success-color: {{ section.settings.color_success }};
+    --nextfil-warning-color: {{ section.settings.color_warning }};
+    --nextfil-error-color: {{ section.settings.color_error }};
+    --nextfil-border-width: {{ section.settings.border_width }}px;
+    --nextfil-border-color: {{ section.settings.border_color }};
+    --nextfil-border-radius: {{ section.settings.border_radius }}px;
+    --nextfil-shadow: {{ section.settings.shadow_x_offset }}px {{ section.settings.shadow_y_offset }}px {{ section.settings.shadow_blur_radius }}px {{ section.settings.shadow_color }};
+    --nextfil-button-background-color: {{ section.settings.button_background_color }};
+    --nextfil-button-background-color-hover: {{ section.settings.button_background_color_hover }};
+    --nextfil-button-text-color: {{ section.settings.button_text_color }};
+    --nextfil-button-text-color-hover: {{ section.settings.button_text_color_hover }};
+    --nextfil-button-border-color: {{ section.settings.button_border_color }};
+    --nextfil-button-border-color-hover: {{ section.settings.button_border_color_hover }};
+    --nextfil-button-border-width: {{ section.settings.button_border_width }}px;
+    {{ section.settings.liquid }}
+  }
+{% endstyle %}
+
+{% javascript %}
+  const toggleSkeleton = '{{ section.settings.toggle_skeleton }}';
+  const skeletonLoader = document.getElementById('skeleton-loader');
+  if (toggleSkeleton === 'false' && skeletonLoader) {
+    skeletonLoader.classList.add('hidden');
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Nextfil App Wrapper",
+  "class": "section--app",
+  "settings": [
+    {
+      "type": "header",
+      "content": "No orders state"
+    },
+    {
+      "type": "image_picker",
+      "id": "no_orders_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "no_orders_title",
+      "label": "Title",
+      "default": "Ready to Get Fizzy?"
+    },
+    {
+      "type": "textarea",
+      "id": "no_orders_description",
+      "label": "Description",
+      "default": "Order your first Fizz Charge 6-pack to start on-demand CO₂ refills for $10 whenever you run low."
+    },
+    {
+      "type": "text",
+      "id": "no_orders_button_text",
+      "label": "Button text",
+      "default": "Shop CO₂ refills"
+    },
+    {
+      "type": "url",
+      "id": "no_orders_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_background",
+      "label": "Background",
+      "default": "#0a1628"
+    },
+    {
+      "type": "color",
+      "id": "color_success",
+      "label": "Success",
+      "default": "#28a745"
+    },
+    {
+      "type": "color",
+      "id": "color_error",
+      "label": "Error",
+      "default": "#dc3545"
+    },
+    {
+      "type": "color",
+      "id": "color_warning",
+      "label": "Warning",
+      "default": "#ffc107"
+    },
+    {
+      "type": "header",
+      "content": "Border and shadow"
+    },
+    {
+      "type": "number",
+      "id": "border_radius",
+      "label": "Border radius (px)",
+      "default": 8
+    },
+    {
+      "type": "number",
+      "id": "border_width",
+      "label": "Border width (px)",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#1e3a5f"
+    },
+    {
+      "type": "number",
+      "id": "shadow_x_offset",
+      "label": "Shadow X offset",
+      "default": 0
+    },
+    {
+      "type": "number",
+      "id": "shadow_y_offset",
+      "label": "Shadow Y offset",
+      "default": 4
+    },
+    {
+      "type": "number",
+      "id": "shadow_blur_radius",
+      "label": "Shadow blur",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Shadow color",
+      "default": "#00000033"
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Button background",
+      "default": "#3b82f6"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color_hover",
+      "label": "Button background hover",
+      "default": "#2563eb"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color_hover",
+      "label": "Button text hover",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Button border",
+      "default": "#3b82f6"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color_hover",
+      "label": "Button border hover",
+      "default": "#2563eb"
+    },
+    {
+      "type": "number",
+      "id": "button_border_width",
+      "label": "Button border width",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "toggle_skeleton",
+      "label": "Show loading animation",
+      "default": true
+    },
+    {
+      "type": "number",
+      "id": "padding_top",
+      "label": "Padding top",
+      "default": 36
+    },
+    {
+      "type": "number",
+      "id": "padding_right",
+      "label": "Padding right",
+      "default": 0
+    },
+    {
+      "type": "number",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "default": 36
+    },
+    {
+      "type": "number",
+      "id": "padding_left",
+      "label": "Padding left",
+      "default": 0
+    },
+    {
+      "type": "liquid",
+      "id": "liquid",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Nextfil App Wrapper"
+    }
+  ]
+}
+{% endschema %}

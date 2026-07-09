@@ -1,0 +1,91 @@
+{% liquid
+  assign bottle = settings.fizz_claude_bottle_product
+  assign shop_url = routes.all_products_collection_url
+  assign shop_price = '$89'
+  if bottle != blank
+    assign shop_url = bottle.url
+    assign shop_price = bottle.price | money
+  endif
+
+  assign nav_glass = true
+  if settings.fizz_claude_nav_glass_enabled == false
+    assign nav_glass = false
+  endif
+
+  assign tint = settings.fizz_claude_nav_tint_color | default: '#080a0d'
+  assign tint_opacity = settings.fizz_claude_nav_tint_opacity | default: 55 | times: 1.0 | divided_by: 100.0
+  assign nav_blur = settings.fizz_claude_nav_blur | default: 16
+  assign border_opacity = settings.fizz_claude_nav_border_opacity | default: 15 | times: 1.0 | divided_by: 100.0
+  assign blend_mode = settings.fizz_claude_nav_blend_mode | default: 'difference'
+  assign logo_max_h = settings.fizz_claude_nav_logo_max_height | default: 24
+  assign logo_max_w = settings.fizz_claude_nav_logo_max_width | default: 160
+
+  if settings.fizz_claude_nav_sync_colorway_tint
+    assign sync_ink = 'var(--color-ink)'
+    unless settings.fizz_claude_colorway_hero_use_global
+      if settings.fizz_claude_colorway_hero_bg != blank
+        assign sync_ink = settings.fizz_claude_colorway_hero_bg
+      endif
+    endunless
+    assign tint_pct = tint_opacity | times: 100 | round
+    if settings.fizz_claude_nav_gradient_enabled
+      assign grad_angle = settings.fizz_claude_nav_gradient_angle | default: 180
+      assign nav_bg = 'linear-gradient(' | append: grad_angle | append: 'deg, color-mix(in srgb, ' | append: sync_ink | append: ' ' | append: tint_pct | append: '%, transparent), color-mix(in srgb, var(--color-surface-elevated) ' | append: tint_pct | append: '%, transparent))'
+    else
+      assign nav_bg = 'color-mix(in srgb, ' | append: sync_ink | append: ' ' | append: tint_pct | append: '%, transparent)'
+    endif
+  elsif settings.fizz_claude_nav_gradient_enabled
+    assign grad_start = settings.fizz_claude_nav_gradient_start | default: '#080a0d' | color_modify: 'alpha', tint_opacity
+    assign grad_end = settings.fizz_claude_nav_gradient_end | default: '#1a2230' | color_modify: 'alpha', tint_opacity
+    assign grad_angle = settings.fizz_claude_nav_gradient_angle | default: 180
+    assign nav_bg = 'linear-gradient(' | append: grad_angle | append: 'deg, ' | append: grad_start | append: ', ' | append: grad_end | append: ')'
+  else
+    assign nav_bg = tint | color_modify: 'alpha', tint_opacity
+  endif
+
+  assign nav_classes = 'fizz-nav'
+  if nav_glass
+    assign nav_classes = nav_classes | append: ' fizz-nav--glass'
+  endif
+%}
+
+<div
+  class="{{ nav_classes }}"
+  style="
+    --nav-logo-h: {{ logo_max_h }}px;
+    --nav-logo-w: {{ logo_max_w }}px;
+    --nav-blur: {{ nav_blur }}px;
+    --nav-border-opacity: {{ border_opacity }};
+    --nav-bg: {{ nav_bg }};
+    --nav-blend-mode: {{ blend_mode }};
+  "
+>
+  <a href="{{ routes.root_url }}" class="fizz-nav__logo-link">
+    {% if settings.fizz_claude_nav_logo != blank %}
+      <img
+        src="{{ settings.fizz_claude_nav_logo | image_url: width: 600 }}"
+        class="logo{% if settings.fizz_claude_nav_logo_invert %} logo--invert{% endif %}"
+        alt="{{ shop.name | escape }}"
+        width="{{ settings.fizz_claude_nav_logo.width }}"
+        height="{{ settings.fizz_claude_nav_logo.height }}"
+        loading="eager"
+      >
+    {% else %}
+      <img
+        src="{{ 'fizz-claude-logo.avif' | asset_url }}"
+        class="logo logo--invert"
+        alt="{{ shop.name | escape }}"
+        width="120"
+        height="32"
+        loading="eager"
+      >
+    {% endif %}
+  </a>
+  <div class="navl">
+    <a href="{% if template.name == 'product' %}#buy{% else %}{{ shop_url }}{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>Bottle</a>
+    <a href="{% if template.name == 'index' %}#how{% else %}{{ routes.root_url }}#how{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>How it works</a>
+    <a href="{% if template.name == 'index' %}#colors{% else %}{{ routes.root_url }}#colors{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>Colorways</a>
+    <a href="{% if template.name == 'index' %}#flavors{% else %}{{ routes.root_url }}#flavors{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>Flavors</a>
+  </div>
+  <a class="navcta" href="{{ shop_url }}">Shop — {{ shop_price }}</a>
+</div>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}" class="fizz-html">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+    <link rel="canonical" href="{{ canonical_url }}">
+    {{ content_for_header }}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    {{ 'fizz-fonts.css' | asset_url | stylesheet_tag }}
+    {{ 'fizz-base.css' | asset_url | stylesheet_tag }}
+    {% render 'fizz-theme-tokens' %}
+  </head>
+
+  <body class="fizz overflow-x-hidden">
+    {% render 'fizz-nav' %}
+
+    <main id="main-content">
+      {{ content_for_layout }}
+    </main>
+
+    <div class="grain" aria-hidden="true"></div>
+    <script src="{{ 'fizz.js' | asset_url }}" defer></script>
+    <script src="{{ 'fizz-transition.js' | asset_url }}" defer></script>
+  </body>
+</html>

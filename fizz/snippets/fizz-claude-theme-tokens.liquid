@@ -1,0 +1,276 @@
+{% comment %}
+  Global colorway design tokens — presets, semantic colors, typography, section surfaces.
+{% endcomment %}
+{% liquid
+  assign preset = settings.fizz_claude_colorway_preset | default: 'lime_fizz'
+  assign accent = '#c6f24e'
+  assign ink = '#080a0d'
+  assign paper = '#f2efe7'
+
+  case preset
+    when 'steel_navy'
+      assign accent = '#6b9fd4'
+      assign ink = '#0f1a2e'
+      assign paper = '#e8edf5'
+    when 'citrus_burst'
+      assign accent = '#f07a2e'
+      assign ink = '#1a0f08'
+      assign paper = '#f5ebe0'
+    when 'berry_night'
+      assign accent = '#c86bff'
+      assign ink = '#120818'
+      assign paper = '#f0e8f5'
+    when 'electric_pool'
+      assign accent = '#2f6fd6'
+      assign ink = '#061018'
+      assign paper = '#e6f0fa'
+    when 'arctic_light'
+      assign accent = '#9ed12f'
+      assign ink = '#f2efe7'
+      assign paper = '#080a0d'
+  endcase
+
+  if settings.fizz_claude_colorway_custom_enabled
+    assign accent = settings.fizz_claude_colorway_accent | default: accent
+    assign ink = settings.fizz_claude_colorway_ink | default: ink
+    assign paper = settings.fizz_claude_colorway_paper | default: paper
+  endif
+
+  assign accent_brightness = accent | color_brightness
+  if accent_brightness > 128
+    assign accent_contrast = ink
+  else
+    assign accent_contrast = paper
+  endif
+  if settings.fizz_claude_colorway_custom_enabled and settings.fizz_claude_colorway_accent_contrast != blank
+    assign accent_contrast = settings.fizz_claude_colorway_accent_contrast
+  endif
+
+  assign on_surface_muted = paper | color_modify: 'alpha', 0.65
+  if settings.fizz_claude_colorway_custom_enabled and settings.fizz_claude_colorway_muted_text != blank
+    assign on_surface_muted = settings.fizz_claude_colorway_muted_text
+  endif
+
+  assign surface_elevated = ink | color_modify: 'lighten', 8
+  if settings.fizz_claude_colorway_custom_enabled and settings.fizz_claude_colorway_surface_elevated != blank
+    assign surface_elevated = settings.fizz_claude_colorway_surface_elevated
+  endif
+
+  assign border_color = paper | color_modify: 'alpha', 0.16
+  if settings.fizz_claude_colorway_custom_enabled and settings.fizz_claude_colorway_border != blank
+    assign border_color = settings.fizz_claude_colorway_border
+  endif
+
+  assign link_hover = accent
+  if settings.fizz_claude_colorway_custom_enabled and settings.fizz_claude_colorway_link_hover != blank
+    assign link_hover = settings.fizz_claude_colorway_link_hover
+  endif
+
+  assign hero_bg = ink
+  assign hero_text = paper
+  assign hero_accent = accent
+  unless settings.fizz_claude_colorway_hero_use_global
+    if settings.fizz_claude_colorway_hero_bg != blank
+      assign hero_bg = settings.fizz_claude_colorway_hero_bg
+    endif
+    if settings.fizz_claude_colorway_hero_text != blank
+      assign hero_text = settings.fizz_claude_colorway_hero_text
+    endif
+    if settings.fizz_claude_colorway_hero_accent != blank
+      assign hero_accent = settings.fizz_claude_colorway_hero_accent
+    endif
+  endunless
+
+  assign statement_bg = paper
+  assign statement_text = ink
+  unless settings.fizz_claude_colorway_statement_use_global
+    if settings.fizz_claude_colorway_statement_bg != blank
+      assign statement_bg = settings.fizz_claude_colorway_statement_bg
+    endif
+    if settings.fizz_claude_colorway_statement_text != blank
+      assign statement_text = settings.fizz_claude_colorway_statement_text
+    endif
+  endunless
+
+  assign how_bg = ink
+  assign how_text = paper
+  assign how_stroke = accent
+  unless settings.fizz_claude_colorway_how_use_global
+    if settings.fizz_claude_colorway_how_bg != blank
+      assign how_bg = settings.fizz_claude_colorway_how_bg
+    endif
+    if settings.fizz_claude_colorway_how_text != blank
+      assign how_text = settings.fizz_claude_colorway_how_text
+    endif
+    if settings.fizz_claude_colorway_how_stroke != blank
+      assign how_stroke = settings.fizz_claude_colorway_how_stroke
+    endif
+  endunless
+
+  assign footer_bg = ink
+  assign footer_text = paper
+  assign footer_stroke = accent
+  unless settings.fizz_claude_colorway_footer_use_global
+    if settings.fizz_claude_colorway_footer_bg != blank
+      assign footer_bg = settings.fizz_claude_colorway_footer_bg
+    endif
+    if settings.fizz_claude_colorway_footer_text != blank
+      assign footer_text = settings.fizz_claude_colorway_footer_text
+    endif
+    if settings.fizz_claude_colorway_footer_stroke != blank
+      assign footer_stroke = settings.fizz_claude_colorway_footer_stroke
+    endif
+  endunless
+
+  assign pdp_stage_bg = surface_elevated
+  assign pdp_text = paper
+
+  assign font_display = settings.fizz_claude_font_display | default: 'anton'
+  assign font_body = settings.fizz_claude_font_body | default: 'archivo'
+  assign font_accent = settings.fizz_claude_font_accent | default: 'bodoni'
+  assign font_label = settings.fizz_claude_font_label | default: 'jetbrains'
+
+  case font_display
+    when 'system'
+      assign font_display_stack = 'system-ui, sans-serif'
+    else
+      assign font_display_stack = 'Anton, sans-serif'
+  endcase
+
+  case font_body
+    when 'system'
+      assign font_body_stack = 'system-ui, sans-serif'
+    else
+      assign font_body_stack = 'Archivo, sans-serif'
+  endcase
+
+  case font_accent
+    when 'system'
+      assign font_accent_stack = 'Georgia, serif'
+    else
+      assign font_accent_stack = "'Bodoni Moda', serif"
+  endcase
+
+  case font_label
+    when 'system'
+      assign font_label_stack = 'ui-monospace, monospace'
+    else
+      assign font_label_stack = "'JetBrains Mono', monospace"
+  endcase
+
+  assign hero_scale = settings.fizz_claude_typo_hero_scale | default: 100 | times: 1.0 | divided_by: 100.0
+  assign body_size = settings.fizz_claude_typo_body_size | default: 16
+  assign label_spacing = settings.fizz_claude_typo_label_spacing | default: 16 | times: 1.0 | divided_by: 100.0
+  assign nav_uppercase = settings.fizz_claude_typo_nav_uppercase
+  assign accent_italic = settings.fizz_claude_typo_accent_italic
+  assign btn_radius = settings.fizz_claude_btn_radius | default: 'pill'
+  assign btn_hover_scale = settings.fizz_claude_btn_hover_scale | default: 105 | times: 1.0 | divided_by: 100.0
+
+  assign btn_primary_bg = accent
+  assign btn_primary_text = accent_contrast
+  if settings.fizz_claude_colorway_custom_enabled
+    if settings.fizz_claude_btn_primary_bg != blank
+      assign btn_primary_bg = settings.fizz_claude_btn_primary_bg
+    endif
+    if settings.fizz_claude_btn_primary_text != blank
+      assign btn_primary_text = settings.fizz_claude_btn_primary_text
+    endif
+  endif
+
+  assign btn_outline_border = paper | color_modify: 'alpha', 0.65
+  assign btn_outline_text = paper
+  if settings.fizz_claude_colorway_custom_enabled
+    if settings.fizz_claude_btn_outline_border != blank
+      assign btn_outline_border = settings.fizz_claude_btn_outline_border
+    endif
+    if settings.fizz_claude_btn_outline_text != blank
+      assign btn_outline_text = settings.fizz_claude_btn_outline_text
+    endif
+  endif
+
+  assign hero_bubble = hero_text | color_modify: 'alpha', 0.22
+  assign how_bubble = hero_accent | color_modify: 'alpha', 0.4
+  assign footer_bubble = footer_text | color_modify: 'alpha', 0.16
+
+  assign btn_radius_px = '999px'
+  if btn_radius == 'rounded'
+    assign btn_radius_px = '12px'
+  endif
+%}
+
+{% style %}
+  :root {
+    --color-accent: {{ accent }};
+    --color-accent-contrast: {{ accent_contrast }};
+    --color-ink: {{ ink }};
+    --color-paper: {{ paper }};
+    --color-surface: {{ ink }};
+    --color-on-surface: {{ paper }};
+    --color-on-surface-muted: {{ on_surface_muted }};
+    --color-surface-elevated: {{ surface_elevated }};
+    --color-border: {{ border_color }};
+    --color-outline-stroke: {{ paper }};
+    --color-link-hover: {{ link_hover }};
+
+    --hero-bg: {{ hero_bg }};
+    --hero-text: {{ hero_text }};
+    --hero-accent: {{ hero_accent }};
+    --hero-bubble-color: {{ hero_bubble }};
+
+    --statement-bg: {{ statement_bg }};
+    --statement-text: {{ statement_text }};
+
+    --how-bg: {{ how_bg }};
+    --how-text: {{ how_text }};
+    --how-step-stroke: {{ how_stroke }};
+    --how-bubble-color: {{ how_bubble }};
+
+    --footer-bg: {{ footer_bg }};
+    --footer-text: {{ footer_text }};
+    --footer-stroke: {{ footer_stroke }};
+    --footer-bubble-color: {{ footer_bubble }};
+
+    --pdp-stage-bg: {{ pdp_stage_bg }};
+    --pdp-text: {{ pdp_text }};
+
+    --font-display: {{ font_display_stack }};
+    --font-body: {{ font_body_stack }};
+    --font-accent: {{ font_accent_stack }};
+    --font-label: {{ font_label_stack }};
+    --typo-hero-scale: {{ hero_scale }};
+    --typo-body-size: {{ body_size }}px;
+    --typo-label-spacing: {{ label_spacing }}em;
+
+    --btn-primary-bg: {{ btn_primary_bg }};
+    --btn-primary-text: {{ btn_primary_text }};
+    --btn-outline-border: {{ btn_outline_border }};
+    --btn-outline-text: {{ btn_outline_text }};
+    --btn-radius: {{ btn_radius_px }};
+    --btn-hover-scale: {{ btn_hover_scale }};
+
+    --acc: var(--color-accent);
+    --ink: var(--color-ink);
+    --paper: var(--color-paper);
+  }
+
+  {% if nav_uppercase %}
+  .fizz-nav .navl a,
+  .fizz-nav .navcta {
+    text-transform: uppercase;
+  }
+  {% else %}
+  .fizz-nav .navl a,
+  .fizz-nav .navcta {
+    text-transform: none;
+  }
+  {% endif %}
+
+  {% unless accent_italic %}
+  .serif,
+  .fname,
+  .ptag,
+  .stx {
+    font-style: normal;
+  }
+  {% endunless %}
+{% endstyle %}

@@ -1,0 +1,92 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% if section.settings.text != blank %}
+  <div class="fizz-promo">{{ section.settings.text }}</div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Fizz promo strip",
+  "tag": "section",
+  "class": "fizz-promo-section fizz-section--spaced fizz-section--compact",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "compact"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Promo text",
+      "default": "Free shipping on orders $50+"
+    },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [{ "name": "Fizz promo strip" }]
+}
+{% endschema %}

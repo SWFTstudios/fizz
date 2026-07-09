@@ -1,0 +1,82 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign collection = collections[section.settings.collection]
+  assign product_limit = section.settings.product_limit | default: 6
+  assign expand_variants = section.settings.expand_variants
+%}
+
+<section class="ss-section" aria-label="{{ section.settings.heading | escape }}">
+  <div class="ss-container">
+    <div class="ss-section-head">
+      <h2 class="ss-h2" data-ss-trigger="scroll" data-ss-split="words" data-ss-duration="0.35">
+        {{ section.settings.heading }}
+      </h2>
+      {% if section.settings.view_all_label != blank %}
+        <a class="ss-link" href="{{ section.settings.view_all_url | default: collection.url | default: routes.all_products_collection_url }}">
+          {{ section.settings.view_all_label }}
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="ss-product-grid" data-ss-stagger>
+      {% if collection != blank and collection.products_count > 0 %}
+        {% assign shown = 0 %}
+        {% for product in collection.products %}
+          {% if expand_variants and product.variants.size > 1 %}
+            {% for variant in product.variants %}
+              {% if shown >= product_limit %}{% break %}{% endif %}
+              {% render 'fizz-ss-product-card', product: product, variant: variant, badge: section.settings.badge %}
+              {% assign shown = shown | plus: 1 %}
+            {% endfor %}
+          {% else %}
+            {% if shown >= product_limit %}{% break %}{% endif %}
+            {% render 'fizz-ss-product-card', product: product, badge: section.settings.badge %}
+            {% assign shown = shown | plus: 1 %}
+          {% endif %}
+          {% if shown >= product_limit %}{% break %}{% endif %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..6) %}
+          <div class="ss-product-card">
+            <div class="ss-product-card__media">
+              <span class="ss-product-card__badge">{{ section.settings.badge }}</span>
+            </div>
+            <h3 class="ss-product-card__title">Product {{ i }}</h3>
+            <div class="ss-product-card__meta"><span>$0.00</span></div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SS Product lineup",
+  "tag": "section",
+  "class": "fizz-ss-product-lineup fizz-section--spaced fizz-section--relaxed",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The lineup" },
+    { "type": "text", "id": "view_all_label", "label": "View all label", "default": "View all" },
+    { "type": "url", "id": "view_all_url", "label": "View all URL" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "product_limit", "min": 3, "max": 12, "step": 1, "label": "Product limit", "default": 6 },
+    { "type": "checkbox", "id": "expand_variants", "label": "Show variants as cards", "default": true },
+    { "type": "text", "id": "badge", "label": "Card badge", "default": "Best seller" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" }
+      ],
+      "default": "relaxed"
+    },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [{ "name": "SS Product lineup" }]
+}
+{% endschema %}

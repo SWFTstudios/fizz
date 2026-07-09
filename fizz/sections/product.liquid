@@ -1,0 +1,71 @@
+{% comment %}
+  Default product section — used only by product.json.
+  Products with a custom template suffix redirect away from ?view=__DEFAULT__ admin links.
+{% endcomment %}
+
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign use_custom_redirect = false
+  if product.template_suffix != blank and request.design_mode == false
+    if request.query_string contains 'view=__DEFAULT__'
+      assign use_custom_redirect = true
+    endif
+  endif
+%}
+
+{% if use_custom_redirect %}
+  <script>window.location.replace({{ product.url | json }});</script>
+  <p class="fizz-pdp-redirect">
+    <a href="{{ product.url }}">View the {{ product.title }} product page</a>
+  </p>
+{% else %}
+  <div class="product-images">
+    {% for image in product.images %}
+      {% render 'image', class: 'product-image', image: image %}
+    {% endfor %}
+  </div>
+
+  <div class="product-info">
+    <h1>{{ product.title }}</h1>
+    <p>{{ product.price | money }}</p>
+    <p>{{ product.description }}</p>
+  </div>
+
+  <div class="product-form">
+    {% form 'product', product %}
+      {% assign current_variant = product.selected_or_first_available_variant %}
+
+      <select name="id">
+        {% for variant in product.variants %}
+          <option
+            value="{{ variant.id }}"
+            {% if variant == current_variant %}
+              selected="selected"
+            {% endif %}
+          >
+            {{ variant.title }} - {{ variant.price | money }}
+          </option>
+        {% endfor %}
+      </select>
+
+      <input type="text" name="quantity" min="1" value="1">
+
+      <input type="submit" value="Add to cart">
+      {{ form | payment_button }}
+    {% endform %}
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:general.product",
+  "settings": [
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

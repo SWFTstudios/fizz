@@ -1,0 +1,378 @@
+{% liquid
+  assign nav_is_sticky = false
+  if nav_sticky == 'true'
+    assign nav_is_sticky = true
+  endif
+
+  assign nav_transparent = false
+  if enable_transparent_nav == 'true'
+    assign nav_transparent = true
+  endif
+
+  assign nav_solid_on_scroll = false
+  if solid_nav_on_scroll == 'true'
+    assign nav_solid_on_scroll = true
+  endif
+
+  assign nav_glass = false
+  if enable_glass_nav == 'true'
+    assign nav_glass = true
+  endif
+
+  assign nav_bg = nav_bg_color | default: '#1e2530'
+  assign nav_glass_bg = nav_bg | color_modify: 'alpha', 0.65
+  assign nav_fg = nav_link_color | default: '#ffffff'
+  assign nav_icon = nav_icon_color | default: '#ffffff'
+  assign inline_count = desktop_inline_links | default: 2
+
+  assign show_search_bar = false
+  if show_search == 'true'
+    assign show_search_bar = true
+  endif
+
+  assign search_ph = search_placeholder | default: 'What are you looking for?'
+
+  assign show_banner = false
+  if show_announcement == 'true'
+    assign show_banner = true
+  endif
+  assign banner_text = announcement_text | default: 'New Arrivals'
+  assign banner_link_label = announcement_link_label | default: 'Shop Now'
+  assign banner_link_url = announcement_link_url | default: routes.all_products_collection_url
+  assign banner_bg = announcement_bg_color | default: '#f5f5f5'
+  assign banner_fg = announcement_text_color | default: '#111111'
+  assign banner_link_color = cta_bg_color | default: '#FF7F50'
+  assign banner_link_fg = cta_text_color | default: '#111111'
+
+  assign nav_classes = 'fizz-nav w-full border-b border-transparent transition-colors duration-300'
+  if nav_transparent and template.name == 'index'
+    assign nav_classes = nav_classes | append: ' fizz-nav-overlay'
+  endif
+  if nav_glass
+    assign nav_classes = nav_classes | append: ' fizz-nav--glass'
+  endif
+
+  assign home_overlay = false
+  if nav_transparent and template.name == 'index'
+    assign home_overlay = true
+  endif
+
+  assign defer_announcement_on_hero = true
+  if announcement_hero_visibility == 'always'
+    assign defer_announcement_on_hero = false
+  endif
+
+  assign header_classes = 'fizz-site-header w-full'
+  if nav_is_sticky
+    assign header_classes = header_classes | append: ' fizz-site-header--sticky'
+  endif
+%}
+
+<div
+  class="{{ header_classes }}"
+  data-fizz-site-header
+  data-nav-sticky="{% if nav_is_sticky %}true{% else %}false{% endif %}"
+  {% if home_overlay %}data-home-overlay="true"{% endif %}
+  {% if show_banner and home_overlay %}
+    data-announcement-defer-hero="{% if defer_announcement_on_hero %}true{% else %}false{% endif %}"
+  {% endif %}
+  {% if show_banner %}data-has-banner="true"{% endif %}
+  {% if show_search_bar %}data-has-mobile-search="true"{% endif %}
+>
+  {% if show_banner %}
+    <div
+      class="fizz-header-banner{% if home_overlay and defer_announcement_on_hero %} fizz-header-banner--defer-hero{% endif %}"
+      style="--fizz-banner-bg: {{ banner_bg }}; --fizz-banner-fg: {{ banner_fg }}; --fizz-banner-link: {{ banner_link_color }}; --fizz-banner-link-fg: {{ banner_link_fg }};"
+    >
+      <div class="fizz-header-banner__inner max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop">
+        <p class="fizz-header-banner__text">
+          {{ banner_text }}
+          <a href="{{ banner_link_url }}" class="fizz-header-banner__link">{{ banner_link_label }}</a>
+        </p>
+      </div>
+    </div>
+  {% endif %}
+
+  <nav
+    class="{{ nav_classes }}"
+    aria-label="Main"
+    data-fizz-nav
+    data-nav-transparent="{% if nav_transparent %}true{% else %}false{% endif %}"
+    data-nav-solid-on-scroll="{% if nav_solid_on_scroll %}true{% else %}false{% endif %}"
+    data-nav-glass="{% if nav_glass %}true{% else %}false{% endif %}"
+    data-nav-theme="dark"
+    style="
+      --fizz-nav-bg: {{ nav_bg }};
+      --fizz-nav-glass-bg: {{ nav_glass_bg }};
+      --fizz-nav-fg-solid: {{ nav_fg }};
+      --fizz-nav-icon-solid: {{ nav_icon }};
+    "
+  >
+    <div class="fizz-nav__bar max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="fizz-nav__col fizz-nav__col--left">
+        <button
+          type="button"
+          class="fizz-nav-icon fizz-nav__menu-toggle"
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="fizz-nav-drawer"
+          data-fizz-nav-drawer-toggle
+        >
+          <span class="fizz-nav__menu-icon fizz-nav__menu-icon--open material-symbols-outlined" aria-hidden="true">menu</span>
+          <span class="fizz-nav__menu-icon fizz-nav__menu-icon--close material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+
+        {% if inline_count > 0 %}
+          <div class="fizz-nav__desktop-links hidden lg:flex" aria-label="Primary">
+            {% for link in linklists[menu].links limit: inline_count %}
+              <a
+                href="{% render 'fizz-nav-link-url', title: link.title, url: link.url %}"
+                class="fizz-nav-link fizz-nav-link--desktop {% if link.active %}fizz-nav-link--active{% endif %}"
+                {% if link.links != blank %}
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  data-fizz-nav-dropdown-trigger
+                {% endif %}
+              >
+                {% render 'fizz-nav-link-label', title: link.title %}
+              </a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="fizz-nav__col fizz-nav__col--center">
+        <a href="{{ routes.root_url }}" class="fizz-nav-brand" aria-label="{{ shop.name | default: 'Fizz' }} home">
+          <img
+            src="{{ 'fizz-logo-white.png' | asset_url }}"
+            alt=""
+            class="fizz-nav-logo fizz-nav-logo--light"
+            width="120"
+            height="40"
+            loading="eager"
+          >
+          <img
+            src="{{ 'fizz-logo-black.avif' | asset_url }}"
+            alt=""
+            class="fizz-nav-logo fizz-nav-logo--dark"
+            width="120"
+            height="40"
+            loading="eager"
+          >
+          <span class="sr-only">{{ shop.name | default: 'Fizz' }}</span>
+        </a>
+      </div>
+
+      <div class="fizz-nav__col fizz-nav__col--right">
+        {% if show_search_bar %}
+          <button
+            type="button"
+            class="fizz-nav__search fizz-nav__search--pill fizz-nav__search-trigger fizz-nav__search-trigger--desktop"
+            aria-label="{{ search_ph }}"
+            aria-expanded="false"
+            aria-controls="fizz-search-drawer"
+            data-fizz-search-toggle
+          >
+            <span class="fizz-nav__search-trigger-text">{{ search_ph }}</span>
+            <span class="material-symbols-outlined" aria-hidden="true">search</span>
+          </button>
+        {% endif %}
+
+        <a href="{{ routes.account_url }}" class="fizz-nav-icon fizz-nav__account" aria-label="Account">
+          <span class="material-symbols-outlined" aria-hidden="true">person</span>
+        </a>
+
+        <button
+          type="button"
+          class="fizz-nav-icon fizz-nav__cart relative"
+          aria-label="Cart"
+          aria-expanded="false"
+          aria-controls="fizz-cart-drawer"
+          data-fizz-cart-toggle
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">shopping_bag</span>
+          <span class="fizz-nav__cart-count" data-fizz-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>
+            {{ cart.item_count }}
+          </span>
+        </button>
+      </div>
+    </div>
+
+    {% if show_search_bar %}
+      <div class="fizz-nav__search-mobile">
+        <button
+          type="button"
+          class="fizz-nav__search fizz-nav__search--pill fizz-nav__search-trigger"
+          aria-label="{{ search_ph }}"
+          aria-expanded="false"
+          aria-controls="fizz-search-drawer"
+          data-fizz-search-toggle
+        >
+          <span class="fizz-nav__search-trigger-text">{{ search_ph }}</span>
+          <span class="material-symbols-outlined" aria-hidden="true">search</span>
+        </button>
+      </div>
+    {% endif %}
+  </nav>
+
+  <div class="fizz-nav-backdrop" data-fizz-nav-backdrop hidden></div>
+
+  <div
+    id="fizz-nav-drawer"
+    class="fizz-nav-drawer"
+    data-fizz-nav-drawer
+    aria-hidden="true"
+    hidden
+  >
+    <div class="fizz-nav-drawer__header lg:hidden">
+      <button
+        type="button"
+        class="fizz-nav-icon fizz-nav-drawer__close"
+        aria-label="Close menu"
+        data-fizz-nav-drawer-close
+      >
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+      </button>
+      {% if inline_count > 0 %}
+        <div class="fizz-nav-drawer__header-links">
+          {% for link in linklists[menu].links limit: inline_count %}
+            <a href="{% render 'fizz-nav-link-url', title: link.title, url: link.url %}" class="fizz-nav-link fizz-nav-link--drawer-header">{% render 'fizz-nav-link-label', title: link.title %}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="fizz-nav-drawer__body">
+      <nav class="fizz-nav-drawer__primary" aria-label="Primary">
+        <ul class="fizz-nav-drawer__list">
+          {% for link in linklists[menu].links %}
+            <li class="fizz-nav-drawer__item {% if link.links != blank %}fizz-nav-drawer__item--has-children{% endif %}">
+              {% if link.links != blank %}
+                <button
+                  type="button"
+                  class="fizz-nav-drawer__trigger"
+                  aria-expanded="false"
+                  data-fizz-drawer-accordion
+                >
+                  <span class="fizz-nav-drawer__trigger-label">{% render 'fizz-nav-link-label', title: link.title %}</span>
+                  <span class="material-symbols-outlined fizz-nav-drawer__chevron" aria-hidden="true">chevron_right</span>
+                </button>
+                <ul class="fizz-nav-drawer__sublist" hidden>
+                  <li>
+                    <a href="{% render 'fizz-nav-link-url', title: link.title, url: link.url %}" class="fizz-nav-drawer__sublink fizz-nav-drawer__sublink--all">Shop all {% render 'fizz-nav-link-label', title: link.title %}</a>
+                  </li>
+                  {% for child in link.links %}
+                    <li>
+                      <a href="{{ child.url }}" class="fizz-nav-drawer__sublink">{{ child.title }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <a href="{% render 'fizz-nav-link-url', title: link.title, url: link.url %}" class="fizz-nav-drawer__link">{% render 'fizz-nav-link-label', title: link.title %}</a>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+
+      <div class="fizz-nav-drawer__utility">
+        <ul class="fizz-nav-drawer__utility-list">
+          {% if utility_menu != blank and linklists[utility_menu].links.size > 0 %}
+            {% for link in linklists[utility_menu].links %}
+              <li>
+                <a href="{{ link.url }}" class="fizz-nav-drawer__utility-link">{% render 'fizz-nav-link-label', title: link.title %}</a>
+              </li>
+            {% endfor %}
+          {% else %}
+            <li>
+              <a href="{{ routes.account_url }}" class="fizz-nav-drawer__utility-link">Login</a>
+            </li>
+            <li>
+              <a href="{{ routes.account_register_url }}" class="fizz-nav-drawer__utility-link">Email Signup</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  {% if show_search_bar %}
+    <div
+      id="fizz-search-drawer"
+      class="fizz-search-drawer"
+      data-fizz-search-drawer
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="fizz-search-drawer-title"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="fizz-search-drawer__header">
+        <h2 id="fizz-search-drawer-title" class="fizz-search-drawer__title">Search</h2>
+        <button
+          type="button"
+          class="fizz-search-drawer__close"
+          aria-label="Close search"
+          data-fizz-search-close
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+      </div>
+
+      <form action="{{ routes.search_url }}" method="get" role="search" class="fizz-search-drawer__form fizz-search-drawer__form--pill">
+        <label class="sr-only" for="fizz-nav-search-drawer-input">{{ search_ph }}</label>
+        <input
+          id="fizz-nav-search-drawer-input"
+          type="search"
+          name="q"
+          class="fizz-search-drawer__input"
+          placeholder="{{ search_ph }}"
+          value="{{ search.terms | escape }}"
+          autocomplete="off"
+        >
+        <button type="submit" class="fizz-search-drawer__submit" aria-label="Search">
+          <span class="material-symbols-outlined" aria-hidden="true">search</span>
+        </button>
+      </form>
+
+      {% if search_trending_menu != blank and linklists[search_trending_menu].links.size > 0 %}
+        <div class="fizz-search-drawer__trending">
+          <h3 class="fizz-search-drawer__trending-title">Trending</h3>
+          <div class="fizz-search-drawer__chips">
+            {% for link in linklists[search_trending_menu].links %}
+              <a href="{{ link.url }}" class="fizz-search-drawer__chip">{% render 'fizz-nav-link-label', title: link.title %}</a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div
+    id="fizz-cart-drawer"
+    class="fizz-cart-drawer"
+    data-fizz-cart-drawer
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="fizz-cart-drawer-title"
+    aria-hidden="true"
+    hidden
+  >
+    <div class="fizz-cart-drawer__panel">
+      <div class="fizz-cart-drawer__header">
+        <h2 id="fizz-cart-drawer-title" class="fizz-cart-drawer__title">Cart</h2>
+        <button
+          type="button"
+          class="fizz-cart-drawer__close"
+          aria-label="Close cart"
+          data-fizz-cart-close
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+      </div>
+      <div class="fizz-cart-drawer__body" data-fizz-cart-drawer-content>
+        {% render 'fizz-cart-drawer-content' %}
+      </div>
+    </div>
+  </div>
+</div>

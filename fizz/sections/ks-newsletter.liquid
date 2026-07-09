@@ -1,0 +1,96 @@
+{% render 'fizz-section-spacing', section: section %}
+
+<section class="bg-primary ks-reveal opacity-0 translate-y-10 transition-all duration-1000">
+  <div class="px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto text-center">
+    <h2 class="font-display-xl text-[40px] md:text-display-xl text-background mb-8">{{ section.settings.heading }}</h2>
+    <p class="text-background/80 text-xl mb-12 max-w-2xl mx-auto">{{ section.settings.body }}</p>
+    {% form 'customer', class: 'flex flex-col md:flex-row gap-4 max-w-xl mx-auto' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input class="flex-grow bg-transparent border-b-2 border-background placeholder:text-background/50 focus:ring-0 focus:border-background font-label-caps py-4 text-background" placeholder="EMAIL ADDRESS" type="email" name="contact[email]" required>
+      <button type="submit" class="bg-background text-primary font-label-caps px-12 py-4 rounded-full font-bold hover:opacity-90 transition-all">SUBSCRIBE</button>
+    {% endform %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "KS Newsletter",
+  "tag": "section",
+  "class": "ks-newsletter-section fizz-section--spaced fizz-section--relaxed",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "relaxed"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "BOLD BOTTLES" },
+    { "type": "textarea", "id": "body", "label": "Body", "default": "Exclusive access to new flavor drops, performance tips, and sustainable living hacks." },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [{ "name": "KS Newsletter" }]
+}
+{% endschema %}

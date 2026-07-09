@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}" class="{% if template.suffix == 'fizz-claude' %}fizz-html{% elsif template.name == 'index' %}fizz-home-html{% else %}dark{% endif %}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% render 'meta-tags' %}
+
+    {% if template.suffix == 'fizz-claude' %}
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      {{ 'fizz-claude-fonts.css' | asset_url | stylesheet_tag }}
+      {{ 'fizz-claude-base.css' | asset_url | stylesheet_tag }}
+      {% render 'fizz-claude-theme-tokens' %}
+    {% else %}
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+      {{ 'fizz-spacing.css' | asset_url | stylesheet_tag }}
+      {{ 'kinetic-spark.css' | asset_url | stylesheet_tag }}
+      {{ 'fizz-nav.css' | asset_url | stylesheet_tag }}
+      {{ 'fizz-commerce.css' | asset_url | stylesheet_tag }}
+      {{ 'fizz-cart-drawer.css' | asset_url | stylesheet_tag }}
+      {{ 'fizz-ss.css' | asset_url | stylesheet_tag }}
+      {% if template.name == 'index' or template == 'collection.flavors' or template.name == 'product' or template.name == 'cart' or template.name == 'collection' or template == 'page.about' %}
+        {{ 'fizz-home.css' | asset_url | stylesheet_tag }}
+      {% endif %}
+      {% if template.name == 'index' and template.suffix != 'fizz-claude' %}
+        {{ 'swiper-bundle.min.css' | asset_url | stylesheet_tag }}
+        {{ 'fizz-progress-carousel.css' | asset_url | stylesheet_tag }}
+      {% endif %}
+      {% if template == 'page.lifestyle' %}
+        {{ 'fizz-lifestyle-gallery.css' | asset_url | stylesheet_tag }}
+      {% endif %}
+      {% if template.name == 'product' %}
+        {{ 'fizz-pdp.css' | asset_url | stylesheet_tag }}
+      {% endif %}
+      {% if template == 'product.bottle' %}
+        {{ 'fizz-pdp-origin.css' | asset_url | stylesheet_tag }}
+      {% endif %}
+    {% endif %}
+
+    {{ content_for_header }}
+  </head>
+
+  <body class="{% if template.suffix == 'fizz-claude' %}fizz fizz-claude-template overflow-x-hidden{% elsif template.name == 'index' %}fizz-ss fizz-home overflow-x-hidden{% elsif template == 'product.bottle' %}fizz-ss fizz-home fizz-bottle-page fizz-pdp-page overflow-x-hidden{% elsif template.name == 'product' %}fizz-ss fizz-home fizz-pdp-page overflow-x-hidden{% elsif template.name == 'cart' %}fizz-ss fizz-home fizz-cart-page overflow-x-hidden{% else %}fizz-ss ks-theme overflow-x-hidden{% endif %}">
+    {% if template.suffix == 'fizz-claude' %}
+      {% render 'fizz-claude-nav' %}
+    {% else %}
+      {% sections 'header-group' %}
+    {% endif %}
+
+    <main id="main-content">
+      {{ content_for_layout }}
+    </main>
+
+    {% unless template.suffix == 'fizz-claude' %}
+      {% sections 'footer-group' %}
+    {% endunless %}
+
+    {% if template.suffix == 'fizz-claude' %}
+      <div class="grain" aria-hidden="true"></div>
+      <script src="{{ 'fizz-claude.js' | asset_url }}" defer></script>
+      <script src="{{ 'fizz-claude-transition.js' | asset_url }}" defer></script>
+    {% else %}
+      <script src="{{ 'fizz-nav.js' | asset_url }}" defer></script>
+      <script src="{{ 'fizz-cart-drawer.js' | asset_url }}" defer></script>
+      <script src="{{ 'fizz-swipe.js' | asset_url }}" defer></script>
+
+      <script src="{{ 'gsap.min.js' | asset_url }}" defer></script>
+      <script src="{{ 'ScrollTrigger.min.js' | asset_url }}" defer></script>
+      <script src="{{ 'lenis.min.js' | asset_url }}" defer></script>
+      <script src="{{ 'fizz-ss-motion.js' | asset_url }}" defer></script>
+
+      {% if template.name == 'index' %}
+        <script src="{{ 'swiper-bundle.min.js' | asset_url }}" defer></script>
+        <script src="{{ 'fizz-progress-carousel.js' | asset_url }}" defer></script>
+        <script src="{{ 'fizz-home.js' | asset_url }}" defer></script>
+      {% elsif template.name == 'product' %}
+        <script src="{{ 'kinetic-spark.js' | asset_url }}" defer></script>
+        <script src="{{ 'fizz-home.js' | asset_url }}" defer></script>
+        <script src="{{ 'fizz-pdp.js' | asset_url }}" defer></script>
+      {% elsif template.name == 'cart' %}
+        <script src="{{ 'kinetic-spark.js' | asset_url }}" defer></script>
+        <script src="{{ 'fizz-home.js' | asset_url }}" defer></script>
+      {% else %}
+        <script src="{{ 'kinetic-spark.js' | asset_url }}" defer></script>
+      {% endif %}
+    {% endif %}
+  </body>
+</html>

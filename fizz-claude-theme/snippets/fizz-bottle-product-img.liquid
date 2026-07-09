@@ -1,0 +1,22 @@
+{% comment %}
+  Transparent bottle PNG from theme assets (uploaded via CLI).
+{% endcomment %}
+{% liquid
+  assign bottle_colors = 'arctic-white,charcoal-black,coral-orange,electric-blue,sage-green,steel-navy' | split: ','
+  assign has_bottle_asset = false
+  if color_slug != blank and bottle_colors contains color_slug
+    assign has_bottle_asset = true
+  endif
+%}
+{% if has_bottle_asset %}
+  <img
+    {% if id != blank %}id="{{ id }}"{% endif %}
+    {% if data_photo %}data-way-photo{% endif %}
+    src="{{ 'fizz-bottle-product-' | append: color_slug | append: '.png' | asset_url }}"
+    alt="{{ alt | default: color_slug | escape }}"
+    class="{{ class | default: 'botimg' }}"
+    loading="{{ loading | default: 'lazy' }}"
+    width="{{ width | default: 170 }}"
+    height="{{ height | default: 430 }}"
+  >
+{% endif %}

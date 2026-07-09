@@ -1,0 +1,51 @@
+<div class="hero" data-screen-label="Hero" style="background:var(--hero-bg);color:var(--hero-text)">
+  <div data-bubbles data-bub-count="16" data-bub-color="var(--hero-bubble-color)" data-bub-seed="7" data-bub-rise="900" class="bubf"></div>
+  <div class="heroin">
+    <p class="mono eyebrow">{{ section.settings.eyebrow }}</p>
+    <h1 class="ht">
+      <span class="hl hl1">{{ section.settings.line_1 }}</span>
+      <span class="hl hl2 out">{{ section.settings.line_2 }}</span>
+      <span class="hl hl3"><em class="serif acc">{{ section.settings.line_3 }}</em></span>
+      <span class="hl hl4">{{ section.settings.line_4 }}<span class="acc">.</span></span>
+    </h1>
+  </div>
+  <div class="herostage">
+    <div class="heroglow"></div>
+    {% if section.settings.bottle_image != blank %}
+      <img class="botimg" src="{{ section.settings.bottle_image | image_url: width: 500 }}" alt="{{ section.settings.bottle_alt | default: 'FIZZ bottle' }}" loading="eager" width="170">
+    {% else %}
+      <div class="botwrap" style="transform:scale(1.14)">
+        <div class="bcap"></div><div class="bneck"></div>
+        <div class="bot" style="background:{{ section.settings.bottle_color }}">
+          <img src="{{ 'fizz-logo.avif' | asset_url }}" class="blogo" alt="" width="48" height="48">
+        </div>
+      </div>
+    {% endif %}
+  </div>
+  <p class="hint">{{ section.settings.scroll_hint }}</p>
+  <div class="heromarq">
+    <div class="tickin">
+      {% for i in (1..8) %}<span class="tickspan mono">{{ section.settings.ticker_text }}</span>{% endfor %}
+      {% for i in (1..8) %}<span class="tickspan mono">{{ section.settings.ticker_text }}</span>{% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Hero",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Portable sparkling water" },
+    { "type": "text", "id": "line_1", "label": "Headline line 1", "default": "Never" },
+    { "type": "text", "id": "line_2", "label": "Headline line 2 (outlined)", "default": "drink" },
+    { "type": "text", "id": "line_3", "label": "Headline line 3 (italic accent)", "default": "flat" },
+    { "type": "text", "id": "line_4", "label": "Headline line 4", "default": "again" },
+    { "type": "text", "id": "scroll_hint", "label": "Scroll hint", "default": "Scroll to fizz ↓" },
+    { "type": "text", "id": "ticker_text", "label": "Marquee text", "default": "FIZZ ANYWHERE /// ZERO SUGAR /// REAL FRUIT /// 60 FIZZES PER POD ///" },
+    { "type": "image_picker", "id": "bottle_image", "label": "Bottle photo (overrides CSS bottle)" },
+    { "type": "text", "id": "bottle_alt", "label": "Bottle photo alt text" },
+    { "type": "color", "id": "bottle_color", "label": "Fallback bottle color", "default": "#1d2a44" }
+  ],
+  "presets": [{ "name": "Hero" }]
+}
+{% endschema %}

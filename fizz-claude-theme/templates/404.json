@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "main": {
+      "type": "fizz-statement",
+      "settings": {
+        "line_1": "404 — page not found.",
+        "line_2": "Let's get you back to the fizz.",
+        "body": "This page doesn't exist. Head home or shop the bottle."
+      }
+    }
+  },
+  "order": ["main"]
+}

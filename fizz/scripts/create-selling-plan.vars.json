@@ -1,0 +1,41 @@
+{
+  "input": {
+    "name": "Fizz Charge Refill",
+    "merchantCode": "fizz-charge-refill",
+    "options": ["Refill"],
+    "sellingPlansToCreate": [
+      {
+        "name": "On-demand 6-pack refill",
+        "options": ["When you need it"],
+        "category": "SUBSCRIPTION",
+        "billingPolicy": {
+          "recurring": {
+            "interval": "YEAR",
+            "intervalCount": 100
+          }
+        },
+        "deliveryPolicy": {
+          "recurring": {
+            "interval": "YEAR",
+            "intervalCount": 100,
+            "intent": "FULFILLMENT_BEGIN",
+            "preAnchorBehavior": "ASAP"
+          }
+        },
+        "pricingPolicies": [
+          {
+            "fixed": {
+              "adjustmentType": "PERCENTAGE",
+              "adjustmentValue": {
+                "percentage": 0.0
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "resources": {
+    "productIds": ["gid://shopify/Product/10229603565853"]
+  }
+}

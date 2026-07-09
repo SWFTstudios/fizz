@@ -1,0 +1,16 @@
+{
+  "name": "fizz",
+  "version": "1.0.0",
+  "description": "**Store:** `g9rykd-jt.myshopify.com` (admin: fizz-9820)   **Live theme:** `fizz-test-61526` (#187955511581)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

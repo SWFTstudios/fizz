@@ -1,0 +1,291 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign has_product = false
+  if product and product != empty
+    assign has_product = true
+  endif
+%}
+
+{% if has_product %}
+  {% liquid
+    assign current_variant = product.selected_or_first_available_variant
+    capture color_slug
+      render 'fizz-pdp-color-slug', variant: current_variant
+    endcapture
+    assign color_slug = color_slug | strip
+    assign installment_cents = current_variant.price | divided_by: 4
+  %}
+  <section
+    id="shopify-section-{{ section.id }}"
+    class="fizz-product-pdp fizz-product-pdp--bottle fizz-pdp-hero fizz-pdp-origin fizz-product-pdp--{{ color_slug }}"
+    data-fizz-pdp-hero
+    data-fizz-product-bottle
+    data-section-id="{{ section.id }}"
+    data-product-url="{{ product.url }}"
+    data-selected-color="{{ color_slug }}"
+  >
+    <div class="fizz-pdp-hero__inner">
+      <div class="fizz-pdp-hero__grid">
+        <div class="fizz-pdp-hero__media-col fizz-commerce-panel fizz-commerce-panel--media">
+          <div class="fizz-pdp-hero__main-media">
+            {% render 'fizz-bottle-product-img',
+              color_slug: color_slug,
+              alt: current_variant.title,
+              class: 'fizz-product-pdp__img',
+              width: 1200,
+              height: 1400,
+              loading: 'eager',
+              id: 'fizz-bottle-image',
+              main_image: true
+            %}
+            {% assign bottle_colors = 'arctic-white,charcoal-black,coral-orange,electric-blue,sage-green,steel-navy' | split: ',' %}
+            {% unless bottle_colors contains color_slug %}
+              {% if current_variant.image %}
+                <img
+                  id="fizz-bottle-image"
+                  data-fizz-pdp-main-image
+                  src="{{ current_variant.image | image_url: width: 1400 }}"
+                  alt="{{ current_variant.title | escape }}"
+                  width="1200"
+                  height="1200"
+                  loading="eager"
+                  class="fizz-product-pdp__img"
+                >
+              {% elsif product.featured_image %}
+                <img
+                  id="fizz-bottle-image"
+                  data-fizz-pdp-main-image
+                  src="{{ product.featured_image | image_url: width: 1400 }}"
+                  alt="{{ product.title | escape }}"
+                  width="1200"
+                  height="1200"
+                  loading="eager"
+                  class="fizz-product-pdp__img"
+                >
+              {% endif %}
+            {% endunless %}
+          </div>
+
+          {% if product.images.size > 1 %}
+            <div class="fizz-pdp-hero__thumbs" role="list" aria-label="Product images">
+              {% for image in product.images %}
+                <button
+                  type="button"
+                  class="fizz-pdp-hero__thumb{% if image == current_variant.image or image == product.featured_image and current_variant.image == blank %} is-active{% endif %}"
+                  data-fizz-pdp-thumb
+                  data-full-src="{{ image | image_url: width: 1400 }}"
+                  data-alt="{{ image.alt | default: product.title | escape }}"
+                  aria-label="View image {{ forloop.index }}"
+                >
+                  {{ image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '' }}
+                </button>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="fizz-pdp-hero__buy-col fizz-commerce-panel fizz-commerce-panel--buy">
+          <div class="fizz-product-pdp__info">
+            <div class="fizz-origin-hero__title-row">
+              <h1 id="fizz-bottle-title">{{ product.title }}</h1>
+              <p class="fizz-origin-hero__price" data-fizz-pdp-price>{{ current_variant.price | money }}</p>
+            </div>
+
+            {% if product.description != blank %}
+              <div class="fizz-origin-hero__desc rte">{{ product.description }}</div>
+            {% endif %}
+
+            {% if product.variants.size > 1 %}
+              <p class="fizz-origin-swatch-label">{{ section.settings.color_label }}</p>
+              <div class="fizz-origin-swatches" role="group" aria-label="Color">
+                {% for variant in product.variants %}
+                  {% capture swatch_slug %}
+                    {% render 'fizz-pdp-color-slug', variant: variant %}
+                  {% endcapture %}
+                  {% assign swatch_slug = swatch_slug | strip %}
+                  <button
+                    type="button"
+                    class="fizz-origin-swatch fizz-origin-swatch--{{ swatch_slug }}{% if variant.id == current_variant.id %} is-active{% endif %}"
+                    data-variant-id="{{ variant.id }}"
+                    data-color-slug="{{ swatch_slug }}"
+                    title="{{ variant.title }}"
+                    aria-label="{{ variant.title }}"
+                    aria-current="{% if variant.id == current_variant.id %}true{% else %}false{% endif %}"
+                    {% unless variant.available %}disabled{% endunless %}
+                  ></button>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            {% if section.blocks.size > 0 %}
+              <div class="fizz-origin-highlights">
+                {% for block in section.blocks %}
+                  {% if block.type == 'highlight' %}
+                    <div class="fizz-origin-highlight" {{ block.shopify_attributes }}>
+                      {% if block.settings.icon != blank %}
+                        <span class="material-symbols-outlined fizz-origin-highlight__icon" aria-hidden="true">{{ block.settings.icon }}</span>
+                      {% endif %}
+                      <p class="fizz-origin-highlight__text">{{ block.settings.text }}</p>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            {% form 'product', product, class: 'fizz-product-pdp__form', id: 'fizz-bottle-form' %}
+              <input type="hidden" name="id" value="{{ current_variant.id }}" id="fizz-bottle-variant-id">
+              <button
+                type="submit"
+                class="fizz-origin-cta"
+                data-fizz-pdp-submit
+                {% unless current_variant.available %}disabled{% endunless %}
+              >
+                <span>
+                  {% if current_variant.available %}
+                    {{ section.settings.cta_label }}
+                  {% else %}
+                    {{ section.settings.sold_out_label }}
+                  {% endif %}
+                </span>
+                <span class="material-symbols-outlined" aria-hidden="true">shopping_bag</span>
+              </button>
+            {% endform %}
+
+            {% if section.settings.show_installments %}
+              <p class="fizz-origin-installments">
+                {{ section.settings.installments_prefix }}
+                {{ installment_cents | money }}
+                {{ section.settings.installments_suffix }}
+              </p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fizz-pdp-sticky-atc" data-fizz-sticky-atc hidden>
+      <div class="fizz-pdp-sticky-atc__meta">
+        <p class="fizz-pdp-sticky-atc__title">{{ product.title }}</p>
+        <p class="fizz-pdp-sticky-atc__price">{{ current_variant.price | money }}</p>
+      </div>
+      <button type="submit" form="fizz-bottle-form" class="fizz-pdp-sticky-atc__btn" data-fizz-pdp-submit>
+        {{ section.settings.cta_label }}
+      </button>
+    </div>
+  </section>
+{% else %}
+  <section class="fizz-product-pdp fizz-product-pdp--bottle fizz-product-pdp--placeholder" data-fizz-product-bottle>
+    <div class="fizz-product-pdp__inner">
+      <p class="fizz-product-pdp__placeholder-msg">
+        Assign <code>product.bottle</code> to a bottle product in Admin.
+      </p>
+    </div>
+  </section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Fizz bottle PDP",
+  "tag": "section",
+  "class": "fizz-bottle-pdp-section fizz-section--spaced fizz-section--hero",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "hero"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "text", "id": "color_label", "label": "Color label", "default": "Select Color" },
+    { "type": "text", "id": "cta_label", "label": "CTA label", "default": "Add To Cart" },
+    { "type": "text", "id": "sold_out_label", "label": "Sold out label", "default": "Sold out" },
+    { "type": "checkbox", "id": "show_installments", "label": "Show installment line", "default": true },
+    { "type": "text", "id": "installments_prefix", "label": "Installments prefix", "default": "or 4 interest-free payments of" },
+    { "type": "text", "id": "installments_suffix", "label": "Installments suffix", "default": "with Shop Pay" },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "blocks": [
+    {
+      "type": "highlight",
+      "name": "Highlight",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Material icon", "default": "hiking" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Built for the Journey" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Fizz bottle PDP",
+      "blocks": [
+        { "type": "highlight", "settings": { "icon": "hiking", "text": "Built for the Journey" } },
+        { "type": "highlight", "settings": { "icon": "bubble_chart", "text": "Always Carbonated" } },
+        { "type": "highlight", "settings": { "icon": "eco", "text": "No more plastic waste" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,158 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% if section.settings.show_lineup_marquee %}
+  <div class="ss-marquee ss-marquee--lg" data-ss-marquee data-ss-speed="{{ section.settings.marquee_speed }}">
+    <div class="ss-marquee__track" data-ss-marquee-track>
+      {% assign lineup_items = section.settings.lineup_text | split: '|' %}
+      {% for item in lineup_items %}
+        <span class="ss-marquee__item">{{ item | strip }}</span>
+        <span class="ss-marquee__item" aria-hidden="true">·</span>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+<footer class="ss-footer">
+  <div class="ss-container">
+    <div class="ss-footer__grid">
+      <div>
+        <p class="ss-footer__brand">{{ shop.name | default: 'FIZZ' }}</p>
+        <p class="ss-body">{{ section.settings.tagline }}</p>
+        {% if section.settings.review_count != blank %}
+          <p class="ss-eyebrow" style="margin-top: 1.25rem;">{{ section.settings.review_count }} · {{ section.settings.review_label }}</p>
+        {% endif %}
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <div class="ss-footer__links">
+          {% for link in linklists[section.settings.explore_menu].links %}
+            <a href="{{ link.url }}">{{ link.title }}</a>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <div class="ss-footer__links">
+          {% for link in linklists[section.settings.support_menu].links %}
+            <a href="{{ link.url }}">{{ link.title }}</a>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <h4>Follow</h4>
+        <div class="ss-footer__links">
+          {% if section.settings.instagram_url != blank %}
+            <a href="{{ section.settings.instagram_url }}" rel="noopener" target="_blank">Instagram</a>
+          {% endif %}
+          {% if section.settings.tiktok_url != blank %}
+            <a href="{{ section.settings.tiktok_url }}" rel="noopener" target="_blank">TikTok</a>
+          {% endif %}
+          {% if section.settings.youtube_url != blank %}
+            <a href="{{ section.settings.youtube_url }}" rel="noopener" target="_blank">YouTube</a>
+          {% endif %}
+          <a href="{{ shop.privacy_policy.url | default: '/policies/privacy-policy' }}">Privacy</a>
+          <a href="{{ shop.terms_of_service.url | default: '/policies/terms-of-service' }}">Terms</a>
+        </div>
+      </div>
+    </div>
+    <div class="ss-footer__bottom">
+      <p>© {{ 'now' | date: '%Y' }} {{ shop.name | upcase }}. All rights reserved.</p>
+      <p>{{ section.settings.bottom_note }}</p>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Kinetic Spark footer",
+  "class": "fizz-section--spaced fizz-section--flush",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Portable carbonation for everyday hydration."
+    },
+    {
+      "type": "link_list",
+      "id": "explore_menu",
+      "label": "Explore menu",
+      "default": "footer"
+    },
+    {
+      "type": "link_list",
+      "id": "support_menu",
+      "label": "Support menu",
+      "default": "footer"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_lineup_marquee",
+      "label": "Show lineup marquee",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "lineup_text",
+      "label": "Lineup marquee items (pipe-separated)",
+      "default": "Bottles | Flavor Packs | Fizz Charge | Coral Orange | Sage Green | Arctic White | Electric Blue"
+    },
+    {
+      "type": "range",
+      "id": "marquee_speed",
+      "min": 15,
+      "max": 60,
+      "step": 1,
+      "unit": "s",
+      "label": "Marquee duration",
+      "default": 32
+    },
+    {
+      "type": "text",
+      "id": "review_count",
+      "label": "Review count label",
+      "default": "333 Reviews"
+    },
+    {
+      "type": "text",
+      "id": "review_label",
+      "label": "Review sublabel",
+      "default": "Loved by thousands"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "tiktok_url",
+      "label": "TikTok URL"
+    },
+    {
+      "type": "url",
+      "id": "youtube_url",
+      "label": "YouTube URL"
+    },
+    {
+      "type": "text",
+      "id": "bottom_note",
+      "label": "Bottom note",
+      "default": "Sparkling water, anytime."
+    },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" }
+      ],
+      "default": "flush"
+    }
+  ]
+}
+{% endschema %}

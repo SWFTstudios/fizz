@@ -1,0 +1,176 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign flavor_collection = section.settings.collection
+  assign slide_count = 0
+  assign use_variants = false
+
+  if flavor_collection != blank and flavor_collection.products_count > 0
+    if flavor_collection.products_count == 1
+      assign flavor_parent = flavor_collection.products.first
+      if flavor_parent.variants.size > 1
+        assign use_variants = true
+        assign slide_count = flavor_parent.variants.size
+        if slide_count > section.settings.product_limit
+          assign slide_count = section.settings.product_limit
+        endif
+      else
+        assign slide_count = 1
+      endif
+    else
+      assign slide_count = flavor_collection.products_count
+      if slide_count > section.settings.product_limit
+        assign slide_count = section.settings.product_limit
+      endif
+    endif
+  endif
+%}
+
+{% if slide_count > 0 %}
+  <section class="fizz-pdp-experience" data-fizz-pdp-experience aria-label="{{ section.settings.heading | escape }}" tabindex="0">
+    <div class="fizz-pdp-experience__inner">
+      <div class="fizz-pdp-experience__header">
+        <h2>{{ section.settings.heading }}</h2>
+        {% if section.settings.shop_all_url != blank %}
+          <a href="{{ section.settings.shop_all_url }}">{{ section.settings.shop_all_label }}</a>
+        {% endif %}
+      </div>
+
+      <div class="fizz-pdp-experience__carousel{% if slide_count < 2 %} fizz-pdp-experience__carousel--single{% endif %}">
+        <button
+          type="button"
+          class="fizz-slide-arrow fizz-slide-arrow--left"
+          data-fizz-exp-prev
+          aria-label="Previous flavor"
+          {% if slide_count < 2 %}hidden{% endif %}
+        >
+          <img src="{{ 'fizz-arrow-left.svg' | asset_url }}" alt="" width="24" height="24">
+        </button>
+
+        <div class="fizz-pdp-experience__viewport" data-fizz-exp-viewport>
+          <div class="fizz-pdp-experience__track" data-fizz-exp-track>
+          {% if use_variants %}
+            {% for variant in flavor_parent.variants limit: section.settings.product_limit %}
+              {% render 'fizz-pdp-experience-slide',
+                product: flavor_parent,
+                variant: variant,
+                tags: section.settings.tags,
+                cta_label: section.settings.cta_label,
+                is_active: forloop.first
+              %}
+            {% endfor %}
+          {% else %}
+            {% for flavor_product in flavor_collection.products limit: section.settings.product_limit %}
+              {% render 'fizz-pdp-experience-slide',
+                product: flavor_product,
+                variant: blank,
+                tags: section.settings.tags,
+                cta_label: section.settings.cta_label,
+                is_active: forloop.first
+              %}
+            {% endfor %}
+          {% endif %}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="fizz-slide-arrow fizz-slide-arrow--right"
+          data-fizz-exp-next
+          aria-label="Next flavor"
+          {% if slide_count < 2 %}hidden{% endif %}
+        >
+          <img src="{{ 'fizz-arrow-right.svg' | asset_url }}" alt="" width="24" height="24">
+        </button>
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "PDP experience card",
+  "tag": "section",
+  "class": "fizz-pdp-experience-section fizz-section--spaced fizz-section--relaxed",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "relaxed"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Complete the Experience" },
+    { "type": "text", "id": "shop_all_label", "label": "Shop all label", "default": "Shop All Accessories" },
+    { "type": "url", "id": "shop_all_url", "label": "Shop all URL" },
+    { "type": "collection", "id": "collection", "label": "Flavors collection" },
+    { "type": "range", "id": "product_limit", "label": "Flavors to show", "min": 1, "max": 12, "step": 1, "default": 6 },
+    { "type": "text", "id": "tags", "label": "Tags", "default": "Accessories | Drinks" },
+    { "type": "text", "id": "cta_label", "label": "CTA label", "default": "Add To Your Order" },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [{ "name": "PDP experience card" }]
+}
+{% endschema %}

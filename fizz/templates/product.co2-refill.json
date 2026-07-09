@@ -1,0 +1,59 @@
+{
+  "sections": {
+    "hero": {
+      "type": "fizz-ss-product",
+      "blocks": {
+        "h1": { "type": "highlight", "settings": { "text": "6-pack value" } },
+        "h2": { "type": "highlight", "settings": { "text": "On-demand refills" } },
+        "f1": {
+          "type": "faq",
+          "settings": {
+            "question": "How much water does one canister carbonate?",
+            "answer": "Each Fizz Charge canister carbonates up to 12 liters."
+          }
+        }
+      },
+      "block_order": ["h1", "h2", "f1"],
+      "settings": {
+        "mode": "co2",
+        "eyebrow": "Fizz Charge",
+        "cta_label": "Add 6-pack to cart",
+        "plan_label": "How do you want to buy?",
+        "onetime_label": "One-time 6-pack",
+        "subscribe_detail": "On-demand refills — reorder when you run low",
+        "subscribe_cta": "Subscribe & refill on demand",
+        "show_faq": true,
+        "faq_heading": "Got questions?",
+        "padding_vertical": "hero"
+      }
+    },
+    "benefits": {
+      "type": "fizz-ss-benefits",
+      "blocks": {
+        "b1": { "type": "benefit", "settings": { "label": "12L per canister" } },
+        "b2": { "type": "benefit", "settings": { "label": "$10 per 6-pack" } },
+        "b3": { "type": "benefit", "settings": { "label": "Subscribe on demand" } }
+      },
+      "block_order": ["b1", "b2", "b3"],
+      "settings": {
+        "heading": "Stay fizzy",
+        "subheading": "Refill on your schedule",
+        "body": "Six canisters. Reorder when you run low — or subscribe for effortless refills.",
+        "padding_vertical": "relaxed"
+      }
+    },
+    "lineup": {
+      "type": "fizz-ss-product-lineup",
+      "settings": {
+        "heading": "Pair with",
+        "view_all_label": "View all",
+        "collection": "bottles",
+        "product_limit": 6,
+        "expand_variants": true,
+        "badge": "Complete your setup",
+        "padding_vertical": "relaxed"
+      }
+    }
+  },
+  "order": ["hero", "benefits", "lineup"]
+}

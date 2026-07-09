@@ -1,0 +1,168 @@
+{% render 'fizz-section-spacing', section: section %}
+
+<section id="intro" class="fizz-intro" aria-label="Introduction">
+  <div class="fizz-intro-video" aria-hidden="true">
+    {% if section.settings.background_video != blank %}
+      {{ section.settings.background_video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true }}
+    {% elsif section.settings.background_video_url != blank %}
+      <video autoplay loop muted playsinline>
+        <source src="{{ section.settings.background_video_url }}" type="video/mp4">
+      </video>
+    {% endif %}
+  </div>
+  <div class="fizz-intro-inner">
+    <div>
+      <h2>{{ section.settings.heading }}</h2>
+      {% if section.settings.logo != blank %}
+        {{ section.settings.logo | image_url: width: 400 | image_tag: loading: 'lazy', width: 238, alt: shop.name }}
+      {% else %}
+        <img src="{{ 'fizz-logo-white.png' | asset_url }}" alt="{{ shop.name }}" width="238" height="80" loading="lazy">
+      {% endif %}
+    </div>
+    <div>
+      <p>{{ section.settings.body }}</p>
+      <div class="fizz-intro-ctas">
+        {% if section.settings.primary_label != blank %}
+          <a href="{{ section.settings.primary_url | default: routes.all_products_collection_url }}" class="fizz-btn-outline">
+            {{ section.settings.primary_label }}
+          </a>
+        {% endif %}
+        {% if section.settings.secondary_label != blank %}
+          <a href="{{ section.settings.secondary_url | default: '#shop' }}" class="fizz-btn-outline">
+            {{ section.settings.secondary_label }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Fizz intro",
+  "tag": "section",
+  "class": "fizz-intro-section fizz-section--spaced fizz-section--flush",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "flush"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Carbonation you can take anywhere"
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Body",
+      "default": "Fizz is a portable carbonation bottle paired with our in-house flavor packs so you can liven up your water and your day in seconds. Just add some Fizz."
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "text",
+      "id": "primary_label",
+      "label": "Primary CTA",
+      "default": "Shop"
+    },
+    {
+      "type": "url",
+      "id": "primary_url",
+      "label": "Primary CTA link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_label",
+      "label": "Secondary CTA",
+      "default": "Explore"
+    },
+    {
+      "type": "url",
+      "id": "secondary_url",
+      "label": "Secondary CTA link"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background video"
+    },
+    {
+      "type": "text",
+      "id": "background_video_url",
+      "label": "Background video URL (MP4)"
+    },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [{ "name": "Fizz intro" }]
+}
+{% endschema %}

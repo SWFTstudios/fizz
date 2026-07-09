@@ -1,0 +1,78 @@
+{% comment %}
+  Single slide for PDP experience flavor carousel.
+  Usage: {% render 'fizz-pdp-experience-slide', product: product, variant: variant, tags: tags, cta_label: cta_label, is_active: is_active %}
+{% endcomment %}
+{% liquid
+  if variant == blank
+    assign slide_variant = product.selected_or_first_available_variant
+  else
+    assign slide_variant = variant
+  endif
+
+  if variant != blank and product.variants.size > 1
+    assign slide_title = variant.title
+    assign slide_url = product.url | append: '?variant=' | append: variant.id
+  else
+    assign slide_title = product.title
+    assign slide_url = product.url
+  endif
+
+  capture pack_slug
+    render 'fizz-pdp-pack-slug', variant: slide_variant
+  endcapture
+  assign pack_slug = pack_slug | strip
+%}
+
+<article
+  class="fizz-pdp-experience__card{% if is_active %} is-active{% endif %}"
+  data-fizz-exp-slide
+  aria-hidden="{% if is_active %}false{% else %}true{% endif %}"
+>
+  <div class="fizz-pdp-experience__media">
+    {% if slide_variant.image %}
+      {{ slide_variant.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: slide_title, class: 'fizz-flavor-pack-img' }}
+    {% elsif product.featured_image %}
+      {{ product.featured_image | image_url: width: 900 | image_tag: loading: 'lazy', alt: slide_title, class: 'fizz-flavor-pack-img' }}
+    {% elsif pack_slug != blank %}
+      {% render 'fizz-flavor-pack-img', slug: pack_slug, alt: slide_title, class: 'fizz-flavor-pack-img' %}
+    {% else %}
+      {% render 'ks-stitch-img', name: 'flavor-packs-lifestyle', alt: slide_title %}
+    {% endif %}
+  </div>
+  <div class="fizz-pdp-experience__body">
+    <p class="fizz-pdp-experience__tags">{{ tags }}</p>
+    <div class="fizz-pdp-experience__title-row">
+      <h3><a href="{{ slide_url }}">{{ slide_title }}</a></h3>
+      <p class="fizz-pdp-experience__price">{{ slide_variant.price | money }}</p>
+    </div>
+    <p class="fizz-pdp-experience__desc">
+      {{ product.description | strip_html | truncate: 160 }}
+    </p>
+    <div class="fizz-pdp-experience__actions">
+      <div class="fizz-cart__qty fizz-pdp-experience__qty" data-fizz-exp-qty>
+        <button type="button" data-fizz-exp-minus aria-label="Decrease quantity">−</button>
+        <input
+          type="number"
+          value="1"
+          min="1"
+          aria-label="Quantity for {{ slide_title }}"
+          readonly
+        >
+        <button type="button" data-fizz-exp-plus aria-label="Increase quantity">+</button>
+      </div>
+      <button
+        type="button"
+        class="fizz-pdp-experience__cta"
+        data-fizz-exp-add
+        data-variant-id="{{ slide_variant.id }}"
+        {% unless slide_variant.available %}disabled{% endunless %}
+      >
+        {% if slide_variant.available %}
+          {{ cta_label }}
+        {% else %}
+          Sold out
+        {% endif %}
+      </button>
+    </div>
+  </div>
+</article>

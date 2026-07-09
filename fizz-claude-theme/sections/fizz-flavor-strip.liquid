@@ -1,0 +1,400 @@
+<div
+  class="flav flav--cols-{{ section.settings.columns }}"
+  id="flavors"
+  data-screen-label="Flavors"
+  style="--flav-min-h: {{ section.settings.min_height }}vh;"
+>
+  {% for block in section.blocks %}
+    {% liquid
+      assign product = block.settings.product
+      assign panel_url = block.settings.link_url
+      if panel_url == blank and product != blank
+        assign panel_url = product.url
+      endif
+
+      assign media_fit = block.settings.media_fit | default: 'cover'
+      assign media_position = block.settings.media_position | default: 'center center'
+      assign media_scale = block.settings.media_scale | default: 100
+      assign span_class = ''
+      if block.settings.span_columns == '2'
+        assign span_class = ' fpanel--span-2'
+      endif
+
+      assign btn_label = block.settings.button_label
+      if btn_label == blank and product != blank
+        assign btn_label = 'Shop ' | append: product.title
+      endif
+      assign btn_url = block.settings.button_link
+      if btn_url == blank
+        assign btn_url = panel_url
+      endif
+
+      assign title = block.settings.title
+      if title == blank and product != blank
+        assign title = product.title
+      endif
+
+      assign price_label = block.settings.price_label
+      if price_label == blank and product != blank
+        assign price_label = product.price | money
+      endif
+
+      assign bg_start = block.settings.bg_color
+      assign bg_end = block.settings.bg_gradient_end
+      if bg_start == blank
+        if forloop.index == 1
+          assign bg_start = '#e8a94a'
+          assign bg_end = '#c9602e'
+        else
+          assign bg_start = '#8f3d78'
+          assign bg_end = '#3a1230'
+        endif
+      endif
+    %}
+
+    {% capture media_vars %}{% render 'fizz-flavor-panel-media', block: block, product: product %}{% endcapture %}
+
+    <article
+      class="fpanel{{ span_class }} fpanel--align-{{ block.settings.content_align | default: 'bottom-left' }}"
+      style="--fp-bg-start: {{ bg_start }}; --fp-bg-end: {{ bg_end }}; --fp-media-fit: {{ media_fit }}; --fp-media-pos: {{ media_position }}; --fp-media-scale: {{ media_scale | divided_by: 100.0 }};"
+      {{ block.shopify_attributes }}
+      data-hot
+    >
+      <div class="fpanel__bg" aria-hidden="true"></div>
+
+      <div class="fpanel__media">
+        {% liquid
+          assign has_video = false
+          if block.settings.video != blank
+            assign has_video = true
+          elsif block.settings.video_url != blank
+            assign has_video = true
+          endif
+        %}
+
+        {% if has_video %}
+          {% if block.settings.video != blank %}
+            {{ block.settings.video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, class: 'fpanel__video' }}
+          {% else %}
+            <video class="fpanel__video" autoplay muted loop playsinline>
+              <source src="{{ block.settings.video_url }}" type="video/mp4">
+            </video>
+          {% endif %}
+        {% else %}
+          {% liquid
+            assign img_src = ''
+            assign source = block.settings.media_source | default: 'auto'
+            if block.settings.image != blank and source != 'product' and source != 'asset' and source != 'metafield'
+              assign img_src = block.settings.image | image_url: width: 1600
+            elsif block.settings.image != blank and source == 'custom'
+              assign img_src = block.settings.image | image_url: width: 1600
+            endif
+            if img_src == blank and product != blank
+              if source == 'auto' or source == 'product'
+                if product.featured_media.preview_image
+                  assign img_src = product.featured_media.preview_image | image_url: width: 1600
+                elsif product.featured_image
+                  assign img_src = product.featured_image | image_url: width: 1600
+                endif
+              endif
+              if img_src == blank and block.settings.metafield_key != blank
+                assign mf_parts = block.settings.metafield_key | split: '.'
+                if mf_parts.size == 2
+                  assign mf_val = product.metafields[mf_parts[0]][mf_parts[1]]
+                  if mf_val != blank
+                    assign img_src = mf_val | image_url: width: 1600
+                  endif
+                endif
+              endif
+            endif
+            if img_src == blank and block.settings.theme_asset != blank
+              assign img_src = block.settings.theme_asset | asset_url
+            endif
+            if img_src == blank and block.settings.image != blank
+              assign img_src = block.settings.image | image_url: width: 1600
+            endif
+          %}
+          {% if img_src != blank %}
+            <img
+              class="fpanel__img"
+              src="{{ img_src }}"
+              alt="{{ block.settings.image_alt | default: title | escape }}"
+              loading="lazy"
+              width="800"
+              height="1000"
+            >
+          {% endif %}
+        {% endif %}
+      </div>
+
+      {% if block.settings.overlay_opacity > 0 %}
+        <div class="fpanel__shade" style="opacity:{{ block.settings.overlay_opacity | divided_by: 100.0 }}"></div>
+      {% endif %}
+
+      <div class="fpanel__content">
+        {% if block.settings.eyebrow != blank %}
+          <p class="feyebrow mono">{{ block.settings.eyebrow }}</p>
+        {% endif %}
+
+        {% if price_label != blank and block.settings.show_price_tag %}
+          <span class="fprice mono">{{ price_label }}</span>
+        {% endif %}
+
+        {% if title != blank %}
+          <h2 class="fname">{{ title }}</h2>
+        {% endif %}
+
+        {% if block.settings.subtitle != blank %}
+          <p class="fsubtitle">{{ block.settings.subtitle }}</p>
+        {% endif %}
+
+        {% if block.settings.ingredients != blank %}
+          <p class="fmeta">{{ block.settings.ingredients }}</p>
+        {% endif %}
+
+        {% if block.settings.body != blank %}
+          <div class="fbody rte">{{ block.settings.body }}</div>
+        {% endif %}
+
+        {% if block.settings.show_button and btn_label != blank and btn_url != blank %}
+          <a
+            class="fbtn fbtn--{{ block.settings.button_style | default: 'pill-tag' }}"
+            href="{{ btn_url }}"
+            {% if block.settings.button_new_tab %}target="_blank" rel="noopener"{% endif %}
+          >
+            {{ btn_label }}
+          </a>
+        {% elsif panel_url != blank and block.settings.whole_panel_link %}
+          <a class="fbtn fbtn--ghost fpanel__stretch-link" href="{{ panel_url }}" aria-label="{{ title }}"></a>
+        {% endif %}
+      </div>
+    </article>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "Flavor Strip",
+  "settings": [
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns (desktop)",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "label": "Panel min height",
+      "min": 50,
+      "max": 100,
+      "step": 2,
+      "unit": "vh",
+      "default": 92
+    }
+  ],
+  "blocks": [
+    {
+      "type": "panel",
+      "name": "Flavor panel",
+      "settings": [
+        { "type": "header", "content": "Product" },
+        { "type": "product", "id": "product", "label": "Linked product" },
+        { "type": "checkbox", "id": "whole_panel_link", "label": "Make entire panel clickable", "default": false },
+        { "type": "url", "id": "link_url", "label": "Panel link (overrides product URL)" },
+
+        { "type": "header", "content": "Media" },
+        {
+          "type": "select",
+          "id": "media_source",
+          "label": "Image source priority",
+          "default": "auto",
+          "options": [
+            { "value": "auto", "label": "Auto (custom → product → metafield → asset)" },
+            { "value": "custom", "label": "Custom image only" },
+            { "value": "product", "label": "Product featured image" },
+            { "value": "metafield", "label": "Product metafield" },
+            { "value": "asset", "label": "Theme asset filename" }
+          ]
+        },
+        { "type": "image_picker", "id": "image", "label": "Custom image" },
+        { "type": "text", "id": "image_alt", "label": "Image alt text" },
+        {
+          "type": "text",
+          "id": "theme_asset",
+          "label": "Theme asset filename",
+          "info": "e.g. flavor-pack-zesty-lime.png or stitch-flavor-zesty-lime.jpg"
+        },
+        {
+          "type": "text",
+          "id": "metafield_key",
+          "label": "Product image metafield",
+          "default": "custom.splash_image",
+          "info": "namespace.key — file reference metafield on linked product"
+        },
+        { "type": "video", "id": "video", "label": "Shopify-hosted video" },
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "External video URL",
+          "info": "MP4 URL — used if no Shopify video is set"
+        },
+        {
+          "type": "select",
+          "id": "media_fit",
+          "label": "Media fit",
+          "default": "cover",
+          "options": [
+            { "value": "cover", "label": "Cover" },
+            { "value": "contain", "label": "Contain" },
+            { "value": "fill", "label": "Fill" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "media_position",
+          "label": "Media position",
+          "default": "center center",
+          "options": [
+            { "value": "center center", "label": "Center" },
+            { "value": "top center", "label": "Top center" },
+            { "value": "bottom center", "label": "Bottom center" },
+            { "value": "left center", "label": "Left center" },
+            { "value": "right center", "label": "Right center" },
+            { "value": "top left", "label": "Top left" },
+            { "value": "top right", "label": "Top right" },
+            { "value": "bottom left", "label": "Bottom left" },
+            { "value": "bottom right", "label": "Bottom right" }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "media_scale",
+          "label": "Media scale",
+          "min": 60,
+          "max": 160,
+          "step": 5,
+          "unit": "%",
+          "default": 100
+        },
+        {
+          "type": "range",
+          "id": "overlay_opacity",
+          "label": "Dark overlay",
+          "min": 0,
+          "max": 80,
+          "step": 5,
+          "unit": "%",
+          "default": 15
+        },
+
+        { "type": "header", "content": "Background" },
+        { "type": "color", "id": "bg_color", "label": "Gradient start (fallback behind media)" },
+        { "type": "color", "id": "bg_gradient_end", "label": "Gradient end" },
+
+        { "type": "header", "content": "Layout" },
+        {
+          "type": "select",
+          "id": "span_columns",
+          "label": "Column span (desktop)",
+          "default": "1",
+          "options": [
+            { "value": "1", "label": "1 column" },
+            { "value": "2", "label": "Full width (2 cols)" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "content_align",
+          "label": "Content position",
+          "default": "bottom-left",
+          "options": [
+            { "value": "bottom-left", "label": "Bottom left" },
+            { "value": "bottom-center", "label": "Bottom center" },
+            { "value": "bottom-right", "label": "Bottom right" },
+            { "value": "center", "label": "Center" },
+            { "value": "top-left", "label": "Top left" }
+          ]
+        },
+
+        { "type": "header", "content": "Text" },
+        { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+        { "type": "text", "id": "title", "label": "Title", "info": "Defaults to product title" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle" },
+        { "type": "text", "id": "ingredients", "label": "Ingredients / meta line" },
+        { "type": "richtext", "id": "body", "label": "Body text" },
+        { "type": "text", "id": "price_label", "label": "Price tag", "default": "12-pack · $18" },
+        { "type": "checkbox", "id": "show_price_tag", "label": "Show price tag", "default": true },
+
+        { "type": "header", "content": "Button" },
+        { "type": "checkbox", "id": "show_button", "label": "Show button", "default": false },
+        { "type": "text", "id": "button_label", "label": "Button label" },
+        { "type": "url", "id": "button_link", "label": "Button link" },
+        { "type": "checkbox", "id": "button_new_tab", "label": "Open in new tab" },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "default": "pill-tag",
+          "options": [
+            { "value": "pill-tag", "label": "Pill tag (top-right style)" },
+            { "value": "solid", "label": "Solid lime" },
+            { "value": "outline", "label": "Outline" },
+            { "value": "ghost", "label": "Text link" }
+          ]
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Flavor Strip",
+      "blocks": [
+        {
+          "type": "panel",
+          "settings": {
+            "title": "Citrus",
+            "ingredients": "Yuzu · Lime · Blood orange",
+            "price_label": "12-pack · $18",
+            "theme_asset": "flavor-pack-zesty-lime.png",
+            "media_position": "center center",
+            "bg_color": "#e8a94a",
+            "bg_gradient_end": "#c9602e"
+          }
+        },
+        {
+          "type": "panel",
+          "settings": {
+            "title": "Berry",
+            "ingredients": "Raspberry · Açaí · Blackcurrant",
+            "price_label": "12-pack · $18",
+            "theme_asset": "flavor-pack-mixed-berry.png",
+            "media_position": "center center",
+            "bg_color": "#8f3d78",
+            "bg_gradient_end": "#3a1230"
+          }
+        },
+        {
+          "type": "panel",
+          "settings": {
+            "title": "Orange Tangerine",
+            "ingredients": "Bright citrus · Zero sugar",
+            "price_label": "12-pack · $18",
+            "theme_asset": "flavor-pack-orange-tangerine.png",
+            "media_position": "center center",
+            "span_columns": "2",
+            "bg_color": "#d4622a",
+            "bg_gradient_end": "#8a3a12",
+            "show_button": true,
+            "button_label": "Shop orange tangerine",
+            "button_style": "solid"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

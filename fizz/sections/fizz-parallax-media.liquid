@@ -1,0 +1,619 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign media_type = section.settings.media_type
+  assign text_v = section.settings.text_position_vertical | default: 'center'
+  assign text_h = section.settings.text_position_horizontal | default: 'center'
+  assign overlay_opacity = section.settings.overlay_opacity | times: 0.01
+%}
+
+<section
+  id="fizz-parallax-{{ section.id }}"
+  class="fizz-parallax-media"
+  data-fizz-parallax-media
+  data-parallax-speed="{{ section.settings.parallax_speed }}"
+  style="
+    --parallax-height: {{ section.settings.section_height }}px;
+    --parallax-content-width: {{ section.settings.content_width }}%;
+    --parallax-text-color: {{ section.settings.text_color }};
+    --parallax-overlay: rgba({{ section.settings.overlay_color.rgb }}, {{ overlay_opacity }});
+    --parallax-content-y: {{ text_v }};
+    --parallax-content-x: {{ text_h }};
+  "
+  aria-label="{{ section.settings.heading | strip_html | default: 'Parallax media' | escape }}"
+>
+  <div class="fizz-parallax-media__frame">
+    <div class="fizz-parallax-media__media-wrap" data-parallax-media-inner>
+      {% if media_type == 'video' %}
+        {% if section.settings.video != blank %}
+          {{
+            section.settings.video
+            | video_tag:
+              autoplay: true,
+              loop: true,
+              muted: true,
+              playsinline: true,
+              class: 'fizz-parallax-media__media fizz-parallax-media__video'
+          }}
+        {% elsif section.settings.video_url != blank %}
+          <video
+            class="fizz-parallax-media__media fizz-parallax-media__video"
+            autoplay
+            loop
+            muted
+            playsinline
+            {% if section.settings.image != blank %}
+              poster="{{ section.settings.image | image_url: width: 1920 }}"
+            {% endif %}
+          >
+            <source src="{{ section.settings.video_url }}" type="video/mp4">
+          </video>
+        {% elsif section.settings.image != blank %}
+          {{
+            section.settings.image
+            | image_url: width: 2400
+            | image_tag:
+              class: 'fizz-parallax-media__media fizz-parallax-media__image',
+              loading: 'lazy',
+              alt: section.settings.image_alt
+          }}
+        {% endif %}
+      {% elsif section.settings.image != blank %}
+        {{
+          section.settings.image
+          | image_url: width: 2400
+          | image_tag:
+            class: 'fizz-parallax-media__media fizz-parallax-media__image',
+            loading: 'lazy',
+            alt: section.settings.image_alt
+        }}
+      {% else %}
+        <div class="fizz-parallax-media__placeholder" aria-hidden="true">
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'fizz-parallax-media__placeholder-svg' }}
+        </div>
+      {% endif %}
+    </div>
+
+    {% if section.settings.show_overlay %}
+      <div class="fizz-parallax-media__overlay" aria-hidden="true"></div>
+    {% endif %}
+
+    <div class="fizz-parallax-media__content fizz-parallax-media__content--v-{{ text_v }} fizz-parallax-media__content--h-{{ text_h }}">
+      <div class="fizz-parallax-media__content-inner fizz-parallax-media__content-inner--align-{{ section.settings.text_align }}">
+        {% if section.settings.eyebrow != blank %}
+          <p class="fizz-parallax-media__eyebrow">{{ section.settings.eyebrow }}</p>
+        {% endif %}
+        {% if section.settings.heading != blank %}
+          <div class="fizz-parallax-media__heading rte">{{ section.settings.heading }}</div>
+        {% endif %}
+        {% if section.settings.subheading != blank %}
+          <div class="fizz-parallax-media__subheading rte">{{ section.settings.subheading }}</div>
+        {% endif %}
+        {% if section.settings.button_label != blank and section.settings.button_url != blank %}
+          <a
+            href="{{ section.settings.button_url }}"
+            class="fizz-parallax-media__btn fizz-parallax-media__btn--{{ section.settings.button_style }}"
+          >
+            {{ section.settings.button_label }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .fizz-parallax-media {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    overflow: hidden;
+    background: #030303;
+  }
+
+  .fizz-parallax-media__frame {
+    position: relative;
+    display: flex;
+    width: 100%;
+    min-height: var(--parallax-height, 600px);
+    height: var(--parallax-height, 600px);
+    overflow: hidden;
+  }
+
+  .fizz-parallax-media__media-wrap {
+    position: absolute;
+    inset: -12% 0;
+    will-change: transform;
+  }
+
+  .fizz-parallax-media__media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .fizz-parallax-media__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+  }
+
+  .fizz-parallax-media__placeholder-svg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.35;
+  }
+
+  .fizz-parallax-media__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: var(--parallax-overlay, rgba(0, 0, 0, 0.35));
+    pointer-events: none;
+  }
+
+  .fizz-parallax-media__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    color: var(--parallax-text-color, #fff);
+    pointer-events: none;
+  }
+
+  .fizz-parallax-media__content-inner {
+    pointer-events: auto;
+    max-width: var(--parallax-content-width, 100%);
+    width: 100%;
+  }
+
+  .fizz-parallax-media__content--v-top {
+    align-items: flex-start;
+  }
+
+  .fizz-parallax-media__content--v-center {
+    align-items: center;
+  }
+
+  .fizz-parallax-media__content--v-bottom {
+    align-items: flex-end;
+  }
+
+  .fizz-parallax-media__content--h-left {
+    justify-content: flex-start;
+  }
+
+  .fizz-parallax-media__content--h-center {
+    justify-content: center;
+  }
+
+  .fizz-parallax-media__content--h-right {
+    justify-content: flex-end;
+  }
+
+  .fizz-parallax-media__content-inner--align-left {
+    text-align: left;
+  }
+
+  .fizz-parallax-media__content-inner--align-center {
+    text-align: center;
+  }
+
+  .fizz-parallax-media__content-inner--align-right {
+    text-align: right;
+  }
+
+  .fizz-parallax-media__eyebrow {
+    margin: 0 0 0.75rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+
+  .fizz-parallax-media__heading {
+    margin: 0 0 0.75rem;
+    font-size: clamp(2rem, 5vw, 3.75rem);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  .fizz-parallax-media__heading p {
+    margin: 0;
+  }
+
+  .fizz-parallax-media__subheading {
+    margin: 0 0 1.25rem;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    line-height: 1.55;
+    opacity: 0.92;
+    max-width: 42ch;
+  }
+
+  .fizz-parallax-media__content-inner--align-center .fizz-parallax-media__subheading {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .fizz-parallax-media__content-inner--align-right .fizz-parallax-media__subheading {
+    margin-left: auto;
+  }
+
+  .fizz-parallax-media__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 200ms ease, background-color 200ms ease, border-color 200ms ease;
+  }
+
+  .fizz-parallax-media__btn--solid {
+    padding: 0.875rem 1.5rem;
+    border-radius: 100px;
+    background: #fff;
+    color: #030303;
+  }
+
+  .fizz-parallax-media__btn--outline {
+    padding: 0.875rem 1.5rem;
+    border: 1px solid currentColor;
+    border-radius: 100px;
+  }
+
+  .fizz-parallax-media__btn--link {
+    padding-bottom: 0.125rem;
+    border-bottom: 1px solid currentColor;
+  }
+
+  .fizz-parallax-media__btn:hover {
+    opacity: 0.9;
+  }
+
+  @media (max-width: 767px) {
+    .fizz-parallax-media__content-inner {
+      max-width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fizz-parallax-media__media-wrap {
+      inset: 0;
+      transform: none !important;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    var sections = document.querySelectorAll('[data-fizz-parallax-media]');
+    if (!sections.length) return;
+
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) return;
+
+    var ticking = false;
+
+    function updateParallax() {
+      sections.forEach(function (section) {
+        var inner = section.querySelector('[data-parallax-media-inner]');
+        if (!inner) return;
+
+        var speed = parseFloat(section.getAttribute('data-parallax-speed')) || 0.5;
+        if (speed <= 0) {
+          inner.style.transform = 'none';
+          return;
+        }
+        var rect = section.getBoundingClientRect();
+        var viewH = window.innerHeight;
+        var scrollRange = rect.height + viewH;
+        var progress = (viewH - rect.top) / scrollRange;
+        progress = Math.max(0, Math.min(1, progress));
+
+        var maxShift = section.offsetHeight * speed * 0.45;
+        var y = (progress - 0.5) * maxShift * 2;
+        inner.style.transform = 'translate3d(0, ' + y + 'px, 0)';
+      });
+      ticking = false;
+    }
+
+    function onScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    updateParallax();
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Fizz parallax media",
+  "tag": "section",
+  "class": "fizz-parallax-media-section fizz-section--spaced fizz-section--flush",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "flush"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "select",
+      "id": "media_type",
+      "label": "Media type",
+      "options": [
+        { "value": "video", "label": "Video" },
+        { "value": "image", "label": "Image" }
+      ],
+      "default": "video"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video upload"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video URL (MP4 fallback)",
+      "info": "Used when no video is uploaded. External CDN URLs supported."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Used for image mode, or as video poster / fallback"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image alt text"
+    },
+    {
+      "type": "range",
+      "id": "parallax_speed",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "label": "Parallax speed",
+      "default": 0.5,
+      "info": "How much the background moves while scrolling. 0 disables movement."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "section_height",
+      "min": 320,
+      "max": 900,
+      "step": 20,
+      "unit": "px",
+      "label": "Section height",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Content max width",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_overlay",
+      "label": "Show overlay",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay opacity",
+      "default": 35
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "text_position_vertical",
+      "label": "Vertical position",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_position_horizontal",
+      "label": "Horizontal position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>Parallax scroll effect</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "<p>Experience smooth vertical parallax scrolling</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "solid", "label": "Solid" },
+        { "value": "outline", "label": "Outline" },
+        { "value": "link", "label": "Text link" }
+      ],
+      "default": "outline"
+    },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [
+    {
+      "name": "Fizz parallax media",
+      "settings": {
+        "media_type": "video",
+        "video_url": "https://cdn.prod.website-files.com/69f88c02240c0cd6011f809d/69fb6ab828d94dcf19a4cf3a_sparkling-blue-bokeh-light-abstract-background-2025-12-17-06-46-25-utc_v1%20%281080p%29_mp4.mp4",
+        "parallax_speed": 0.5,
+        "section_height": 600,
+        "show_overlay": true,
+        "overlay_color": "#000000",
+        "overlay_opacity": 35,
+        "text_color": "#ffffff",
+        "heading": "<p>Parallax scroll effect</p>",
+        "subheading": "<p>Experience smooth vertical parallax scrolling</p>"
+      }
+    }
+  ]
+}
+{% endschema %}

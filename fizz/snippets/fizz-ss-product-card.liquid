@@ -1,0 +1,62 @@
+{% comment %}
+  SS product card — layout inspired by Stone Sip product boxes.
+  Usage: {% render 'fizz-ss-product-card', product: product, variant: variant %}
+{% endcomment %}
+{% liquid
+  assign use_variant = false
+  if variant != blank
+    assign use_variant = true
+  endif
+
+  if use_variant
+    assign card_title = variant.title
+    if card_title == 'Default Title'
+      assign card_title = product.title
+    endif
+    assign card_url = product.url | append: '?variant=' | append: variant.id
+    assign card_price = variant.price
+    assign card_image = variant.image | default: product.featured_image
+    assign badge = badge | default: 'Best seller'
+    assign color_slug = variant.metafields.custom.color_slug
+    if color_slug == blank
+      assign color_slug = variant.title | downcase | replace: ' ', '-'
+    endif
+    assign pack_slug = variant.metafields.custom.pack_slug
+  else
+    assign card_title = product.title
+    assign card_url = product.url
+    assign card_price = product.price
+    assign card_image = product.featured_image
+    assign badge = badge | default: ''
+    assign color_slug = ''
+    assign pack_slug = ''
+  endif
+
+  assign bottle_colors = 'arctic-white,charcoal-black,coral-orange,electric-blue,sage-green,steel-navy' | split: ','
+%}
+
+<a href="{{ card_url }}" class="ss-product-card">
+  <div class="ss-product-card__media">
+    {% if badge != blank %}
+      <span class="ss-product-card__badge">{{ badge }}</span>
+    {% endif %}
+    {% if card_image != blank %}
+      {{ card_image | image_url: width: 900 | image_tag: loading: 'lazy', alt: card_title }}
+    {% elsif color_slug != blank and bottle_colors contains color_slug %}
+      {% render 'fizz-bottle-card-media', color_slug: color_slug, alt: card_title %}
+    {% elsif pack_slug != blank %}
+      {% render 'fizz-flavor-pack-img', slug: pack_slug, alt: card_title %}
+    {% elsif product.featured_image %}
+      {{ product.featured_image | image_url: width: 900 | image_tag: loading: 'lazy', alt: card_title }}
+    {% else %}
+      <div style="width:100%;height:100%;background:var(--ss-elevated);"></div>
+    {% endif %}
+  </div>
+  <h3 class="ss-product-card__title">{{ card_title }}</h3>
+  <div class="ss-product-card__meta">
+    <span>{{ card_price | money }}</span>
+    {% if product.compare_at_price > card_price %}
+      <span><s>{{ product.compare_at_price | money }}</s></span>
+    {% endif %}
+  </div>
+</a>

@@ -1,0 +1,15 @@
+{% comment %}
+  Compact product card for PDP cross-sell rails.
+  Usage: {% render 'fizz-pdp-product-card', card_product: product %}
+{% endcomment %}
+{% if card_product != blank %}
+  <a href="{{ card_product.url }}" class="fizz-pdp-card">
+    <div class="fizz-pdp-card__media">
+      {% if card_product.featured_image %}
+        {{ card_product.featured_image | image_url: width: 480 | image_tag: loading: 'lazy', alt: card_product.title }}
+      {% endif %}
+    </div>
+    <p class="fizz-pdp-card__title">{{ card_product.title }}</p>
+    <p class="fizz-pdp-card__price">{{ card_product.price | money }}</p>
+  </a>
+{% endif %}

@@ -1,0 +1,189 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign pdp_tagline = product.metafields.custom.pdp_tagline
+%}
+<section
+  id="shopify-section-{{ section.id }}"
+  class="fizz-product-pdp fizz-product-pdp--co2 fizz-pdp-hero"
+  data-fizz-pdp-hero
+  data-fizz-product-co2
+>
+  <div class="fizz-pdp-hero__inner">
+    <div class="fizz-pdp-hero__grid">
+      <div class="fizz-pdp-hero__media-col fizz-commerce-panel fizz-commerce-panel--media">
+        <div class="fizz-pdp-hero__main-media">
+          {% if product.featured_image %}
+            {{ product.featured_image | image_url: width: 800 | image_tag: loading: 'eager', alt: product.title, class: 'fizz-product-pdp__img', id: 'fizz-co2-image' }}
+          {% else %}
+            {% render 'ks-stitch-img', name: 'science-carbonation', alt: product.title %}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="fizz-pdp-hero__buy-col fizz-commerce-panel fizz-commerce-panel--buy">
+        <div class="fizz-product-pdp__info">
+          <p class="fizz-product-pdp__eyebrow fizz-commerce-eyebrow">{{ section.settings.eyebrow }}</p>
+          {% if pdp_tagline != blank %}
+            <p class="fizz-pdp-tagline">{{ pdp_tagline }}</p>
+          {% endif %}
+          <h1>{{ product.title }}</h1>
+          <p class="fizz-product-pdp__pack-badge">{{ section.settings.pack_badge }}</p>
+          <p class="fizz-product-pdp__price">{{ current_variant.price | money }}</p>
+          {% if current_variant.unit_price_measurement.reference_value > 0 %}
+            <p class="fizz-product-pdp__unit-price">
+              {{ current_variant.unit_price | money }} / {{ section.settings.unit_label }}
+              ({{ current_variant.unit_price_measurement.reference_value | round }} {{ section.settings.pack_label }})
+            </p>
+          {% endif %}
+          <div class="fizz-product-pdp__desc rte">{{ product.description }}</div>
+
+          {% form 'product', product, class: 'fizz-co2-collection__form', id: 'fizz-co2-form' %}
+            <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+            {% if product.selling_plan_groups.size > 0 %}
+              <fieldset class="fizz-co2-collection__plans">
+                <legend>{{ section.settings.plan_label }}</legend>
+                <label class="fizz-co2-plan">
+                  <input type="radio" name="selling_plan" value="" checked>
+                  <span>{{ section.settings.onetime_label }}</span>
+                  <span class="fizz-co2-plan__price">{{ current_variant.price | money }}</span>
+                </label>
+                {% for group in product.selling_plan_groups %}
+                  {% for plan in group.selling_plans %}
+                    <label class="fizz-co2-plan">
+                      <input type="radio" name="selling_plan" value="{{ plan.id }}">
+                      <span>{{ plan.name }}</span>
+                      <span class="fizz-co2-plan__detail">{{ section.settings.subscribe_detail }}</span>
+                    </label>
+                  {% endfor %}
+                {% endfor %}
+              </fieldset>
+            {% else %}
+              <p class="fizz-product-pdp__subscribe-hint">{{ section.settings.no_plan_hint }}</p>
+            {% endif %}
+
+            <button type="submit" class="fizz-product-pdp__cta" data-fizz-pdp-submit>
+              {% if product.selling_plan_groups.size > 0 %}
+                {{ section.settings.cta_label }}
+              {% else %}
+                {{ section.settings.cta_onetime_label }}
+              {% endif %}
+            </button>
+          {% endform %}
+
+          {% for block in section.blocks %}
+            {% if block.type == '@app' %}
+              {% render block %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fizz-pdp-sticky-atc" data-fizz-sticky-atc hidden>
+    <div class="fizz-pdp-sticky-atc__meta">
+      <p class="fizz-pdp-sticky-atc__title">{{ product.title }}</p>
+      <p class="fizz-pdp-sticky-atc__price">{{ current_variant.price | money }}</p>
+    </div>
+    <button type="submit" form="fizz-co2-form" class="fizz-pdp-sticky-atc__btn">{{ section.settings.cta_onetime_label }}</button>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Fizz CO2 refill PDP",
+  "tag": "section",
+  "class": "fizz-co2-pdp-section fizz-section--spaced fizz-section--hero",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "hero"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Fizz Charge" },
+    { "type": "text", "id": "pack_badge", "label": "Pack badge", "default": "6-pack · $10 per refill" },
+    { "type": "text", "id": "unit_label", "label": "Unit price label", "default": "canister" },
+    { "type": "text", "id": "pack_label", "label": "Pack label", "default": "canisters" },
+    { "type": "text", "id": "plan_label", "label": "Plan picker label", "default": "How do you want to buy?" },
+    { "type": "text", "id": "onetime_label", "label": "One-time label", "default": "One-time 6-pack" },
+    { "type": "text", "id": "subscribe_detail", "label": "Subscribe detail", "default": "On-demand refills — reorder when you run low" },
+    { "type": "text", "id": "cta_label", "label": "Subscribe CTA", "default": "Subscribe & refill on demand" },
+    { "type": "text", "id": "cta_onetime_label", "label": "One-time CTA", "default": "Add 6-pack to cart" },
+    { "type": "text", "id": "no_plan_hint", "label": "No selling plan hint", "default": "Subscription refills coming soon — one-time 6-packs available now." },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [{ "name": "Fizz CO2 refill PDP" }]
+}
+{% endschema %}

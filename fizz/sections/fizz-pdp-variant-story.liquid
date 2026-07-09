@@ -1,0 +1,154 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign story_image = current_variant.metafields.custom.lifestyle_image
+  assign story_image_mobile = current_variant.metafields.custom.lifestyle_image_mobile
+  assign story_caption = current_variant.metafields.custom.lifestyle_caption
+  assign story_body = current_variant.metafields.custom.variant_story
+
+  capture color_slug
+    render 'fizz-pdp-color-slug', variant: current_variant
+  endcapture
+  assign color_slug = color_slug | strip
+
+  if story_image == blank
+    assign fallback_asset = 'hero-lifestyle-' | append: color_slug | append: '.png'
+  endif
+%}
+
+<section
+  class="fizz-pdp-variant-story fizz-pdp-variant-story--{{ color_slug }}"
+  data-fizz-pdp-variant-story
+  data-section-id="{{ section.id }}"
+>
+  <div class="fizz-pdp-variant-story__inner">
+    {% if section.settings.heading != blank %}
+      <h2 class="fizz-pdp-variant-story__heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    <div class="fizz-pdp-variant-story__grid">
+      <div class="fizz-pdp-variant-story__media">
+        {% if story_image != blank %}
+          <picture>
+            {% if story_image_mobile != blank %}
+              <source media="(max-width: 767px)" srcset="{{ story_image_mobile | image_url: width: 800 }}">
+            {% endif %}
+            {{ story_image | image_url: width: 1400 | image_tag: class: 'fizz-pdp-variant-story__img', loading: 'lazy', alt: story_caption | default: current_variant.title }}
+          </picture>
+        {% elsif fallback_asset != blank %}
+          <picture>
+            <source media="(max-width: 767px)" srcset="{{ fallback_asset | replace: '.png', '-mobile.png' | asset_url }}">
+            <img
+              class="fizz-pdp-variant-story__img"
+              src="{{ fallback_asset | asset_url }}"
+              alt="{{ story_caption | default: current_variant.title | escape }}"
+              width="1400"
+              height="900"
+              loading="lazy"
+            >
+          </picture>
+        {% endif %}
+        {% if story_caption != blank %}
+          <p class="fizz-pdp-variant-story__caption">{{ story_caption }}</p>
+        {% endif %}
+      </div>
+
+      <div class="fizz-pdp-variant-story__copy">
+        {% if story_body != blank %}
+          <div class="fizz-pdp-variant-story__body rte">{{ story_body | metafield_text }}</div>
+        {% elsif section.settings.fallback_copy != blank %}
+          <div class="fizz-pdp-variant-story__body rte">{{ section.settings.fallback_copy }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "PDP variant story",
+  "tag": "section",
+  "class": "fizz-pdp-variant-story-section fizz-section--spaced fizz-section--relaxed",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "relaxed"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Designed for your routine" },
+    {
+      "type": "richtext",
+      "id": "fallback_copy",
+      "label": "Fallback copy (if variant story metafield empty)",
+      "default": "<p>Take Fizz anywhere — desk, gym, or kitchen. Your color, your vibe.</p>"
+    },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [{ "name": "PDP variant story" }]
+}
+{% endschema %}

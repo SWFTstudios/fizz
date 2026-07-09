@@ -1,0 +1,20 @@
+mutation sellingPlanGroupCreate($input: SellingPlanGroupInput!, $resources: SellingPlanGroupResourceInput) {
+  sellingPlanGroupCreate(input: $input, resources: $resources) {
+    sellingPlanGroup {
+      id
+      name
+      sellingPlans(first: 5) {
+        edges {
+          node {
+            id
+            name
+          }
+        }
+      }
+    }
+    userErrors {
+      field
+      message
+    }
+  }
+}

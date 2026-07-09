@@ -1,0 +1,31 @@
+<div class="foot rv" data-screen-label="Footer" style="background:var(--footer-bg);color:var(--footer-text)">
+  <div data-bubbles data-bub-count="10" data-bub-color="var(--footer-bubble-color)" data-bub-seed="41" data-bub-rise="700" class="bubf"></div>
+  <h2 class="fh">{{ section.settings.line_1 }}<br><span class="out2">{{ section.settings.line_2 }}</span></h2>
+  <a class="bigcta" href="{{ section.settings.cta_link | default: routes.all_products_collection_url }}">{{ section.settings.cta_label }}</a>
+  <div class="footmeta">
+    <span>© {{ 'now' | date: '%Y' }} {{ shop.name }}</span>
+    <span>{{ section.settings.shipping_note }}</span>
+    <span>{{ section.settings.guarantee_note }}</span>
+    <span>
+      {% if section.settings.instagram_url != blank %}<a href="{{ section.settings.instagram_url }}">Instagram</a>{% endif %}
+      {% if section.settings.tiktok_url != blank %} / <a href="{{ section.settings.tiktok_url }}">TikTok</a>{% endif %}
+    </span>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    { "type": "text", "id": "line_1", "label": "Line 1", "default": "Hydrate" },
+    { "type": "text", "id": "line_2", "label": "Line 2 (outlined)", "default": "louder." },
+    { "type": "text", "id": "cta_label", "label": "CTA label", "default": "Shop FIZZ — $89" },
+    { "type": "url", "id": "cta_link", "label": "CTA link" },
+    { "type": "text", "id": "shipping_note", "label": "Shipping note", "default": "Free shipping over $50" },
+    { "type": "text", "id": "guarantee_note", "label": "Guarantee note", "default": "30-day fizz guarantee" },
+    { "type": "url", "id": "instagram_url", "label": "Instagram URL" },
+    { "type": "url", "id": "tiktok_url", "label": "TikTok URL" }
+  ],
+  "presets": [{ "name": "Footer" }]
+}
+{% endschema %}

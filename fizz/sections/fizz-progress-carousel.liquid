@@ -1,0 +1,327 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% if section.blocks.size > 0 %}
+  {% liquid
+    assign slides_mobile = section.settings.slides_per_view_mobile | default: 1
+    assign slides_tablet = section.settings.slides_per_view_tablet | default: 2
+    assign slides_desktop = section.settings.slides_per_view_desktop | default: 3
+
+    case slides_desktop
+      when 4
+        assign image_sizes_desktop = '25vw'
+      when 3
+        assign image_sizes_desktop = '33vw'
+      when 2
+        assign image_sizes_desktop = '50vw'
+      else
+        assign image_sizes_desktop = '85vw'
+    endcase
+
+    case slides_tablet
+      when 4
+        assign image_sizes_tablet = '25vw'
+      when 3
+        assign image_sizes_tablet = '33vw'
+      when 2
+        assign image_sizes_tablet = '50vw'
+      else
+        assign image_sizes_tablet = '85vw'
+    endcase
+
+    assign image_sizes = '(min-width: 1024px) ' | append: image_sizes_desktop | append: ', (min-width: 768px) ' | append: image_sizes_tablet | append: ', 85vw'
+  %}
+  <section
+    class="fizz-progress-carousel"
+    data-fizz-progress-carousel
+    data-autoplay-ms="{{ section.settings.autoplay_seconds | times: 1000 }}"
+    data-show-arrows="{{ section.settings.show_arrows }}"
+    data-slides-mobile="{{ slides_mobile }}"
+    data-slides-tablet="{{ slides_tablet }}"
+    data-slides-desktop="{{ slides_desktop }}"
+    aria-label="{{ section.settings.heading | default: 'Carousel' | escape }}"
+    style="--fizz-progress-track: {{ section.settings.progress_track_color }}; --fizz-progress-fill: {{ section.settings.progress_fill_color }};"
+  >
+    <div class="fizz-progress-carousel__inner">
+      {% if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.subheading != blank %}
+        <div class="fizz-progress-carousel__header">
+          {% if section.settings.eyebrow != blank %}
+            <p class="fizz-progress-carousel__eyebrow">{{ section.settings.eyebrow }}</p>
+          {% endif %}
+          {% if section.settings.heading != blank %}
+            <h2>{{ section.settings.heading }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="fizz-progress-carousel__lead">{{ section.settings.subheading }}</p>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="fizz-progress-carousel__shell{% if section.blocks.size < 2 %} fizz-progress-carousel__shell--single{% endif %}">
+        {% if section.settings.show_arrows and section.blocks.size > 1 %}
+          <button
+            type="button"
+            class="fizz-slide-arrow fizz-slide-arrow--left fizz-progress-carousel__arrow fizz-progress-carousel__arrow--prev"
+            data-fizz-progress-prev
+            aria-label="Previous slide"
+          >
+            <img src="{{ 'fizz-arrow-left.svg' | asset_url }}" alt="" width="24" height="24">
+          </button>
+        {% endif %}
+
+        <div class="swiper fizz-progress-carousel__swiper" data-fizz-progress-swiper>
+          <div class="swiper-wrapper">
+            {% for block in section.blocks %}
+              <div class="swiper-slide" {{ block.shopify_attributes }}>
+                {% if block.settings.link != blank %}
+                  <a href="{{ block.settings.link }}" class="fizz-progress-carousel__card fizz-progress-carousel__card--linked">
+                {% else %}
+                  <article class="fizz-progress-carousel__card">
+                {% endif %}
+                  <div class="fizz-progress-carousel__media">
+                    {% if block.settings.image != blank %}
+                      {% liquid
+                        assign slide_alt = block.settings.image.alt
+                        if slide_alt == blank
+                          assign slide_alt = block.settings.title
+                        endif
+                      %}
+                      {{
+                        block.settings.image
+                        | image_url: width: 900
+                        | image_tag: loading: 'lazy', widths: '400, 600, 900', sizes: image_sizes, alt: slide_alt
+                      }}
+                    {% else %}
+                      <div class="fizz-progress-carousel__media-placeholder" aria-hidden="true"></div>
+                    {% endif %}
+                  </div>
+                  <div class="fizz-progress-carousel__body">
+                    {% if block.settings.title != blank %}
+                      <h3 class="fizz-progress-carousel__title">{{ block.settings.title }}</h3>
+                    {% endif %}
+                    {% if block.settings.body != blank %}
+                      <p class="fizz-progress-carousel__text">{{ block.settings.body }}</p>
+                    {% endif %}
+                    {% if block.settings.cta_label != blank and block.settings.link != blank %}
+                      <span class="fizz-progress-carousel__cta">{{ block.settings.cta_label }}</span>
+                    {% endif %}
+                  </div>
+                {% if block.settings.link != blank %}
+                  </a>
+                {% else %}
+                  </article>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% if section.settings.show_arrows and section.blocks.size > 1 %}
+          <button
+            type="button"
+            class="fizz-slide-arrow fizz-slide-arrow--right fizz-progress-carousel__arrow fizz-progress-carousel__arrow--next"
+            data-fizz-progress-next
+            aria-label="Next slide"
+          >
+            <img src="{{ 'fizz-arrow-right.svg' | asset_url }}" alt="" width="24" height="24">
+          </button>
+        {% endif %}
+      </div>
+
+      {% if section.blocks.size > 1 %}
+        <div
+          class="fizz-progress-carousel__pagination"
+          data-fizz-progress-pagination
+          role="tablist"
+          aria-label="Slide pagination"
+        ></div>
+      {% endif %}
+    </div>
+  </section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Fizz progress carousel",
+  "tag": "section",
+  "class": "fizz-progress-carousel-section fizz-section--spaced fizz-section--relaxed",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "relaxed"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+        { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Discover Fizz" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Swipe through our favorite moments." },
+    { "type": "header", "content": "Carousel" },
+    {
+      "type": "range",
+      "id": "autoplay_seconds",
+      "label": "Autoplay interval (seconds, 0 = off)",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show prev/next arrows",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_mobile",
+      "label": "Slides visible (mobile)",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_tablet",
+      "label": "Slides visible (tablet)",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_desktop",
+      "label": "Slides visible (desktop)",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "progress_track_color",
+      "label": "Progress track color",
+      "default": "rgba(26, 26, 26, 0.15)"
+    },
+    {
+      "type": "color",
+      "id": "progress_fill_color",
+      "label": "Progress fill color",
+      "default": "#1a1a1a"
+    },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Slide title" },
+        { "type": "textarea", "id": "body", "label": "Body", "default": "Add a short description for this slide." },
+        { "type": "text", "id": "cta_label", "label": "CTA label" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Fizz progress carousel",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "title": "Sunny Terrace",
+            "body": "Bright citrus energy for your morning ritual."
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "title": "After Hours",
+            "body": "Sleek finish for dinner parties and nightcaps."
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "title": "Poolside",
+            "body": "Clean and crisp for sunny afternoons."
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "title": "On the Go",
+            "body": "Portable fizz wherever life takes you."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

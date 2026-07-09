@@ -1,0 +1,111 @@
+{% render 'fizz-section-spacing', section: section %}
+
+<section
+  class="fizz-pdp-elevate"
+  data-fizz-pdp-elevate
+  data-section-id="{{ section.id }}"
+  aria-label="{{ section.settings.heading | escape }}"
+>
+  <div class="fizz-pdp-elevate__bg">
+    {% if section.settings.background_image %}
+      {{ section.settings.background_image | image_url: width: 2000 | image_tag: loading: 'lazy', alt: '', class: 'fizz-pdp-elevate__bg-img' }}
+    {% else %}
+      {% render 'ks-stitch-img', name: 'flavor-packs-lifestyle', alt: '', class: 'fizz-pdp-elevate__bg-img' %}
+    {% endif %}
+    <div class="fizz-pdp-elevate__overlay"></div>
+  </div>
+
+  <div class="fizz-pdp-elevate__content">
+    <h2>{{ section.settings.heading }}</h2>
+    <p>{{ section.settings.subheading }}</p>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "PDP elevate band",
+  "tag": "section",
+  "class": "fizz-pdp-elevate-section fizz-section--spaced fizz-section--flush",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "flush"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Elevate Every Drop" },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Your daily ritual, upgraded with a crisp, refreshing twist."
+    },
+    { "type": "image_picker", "id": "background_image", "label": "Background image" },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [{ "name": "PDP elevate band" }]
+}
+{% endschema %}

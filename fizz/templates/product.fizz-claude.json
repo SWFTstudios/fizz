@@ -1,0 +1,61 @@
+{
+  "sections": {
+    "main": {
+      "type": "fizz-claude-product",
+      "blocks": {
+        "a1": {
+          "type": "addon",
+          "settings": {
+            "title": "CO₂ backup 6-pack",
+            "description": "360 fizzes of backup — never carbonate-less",
+            "price_label": "$15",
+            "addon_price": 15,
+            "addon_key": "co2"
+          }
+        },
+        "a2": {
+          "type": "addon",
+          "settings": {
+            "title": "Flavor sampler",
+            "description": "4 citrus + 4 berry packs. Real fruit, zero sugar",
+            "price_label": "$12",
+            "addon_price": 12,
+            "addon_key": "flavor"
+          }
+        },
+        "f1": {
+          "type": "faq",
+          "settings": {
+            "question": "What's in the box",
+            "answer": "The FIZZ bottle in your colorway, one CO₂ pod (60 fizzes), a quick-start card, and a cap tool for pod swaps."
+          }
+        },
+        "f2": {
+          "type": "faq",
+          "settings": {
+            "question": "How the fizz works",
+            "answer": "The pod threads into the cap and releases food-grade CO₂ through a diffuser as you twist. Pressure auto-regulates, so it's leakproof even fully charged."
+          }
+        },
+        "f3": {
+          "type": "faq",
+          "settings": {
+            "question": "Care",
+            "answer": "Cap is top-rack dishwasher safe. Hand-wash the vessel to keep the vacuum wall happy."
+          }
+        }
+      },
+      "block_order": ["a1", "a2", "f1", "f2", "f3"],
+      "settings": {
+        "tagline": "Sparkling water, wherever you are."
+      }
+    },
+    "footer": {
+      "type": "fizz-claude-footer",
+      "settings": {
+        "cta_link": "/collections/all"
+      }
+    }
+  },
+  "order": ["main", "footer"]
+}

@@ -1,0 +1,65 @@
+{
+  "sections": {
+    "hero": {
+      "type": "fizz-ss-product",
+      "blocks": {
+        "h1": { "type": "highlight", "settings": { "text": "Built for the Journey" } },
+        "h2": { "type": "highlight", "settings": { "text": "Always Carbonated" } },
+        "h3": { "type": "highlight", "settings": { "text": "No more plastic waste" } },
+        "f1": {
+          "type": "faq",
+          "settings": {
+            "question": "Is the bottle dishwasher safe?",
+            "answer": "Yes — top rack only. Hand-wash the cap for best results."
+          }
+        },
+        "f2": {
+          "type": "faq",
+          "settings": {
+            "question": "What CO2 does Fizz use?",
+            "answer": "Fizz Charge 6-packs are designed for the Fizz system. Each canister carbonates up to 12 liters."
+          }
+        }
+      },
+      "block_order": ["h1", "h2", "h3", "f1", "f2"],
+      "settings": {
+        "mode": "bottle",
+        "eyebrow": "Fizz Bottle",
+        "swatch_label": "Select color",
+        "cta_label": "Add to cart",
+        "show_faq": true,
+        "faq_heading": "Got questions?",
+        "padding_vertical": "hero"
+      }
+    },
+    "benefits": {
+      "type": "fizz-ss-benefits",
+      "blocks": {
+        "b1": { "type": "benefit", "settings": { "label": "12L per cartridge" } },
+        "b2": { "type": "benefit", "settings": { "label": "Portable fizz" } },
+        "b3": { "type": "benefit", "settings": { "label": "Reusable bottle" } }
+      },
+      "block_order": ["b1", "b2", "b3"],
+      "settings": {
+        "heading": "Why this bottle",
+        "subheading": "Carbonation made portable",
+        "body": "Precision flow, sustainable craftsmanship, and sparkle that lasts.",
+        "padding_vertical": "relaxed"
+      }
+    },
+    "lineup": {
+      "type": "fizz-ss-product-lineup",
+      "settings": {
+        "heading": "The lineup",
+        "view_all_label": "View all",
+        "view_all_url": "/collections/flavor-packs",
+        "collection": "flavor-packs",
+        "product_limit": 6,
+        "expand_variants": true,
+        "badge": "Pair with",
+        "padding_vertical": "relaxed"
+      }
+    }
+  },
+  "order": ["hero", "benefits", "lineup"]
+}

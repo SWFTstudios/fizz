@@ -1,0 +1,246 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% if section.settings.nav_sticky != false %}
+  {% style %}
+    #shopify-section-{{ section.id }} {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+  {% endstyle %}
+{% endif %}
+
+{% liquid
+  if section.settings.nav_sticky == false
+    assign nav_sticky_str = 'false'
+  else
+    assign nav_sticky_str = 'true'
+  endif
+
+  if section.settings.enable_transparent_nav == false
+    assign enable_transparent_nav_str = 'false'
+  else
+    assign enable_transparent_nav_str = 'true'
+  endif
+
+  if section.settings.solid_nav_on_scroll == false
+    assign solid_nav_on_scroll_str = 'false'
+  else
+    assign solid_nav_on_scroll_str = 'true'
+  endif
+
+  if section.settings.enable_glass_nav
+    assign enable_glass_nav_str = 'true'
+  else
+    assign enable_glass_nav_str = 'false'
+  endif
+
+  if section.settings.show_search == false
+    assign show_search_str = 'false'
+  else
+    assign show_search_str = 'true'
+  endif
+
+  if section.settings.show_announcement == false
+    assign show_announcement_str = 'false'
+  else
+    assign show_announcement_str = 'true'
+  endif
+%}
+
+{% render 'ks-nav',
+  menu: section.settings.menu,
+  utility_menu: section.settings.utility_menu,
+  nav_sticky: nav_sticky_str,
+  enable_transparent_nav: enable_transparent_nav_str,
+  solid_nav_on_scroll: solid_nav_on_scroll_str,
+  enable_glass_nav: enable_glass_nav_str,
+  nav_bg_color: section.settings.nav_bg_color,
+  nav_link_color: section.settings.nav_link_color,
+  nav_icon_color: section.settings.nav_icon_color,
+  desktop_inline_links: section.settings.desktop_inline_links,
+  show_search: show_search_str,
+  search_placeholder: section.settings.search_placeholder,
+  search_trending_menu: section.settings.search_trending_menu,
+  show_announcement: show_announcement_str,
+  announcement_text: section.settings.announcement_text,
+  announcement_link_label: section.settings.announcement_link_label,
+  announcement_link_url: section.settings.announcement_link_url,
+  announcement_bg_color: section.settings.announcement_bg_color,
+  announcement_text_color: section.settings.announcement_text_color,
+  announcement_hero_visibility: section.settings.announcement_hero_visibility,
+  cta_bg_color: section.settings.cta_bg_color,
+  cta_text_color: section.settings.cta_text_color
+%}
+
+{% schema %}
+{
+  "name": "Kinetic Spark header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Main menu",
+      "default": "main-menu",
+      "info": "Primary navigation shown in the drawer and as inline links on desktop."
+    },
+    {
+      "type": "link_list",
+      "id": "utility_menu",
+      "label": "Utility menu",
+      "info": "Secondary links in the mobile drawer (e.g. Login, Help Center)."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_sticky",
+      "label": "Keep navigation visible while scrolling",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "desktop_inline_links",
+      "label": "Desktop inline links",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "default": 2,
+      "info": "Top-level links shown left of the logo on desktop (like Shop, Activities)."
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_transparent_nav",
+      "label": "Transparent navigation over hero",
+      "default": true,
+      "info": "On the homepage, the nav starts transparent over the hero section."
+    },
+    {
+      "type": "checkbox",
+      "id": "solid_nav_on_scroll",
+      "label": "Show solid background after hero",
+      "default": true,
+      "info": "When enabled with transparent nav, the background appears after scrolling past the hero."
+    },
+    {
+      "type": "header",
+      "content": "Navigation background"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_glass_nav",
+      "label": "Glassmorphic background",
+      "default": false,
+      "info": "Frosted glass effect with blur. When off, the nav uses a solid background color."
+    },
+    {
+      "type": "color",
+      "id": "nav_bg_color",
+      "label": "Background color",
+      "default": "#1e2530",
+      "info": "Used as the solid fill, or as the tint behind the glass effect."
+    },
+    {
+      "type": "color",
+      "id": "nav_link_color",
+      "label": "Link color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "nav_icon_color",
+      "label": "Icon color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Search"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder",
+      "default": "What are you looking for?"
+    },
+    {
+      "type": "link_list",
+      "id": "search_trending_menu",
+      "label": "Trending search links",
+      "info": "Quick links shown in the search drawer (e.g. Bottles, Flavors, CO₂)."
+    },
+    {
+      "type": "header",
+      "content": "Announcement bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show announcement bar",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "announcement_hero_visibility",
+      "label": "On homepage hero",
+      "options": [
+        { "value": "defer", "label": "Hide until scrolled past hero" },
+        { "value": "always", "label": "Always visible" }
+      ],
+      "default": "defer",
+      "info": "Only applies when transparent navigation is enabled on the homepage."
+    },
+    {
+      "type": "text",
+      "id": "announcement_text",
+      "label": "Announcement text",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "text",
+      "id": "announcement_link_label",
+      "label": "Announcement link label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "announcement_link_url",
+      "label": "Announcement link URL"
+    },
+    {
+      "type": "color",
+      "id": "announcement_bg_color",
+      "label": "Announcement background",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "announcement_text_color",
+      "label": "Announcement text color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "cta_bg_color",
+      "label": "Announcement link accent color",
+      "default": "#FF7F50",
+      "info": "Color for the Shop Now link in the announcement bar."
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "Announcement link text color",
+      "default": "#111111"
+    },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ]
+}
+{% endschema %}

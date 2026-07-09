@@ -1,0 +1,16 @@
+{% if variant.metafields.custom.pack_slug != blank %}
+  {{- variant.metafields.custom.pack_slug -}}
+{% else %}
+  {% liquid
+    assign flavor_key = variant.title | downcase
+    if flavor_key contains 'orange'
+      echo 'orange-tangerine'
+    elsif flavor_key contains 'lime'
+      echo 'zesty-lime'
+    elsif flavor_key contains 'berry'
+      echo 'mixed-berry'
+    else
+      echo flavor_key | replace: ' ', '-'
+    endif
+  %}
+{% endif %}

@@ -1,0 +1,30 @@
+{
+  "sections": {
+    "main": {
+      "type": "fizz-ss-collection",
+      "settings": {
+        "eyebrow": "Shop",
+        "expand_variants": false,
+        "badge": "Best seller",
+        "products_per_page": 24,
+        "padding_vertical": "default"
+      }
+    },
+    "benefits": {
+      "type": "fizz-ss-benefits",
+      "blocks": {
+        "b1": { "type": "benefit", "settings": { "label": "12L per cartridge" } },
+        "b2": { "type": "benefit", "settings": { "label": "Portable fizz" } },
+        "b3": { "type": "benefit", "settings": { "label": "Real flavor packs" } }
+      },
+      "block_order": ["b1", "b2", "b3"],
+      "settings": {
+        "heading": "Why Fizz",
+        "subheading": "Carbonation made for everyday",
+        "body": "Bottles, flavor packs, and Fizz Charge — everything you need to sparkle on demand.",
+        "padding_vertical": "relaxed"
+      }
+    }
+  },
+  "order": ["main", "benefits"]
+}

@@ -1,0 +1,88 @@
+{% render 'fizz-section-spacing', section: section %}
+
+<section class="ss-section" aria-label="{{ collection.title | escape }}">
+  <div class="ss-container">
+    <div class="ss-collection-hero">
+      <p class="ss-eyebrow" data-ss-trigger="load" data-ss-fade="up">{{ section.settings.eyebrow }}</p>
+      <h1
+        class="ss-h1"
+        data-ss-trigger="load"
+        data-ss-split="words"
+        data-ss-duration="0.4"
+        data-ss-delay="0.1"
+      >
+        {{ section.settings.heading | default: collection.title }}
+      </h1>
+      {% if section.settings.subheading != blank or collection.description != blank %}
+        <p class="ss-body" style="margin-top: 1.25rem;" data-ss-trigger="load" data-ss-fade="up" data-ss-delay="0.3">
+          {{ section.settings.subheading | default: collection.description | strip_html }}
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="ss-product-grid" data-ss-stagger>
+      {% paginate collection.products by section.settings.products_per_page %}
+        {% for product in collection.products %}
+          {% if section.settings.expand_variants and product.variants.size > 1 %}
+            {% for variant in product.variants %}
+              {% render 'fizz-ss-product-card', product: product, variant: variant, badge: section.settings.badge %}
+            {% endfor %}
+          {% else %}
+            {% render 'fizz-ss-product-card', product: product, badge: section.settings.badge %}
+          {% endif %}
+        {% else %}
+          <p class="ss-body">No products found in this collection.</p>
+        {% endfor %}
+
+        {% if paginate.pages > 1 %}
+          <nav class="ss-section-head" style="grid-column: 1 / -1; margin-top: 2rem;" aria-label="Pagination">
+            {% if paginate.previous %}
+              <a class="ss-link" href="{{ paginate.previous.url }}">Previous</a>
+            {% endif %}
+            <span class="ss-eyebrow">Page {{ paginate.current_page }} of {{ paginate.pages }}</span>
+            {% if paginate.next %}
+              <a class="ss-link" href="{{ paginate.next.url }}">Next</a>
+            {% endif %}
+          </nav>
+        {% endif %}
+      {% endpaginate %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SS Collection",
+  "tag": "section",
+  "class": "fizz-ss-collection fizz-section--spaced fizz-section--default",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Shop" },
+    { "type": "text", "id": "heading", "label": "Heading override" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading override" },
+    { "type": "checkbox", "id": "expand_variants", "label": "Show variants as cards", "default": false },
+    { "type": "text", "id": "badge", "label": "Card badge", "default": "Best seller" },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 6,
+      "max": 36,
+      "step": 3,
+      "label": "Products per page",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" }
+      ],
+      "default": "default"
+    },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [{ "name": "SS Collection" }]
+}
+{% endschema %}

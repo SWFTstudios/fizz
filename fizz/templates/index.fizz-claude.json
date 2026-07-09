@@ -1,0 +1,131 @@
+{
+  "sections": {
+    "hero": {
+      "type": "fizz-claude-hero",
+      "settings": {}
+    },
+    "statement": {
+      "type": "fizz-claude-statement",
+      "settings": {}
+    },
+    "how": {
+      "type": "fizz-claude-how",
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "title": "Fill it cold",
+            "body": "Water, iced tea, juice \u2014 anything cold. Double-wall vacuum steel keeps 24 ounces ice-cold from first light to last set."
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "title": "Twist to fizz",
+            "body": "A recyclable CO\u2082 pod lives in the cap. One twist carbonates in eight seconds \u2014 dial it from gentle spritz to full bite. 60 fizzes per pod."
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "title": "Drop a flavor",
+            "body": "Real fruit, zero sugar, added electrolytes. Citrus or berry. Healthy stopped being flavorless the day we bottled it."
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3"
+      ],
+      "settings": {}
+    },
+    "colorways": {
+      "type": "fizz-claude-colorways",
+      "blocks": {
+        "cw_navy": { "type": "colorway", "settings": { "slug": "steel-navy", "bg_color": "#0f1a2e", "bg_gradient_end": "#26344f", "btn_color": "#1d2a44" } },
+        "cw_blue": { "type": "colorway", "settings": { "slug": "electric-blue", "bg_color": "#061018", "bg_gradient_end": "#2f6fd6", "btn_color": "#2f6fd6" } },
+        "cw_citrus": { "type": "colorway", "settings": { "slug": "coral-orange", "bg_color": "#1a0f08", "bg_gradient_end": "#f07a2e", "btn_color": "#f07a2e" } },
+        "cw_fern": { "type": "colorway", "settings": { "slug": "sage-green", "bg_color": "#0a1a12", "bg_gradient_end": "#2e8b57", "btn_color": "#2e8b57" } },
+        "cw_onyx": { "type": "colorway", "settings": { "slug": "charcoal-black", "bg_color": "#080a0d", "bg_gradient_end": "#16161a", "btn_color": "#c6f24e" } },
+        "cw_cloud": { "type": "colorway", "settings": { "slug": "arctic-white", "bg_color": "#d4d3cc", "bg_gradient_end": "#efeee8", "btn_color": "#080a0d", "text_color": "#080a0d" } }
+      },
+      "block_order": ["cw_navy", "cw_blue", "cw_citrus", "cw_fern", "cw_onyx", "cw_cloud"],
+      "settings": {
+        "eyebrow": "The bottle — six colorways",
+        "sync_scene_colors": true,
+        "scene_bg_style": "gradient",
+        "gradient_angle": 160,
+        "use_theme_accent": false
+      }
+    },
+    "flavors": {
+      "type": "fizz-claude-flavor-strip",
+      "blocks": {
+        "f1": {
+          "type": "panel",
+          "settings": {
+            "title": "Citrus",
+            "ingredients": "Yuzu \u00b7 Lime \u00b7 Blood orange",
+            "price_label": "12-pack \u00b7 $18",
+            "theme_asset": "flavor-pack-zesty-lime.png",
+            "media_position": "center center",
+            "bg_color": "#e8a94a",
+            "bg_gradient_end": "#c9602e"
+          }
+        },
+        "f2": {
+          "type": "panel",
+          "settings": {
+            "title": "Berry",
+            "ingredients": "Raspberry \u00b7 A\u00e7a\u00ed \u00b7 Blackcurrant",
+            "price_label": "12-pack \u00b7 $18",
+            "theme_asset": "flavor-pack-mixed-berry.png",
+            "media_position": "center center",
+            "bg_color": "#8f3d78",
+            "bg_gradient_end": "#3a1230"
+          }
+        },
+        "f3": {
+          "type": "panel",
+          "settings": {
+            "title": "Orange Tangerine",
+            "ingredients": "Bright citrus \u00b7 Zero sugar",
+            "price_label": "12-pack \u00b7 $18",
+            "theme_asset": "flavor-pack-orange-tangerine.png",
+            "media_position": "center center",
+            "span_columns": "2",
+            "bg_color": "#d4622a",
+            "bg_gradient_end": "#8a3a12",
+            "show_button": true,
+            "button_label": "Shop orange tangerine",
+            "button_style": "solid"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3"
+      ],
+      "settings": {
+        "columns": 2,
+        "min_height": 92
+      }
+    },
+    "footer": {
+      "type": "fizz-claude-footer",
+      "settings": {
+        "cta_link": "/collections/all"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "statement",
+    "how",
+    "colorways",
+    "flavors",
+    "footer"
+  ]
+}

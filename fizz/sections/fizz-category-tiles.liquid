@@ -1,0 +1,160 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign height_class = ''
+  case section.settings.column_height
+    when 'tall'
+      assign height_class = ' fizz-edge-media--height-tall'
+    when 'compact'
+      assign height_class = ' fizz-edge-media--height-compact'
+  endcase
+
+  assign grid_gap = section.settings.grid_gap | default: 0
+%}
+
+<section class="fizz-edge-media fizz-edge-media--3{{ height_class }}" id="shop" aria-label="Shop categories">
+  <div class="fizz-edge-media__grid" style="--fizz-edge-media-grid-gap: {{ grid_gap }}px;">
+    {% for block in section.blocks %}
+      {% render 'fizz-edge-media-column',
+        title: block.settings.title,
+        url: block.settings.url,
+        media_type: 'image',
+        image: block.settings.image,
+        fallback_image: block.settings.fallback_image,
+        loading: 'lazy',
+        shopify_attributes: block.shopify_attributes
+      %}
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Fizz category tiles",
+  "tag": "section",
+  "class": "fizz-tiles-section fizz-section--spaced fizz-section--flush",
+  "settings": [
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "select",
+      "id": "column_height",
+      "label": "Column height",
+      "options": [
+        { "value": "viewport", "label": "Viewport (75vh)" },
+        { "value": "tall", "label": "Tall (85vh)" },
+        { "value": "compact", "label": "Compact (60vh)" }
+      ],
+      "default": "viewport"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 0
+    },
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "flush"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+        { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Tile",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Shop Bottles" },
+        { "type": "url", "id": "url", "label": "Link" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        {
+          "type": "text",
+          "id": "fallback_image",
+          "label": "Fallback asset name",
+          "default": "hero-hiker-sunrise",
+          "info": "Stitch asset without stitch- prefix, e.g. hero-hiker-sunrise"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Fizz category tiles",
+      "blocks": [
+        { "type": "tile", "settings": { "title": "Shop Bottles", "url": "/collections/bottles", "fallback_image": "hero-hiker-sunrise" } },
+        { "type": "tile", "settings": { "title": "Flavor Packs", "url": "/collections/flavor-packs", "fallback_image": "flavor-packs-lifestyle" } },
+        { "type": "tile", "settings": { "title": "Fizz Charge", "url": "/collections/co2-refills", "fallback_image": "science-carbonation" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

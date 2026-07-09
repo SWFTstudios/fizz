@@ -1,0 +1,198 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign height_class = ''
+  case section.settings.column_height
+    when 'tall'
+      assign height_class = ' fizz-edge-media--height-tall'
+    when 'compact'
+      assign height_class = ' fizz-edge-media--height-compact'
+  endcase
+
+  assign grid_gap = section.settings.grid_gap | default: 2
+%}
+
+<section class="fizz-edge-media fizz-edge-media--2{{ height_class }}" aria-label="{{ section.settings.aria_label | default: 'Media columns' | escape }}">
+  <div class="fizz-edge-media__grid" style="--fizz-edge-media-grid-gap: {{ grid_gap }}px;">
+    {% for block in section.blocks %}
+      {% render 'fizz-edge-media-column',
+        title: block.settings.title,
+        url: block.settings.url,
+        media_type: block.settings.media_type,
+        image: block.settings.image,
+        video: block.settings.video,
+        video_url: block.settings.video_url,
+        fallback_image: block.settings.fallback_image,
+        loading: 'lazy',
+        shopify_attributes: block.shopify_attributes
+      %}
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Fizz media columns",
+  "tag": "section",
+  "class": "fizz-media-columns-section fizz-section--spaced fizz-section--flush",
+  "settings": [
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "Accessibility label",
+      "default": "Featured media"
+    },
+    {
+      "type": "select",
+      "id": "column_height",
+      "label": "Column height",
+      "options": [
+        { "value": "viewport", "label": "Viewport (75vh)" },
+        { "value": "tall", "label": "Tall (85vh)" },
+        { "value": "compact", "label": "Compact (60vh)" }
+      ],
+      "default": "viewport"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 2
+    },
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "flush"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+        { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "max_blocks": 2,
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Column",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Workspace Essentials" },
+        { "type": "url", "id": "url", "label": "Link" },
+        {
+          "type": "select",
+          "id": "media_type",
+          "label": "Media type",
+          "options": [
+            { "value": "image", "label": "Image" },
+            { "value": "video", "label": "Video" }
+          ],
+          "default": "image"
+        },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "video", "id": "video", "label": "Video" },
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "External video URL",
+          "info": "MP4 URL used when no Shopify video is selected."
+        },
+        {
+          "type": "text",
+          "id": "fallback_image",
+          "label": "Fallback asset name",
+          "default": "flavor-packs-lifestyle",
+          "info": "Stitch asset without stitch- prefix."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Fizz media columns",
+      "blocks": [
+        {
+          "type": "column",
+          "settings": {
+            "title": "Workspace Essentials",
+            "media_type": "image",
+            "fallback_image": "flavor-packs-lifestyle"
+          }
+        },
+        {
+          "type": "column",
+          "settings": {
+            "title": "Cable Management",
+            "media_type": "image",
+            "fallback_image": "science-carbonation"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

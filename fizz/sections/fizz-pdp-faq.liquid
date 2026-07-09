@@ -1,0 +1,142 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign faq_metafields = product.metafields.custom.pdp_faqs.value
+  assign has_meta_faqs = false
+  if faq_metafields != blank and faq_metafields.size > 0
+    assign has_meta_faqs = true
+  endif
+%}
+
+<section class="fizz-pdp-faq" aria-label="{{ section.settings.heading | escape }}">
+  <div class="fizz-pdp-faq__inner">
+    <h2>{{ section.settings.heading }}</h2>
+
+    <div class="fizz-pdp-faq__list">
+      {% if has_meta_faqs %}
+        {% for faq in faq_metafields %}
+          <details class="fizz-pdp-faq__item">
+            <summary>{{ faq.question.value | default: faq.question }}</summary>
+            <div class="fizz-pdp-faq__answer rte">
+              {{ faq.answer | metafield_tag }}
+            </div>
+          </details>
+        {% endfor %}
+      {% else %}
+        {% for block in section.blocks %}
+          {% if block.type == 'faq' %}
+            <details class="fizz-pdp-faq__item" {{ block.shopify_attributes }}>
+              <summary>{{ block.settings.question }}</summary>
+              <p class="fizz-pdp-faq__answer">{{ block.settings.answer }}</p>
+            </details>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "PDP FAQ",
+  "tag": "section",
+  "class": "fizz-pdp-faq-section fizz-section--spaced fizz-section--compact",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "compact"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Frequently asked questions" },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ item",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "How long does a cartridge last?" },
+        { "type": "textarea", "id": "answer", "label": "Answer", "default": "Each cartridge carbonates up to 12 liters." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP FAQ",
+      "blocks": [
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Is the bottle dishwasher safe?",
+            "answer": "Yes — top rack only. Hand-wash the cap for best results."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

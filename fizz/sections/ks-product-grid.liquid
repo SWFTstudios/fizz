@@ -1,0 +1,163 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign grid_heading = section.settings.heading
+  if grid_heading == blank
+    assign grid_heading = collection.title
+  endif
+%}
+<section class="px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto ks-reveal opacity-0 translate-y-10 transition-all duration-1000">
+  <div class="flex justify-between items-end mb-12 border-b border-outline-variant pb-4">
+    <h2 class="font-headline-lg text-headline-lg tracking-tight uppercase">{{ grid_heading }}</h2>
+    {% if section.settings.link_url != blank %}
+      <a class="font-label-caps text-primary hover:opacity-80 transition-opacity flex items-center gap-2" href="{{ section.settings.link_url }}">
+        {{ section.settings.link_label }}
+        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+      </a>
+    {% endif %}
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+    {% if collection.products_count > 0 %}
+      {% liquid
+        assign use_variants = false
+        if collection.products_count == 1
+          assign bottle_parent = collection.products.first
+          if bottle_parent.variants.size > 1
+            assign use_variants = true
+          endif
+        endif
+      %}
+      {% if use_variants %}
+        {% for variant in bottle_parent.variants %}
+          {% render 'ks-variant-card', product: bottle_parent, variant: variant, style: 'full' %}
+        {% endfor %}
+      {% else %}
+        {% for product in collection.products %}
+          {% liquid
+            assign skip_product = false
+            assign exclude_collection = section.settings.exclude_collection
+            if exclude_collection != blank
+              for product_collection in product.collections
+                if product_collection.id == exclude_collection.id
+                  assign skip_product = true
+                  break
+                endif
+              endfor
+            endif
+          %}
+          {% unless skip_product %}
+            {% render 'ks-product-card', product: product, style: 'full' %}
+          {% endunless %}
+        {% endfor %}
+      {% endif %}
+    {% else %}
+      {% assign bottle_images = 'bottle-arctic-white-pool,bottle-sage-green-kitchen,bottle-steel-navy-desk,bottle-coral-orange-pool,bottle-electric-blue-water,bottle-charcoal-black-dinner' | split: ',' %}
+      {% assign bottle_names = 'Arctic White,Sage Green,Steel Navy,Coral Orange,Electric Blue,Charcoal Black' | split: ',' %}
+      {% for name in bottle_names %}
+        {% assign idx = forloop.index0 %}
+        <div class="glass-card--shop rounded-xl overflow-hidden group flex flex-col">
+          <div class="relative aspect-[4/5] bg-surface-container-highest overflow-hidden">
+            {% render 'ks-stitch-img', name: bottle_images[idx], alt: name, class: 'w-full h-full object-cover transition-all duration-500 group-hover:scale-105' %}
+          </div>
+          <div class="p-6 flex flex-col flex-grow">
+            <div class="flex justify-between items-start mb-4">
+              <h3 class="font-headline-lg-mobile tracking-tight">Fizz Origin — {{ name }}</h3>
+              <span class="font-label-caps text-primary">$450 USD</span>
+            </div>
+            <p class="font-body-md text-on-surface-variant mb-6">Add products to the {{ collection.title | default: 'bottles' }} collection in Shopify Admin.</p>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "KS Product Grid",
+  "tag": "section",
+  "class": "ks-product-grid-section fizz-section--spaced fizz-section--default",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "info": "Leave blank to use the collection title." },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "View Technical Specs" },
+    { "type": "url", "id": "link_url", "label": "Link URL" },
+    {
+      "type": "collection",
+      "id": "exclude_collection",
+      "label": "Exclude collection",
+      "info": "Hide products that also belong to this collection (e.g. flavor packs shown in a dedicated section)."
+    },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [{ "name": "KS Product Grid" }]
+}
+{% endschema %}

@@ -1,0 +1,23 @@
+{% if variant.metafields.custom.color_slug != blank %}
+  {{- variant.metafields.custom.color_slug -}}
+{% else %}
+  {% liquid
+    assign title_key = variant.title | downcase | strip
+    case title_key
+      when 'black'
+        echo 'charcoal-black'
+      when 'white'
+        echo 'arctic-white'
+      when 'orange'
+        echo 'coral-orange'
+      when 'sage'
+        echo 'sage-green'
+      when 'blue'
+        echo 'electric-blue'
+      when 'navy'
+        echo 'steel-navy'
+      else
+        echo title_key | replace: ' ', '-'
+    endcase
+  %}
+{% endif %}

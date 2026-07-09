@@ -1,0 +1,64 @@
+{%- liquid
+  assign vertical = section.settings.padding_vertical | default: 'relaxed'
+  assign horizontal = section.settings.padding_horizontal | default: 'theme'
+
+  case vertical
+    when 'flush'
+      assign pad_top = '0'
+      assign pad_bottom = '0'
+    when 'compact'
+      assign pad_top = 'var(--fizz-space-section-compact)'
+      assign pad_bottom = 'var(--fizz-space-section-compact)'
+    when 'default'
+      assign pad_top = 'var(--fizz-space-section-default)'
+      assign pad_bottom = 'var(--fizz-space-section-default)'
+    when 'relaxed'
+      assign pad_top = 'var(--fizz-space-section-relaxed)'
+      assign pad_bottom = 'var(--fizz-space-section-relaxed)'
+    when 'statement'
+      assign pad_top = 'var(--fizz-space-section-statement)'
+      assign pad_bottom = 'var(--fizz-space-section-statement)'
+    when 'hero'
+      assign pad_top = 'var(--fizz-space-hero-y)'
+      assign pad_bottom = '0'
+    when 'custom'
+      assign pad_top = section.settings.padding_top | default: 0 | append: 'px'
+      assign pad_bottom = section.settings.padding_bottom | default: 0 | append: 'px'
+    else
+      assign pad_top = 'var(--fizz-space-section-relaxed)'
+      assign pad_bottom = 'var(--fizz-space-section-relaxed)'
+  endcase
+
+  case horizontal
+    when 'none'
+      assign pad_left = '0'
+      assign pad_right = '0'
+    when 'full'
+      assign pad_left = '0'
+      assign pad_right = '0'
+    when 'custom'
+      assign pad_left = section.settings.padding_left | default: 0 | append: 'px'
+      assign pad_right = section.settings.padding_right | default: 0 | append: 'px'
+    else
+      assign pad_left = 'var(--fizz-space-page-x)'
+      assign pad_right = 'var(--fizz-space-page-x)'
+  endcase
+-%}
+{% if horizontal == 'full' %}
+  <span data-fizz-section-full-width hidden aria-hidden="true"></span>
+{% endif %}
+{% if section.settings.background_color != blank %}
+  <span data-fizz-section-bg hidden aria-hidden="true"></span>
+{% endif %}
+{% style %}
+  #shopify-section-{{ section.id }} {
+    --fizz-section-pad-top: {{ pad_top }};
+    --fizz-section-pad-bottom: {{ pad_bottom }};
+    --fizz-section-pad-left: {{ pad_left }};
+    --fizz-section-pad-right: {{ pad_right }};
+    {%- if section.settings.background_color != blank -%}
+    --fizz-section-bg: {{ section.settings.background_color }};
+    background-color: {{ section.settings.background_color }};
+    {%- endif -%}
+  }
+{% endstyle %}

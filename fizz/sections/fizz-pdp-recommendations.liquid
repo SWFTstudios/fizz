@@ -1,0 +1,112 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% if product.id %}
+  <section
+    class="fizz-pdp-recommendations"
+    data-fizz-pdp-recommendations
+    data-product-id="{{ product.id }}"
+    data-intent="{{ section.settings.intent }}"
+    data-limit="{{ section.settings.product_limit }}"
+    aria-label="{{ section.settings.heading | escape }}"
+  >
+    <div class="fizz-pdp-recommendations__inner">
+      <h2>{{ section.settings.heading }}</h2>
+      <div class="fizz-pdp-recommendations__grid" data-fizz-recommendations-grid>
+        <p class="fizz-pdp-recommendations__loading" data-fizz-recommendations-loading>Loading…</p>
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "PDP recommendations",
+  "tag": "section",
+  "class": "fizz-pdp-recommendations-section fizz-section--spaced fizz-section--default",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "You may also like" },
+    {
+      "type": "select",
+      "id": "intent",
+      "label": "Recommendation type",
+      "default": "complementary",
+      "options": [
+        { "value": "complementary", "label": "Complementary (pairs well)" },
+        { "value": "related", "label": "Related" }
+      ]
+    },
+    { "type": "range", "id": "product_limit", "label": "Products to show", "min": 2, "max": 8, "step": 1, "default": 4 },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [{ "name": "PDP recommendations" }]
+}
+{% endschema %}

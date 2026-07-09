@@ -1,0 +1,102 @@
+{% render 'fizz-section-spacing', section: section %}
+
+<section class="ss-section" aria-label="{{ section.settings.label | escape }}">
+  {% if section.settings.label != blank %}
+    <div class="ss-container" style="margin-bottom: 1rem;">
+      <p class="ss-eyebrow">{{ section.settings.label }}</p>
+    </div>
+  {% endif %}
+  <div class="ss-marquee{% if section.settings.size == 'lg' %} ss-marquee--lg{% endif %}" data-ss-marquee data-ss-speed="{{ section.settings.speed }}">
+    <div class="ss-marquee__track" data-ss-marquee-track>
+      {% if section.blocks.size > 0 %}
+        {% for block in section.blocks %}
+          <span class="ss-marquee__item" {{ block.shopify_attributes }}>
+            {% if block.settings.logo != blank %}
+              {{ block.settings.logo | image_url: width: 200 | image_tag: loading: 'lazy', alt: block.settings.text }}
+            {% endif %}
+            {% if block.settings.text != blank %}
+              {{ block.settings.text }}
+            {% endif %}
+          </span>
+        {% endfor %}
+      {% else %}
+        {% assign items = section.settings.fallback_text | split: '|' %}
+        {% for item in items %}
+          <span class="ss-marquee__item">{{ item | strip }}</span>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SS Marquee",
+  "tag": "section",
+  "class": "fizz-ss-marquee fizz-section--spaced fizz-section--compact",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Label", "default": "As seen in" },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Size",
+      "options": [
+        { "value": "sm", "label": "Logo strip" },
+        { "value": "lg", "label": "Large text" }
+      ],
+      "default": "sm"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 12,
+      "max": 60,
+      "step": 1,
+      "unit": "s",
+      "label": "Loop duration",
+      "default": 28
+    },
+    {
+      "type": "text",
+      "id": "fallback_text",
+      "label": "Fallback items (pipe-separated)",
+      "default": "Wired | Outside | TechCrunch | Gear Patrol | Bon Appétit | Fast Company"
+    },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" }
+      ],
+      "default": "compact"
+    },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Marquee item",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Brand" },
+        { "type": "image_picker", "id": "logo", "label": "Logo" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "SS Marquee",
+      "blocks": [
+        { "type": "item", "settings": { "text": "Wired" } },
+        { "type": "item", "settings": { "text": "Outside" } },
+        { "type": "item", "settings": { "text": "TechCrunch" } },
+        { "type": "item", "settings": { "text": "Gear Patrol" } },
+        { "type": "item", "settings": { "text": "Bon Appétit" } },
+        { "type": "item", "settings": { "text": "Fast Company" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

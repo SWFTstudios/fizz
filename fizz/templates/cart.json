@@ -1,0 +1,24 @@
+{
+  "sections": {
+    "main": {
+      "type": "fizz-cart",
+      "settings": {
+        "heading": "Your cart",
+        "padding_vertical": "default"
+      }
+    },
+    "upsell": {
+      "type": "fizz-ss-product-lineup",
+      "settings": {
+        "heading": "You might also like",
+        "view_all_label": "View all",
+        "collection": "flavor-packs",
+        "product_limit": 6,
+        "expand_variants": true,
+        "badge": "Add more",
+        "padding_vertical": "relaxed"
+      }
+    }
+  },
+  "order": ["main", "upsell"]
+}

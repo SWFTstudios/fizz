@@ -1,0 +1,76 @@
+{% liquid
+  assign col_media_type = media_type | default: 'image'
+  assign col_loading = loading | default: 'lazy'
+  assign col_title = title | default: ''
+  assign has_link = false
+  if url != blank and url != '#'
+    assign has_link = true
+  endif
+  assign col_tag = 'div'
+  if has_link
+    assign col_tag = 'a'
+  endif
+%}
+
+<{{ col_tag }}
+  class="fizz-edge-media__cell"
+  {% if has_link %}href="{{ url }}"{% endif %}
+  {% if shopify_attributes %}{{ shopify_attributes }}{% endif %}
+>
+  <div class="fizz-edge-media__media">
+    {% if col_media_type == 'video' %}
+      {% if video != blank %}
+        {{
+          video
+          | video_tag:
+            autoplay: true,
+            loop: true,
+            muted: true,
+            playsinline: true,
+            class: 'fizz-edge-media__video'
+        }}
+      {% elsif video_url != blank %}
+        <video
+          class="fizz-edge-media__video"
+          autoplay
+          loop
+          muted
+          playsinline
+          {% if image != blank %}
+            poster="{{ image | image_url: width: 1920 }}"
+          {% endif %}
+        >
+          <source src="{{ video_url }}" type="video/mp4">
+        </video>
+      {% elsif image != blank %}
+        {{
+          image
+          | image_url: width: 1600
+          | image_tag:
+            class: 'fizz-edge-media__img',
+            loading: col_loading,
+            alt: col_title
+        }}
+      {% elsif fallback_image != blank %}
+        {% render 'ks-stitch-img', name: fallback_image, alt: col_title, class: 'fizz-edge-media__img' %}
+      {% endif %}
+    {% elsif image != blank %}
+      {{
+        image
+        | image_url: width: 1600
+        | image_tag:
+          class: 'fizz-edge-media__img',
+          loading: col_loading,
+          alt: col_title
+      }}
+    {% elsif fallback_image != blank %}
+      {% render 'ks-stitch-img', name: fallback_image, alt: col_title, class: 'fizz-edge-media__img' %}
+    {% endif %}
+  </div>
+
+  <div class="fizz-edge-media__gradient" aria-hidden="true"></div>
+
+  {% if col_title != blank %}
+    <span class="fizz-edge-media__label">{{ col_title }}</span>
+  {% endif %}
+</{{ col_tag }}>

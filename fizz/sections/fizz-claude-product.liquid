@@ -1,0 +1,209 @@
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign base_price = current_variant.price | divided_by: 100.0
+  capture color_slug
+    render 'fizz-color-slug', variant: current_variant
+  endcapture
+  assign color_slug = color_slug | strip
+%}
+
+<div class="pdp" id="buy" data-pdp data-screen-label="Product hero">
+  <div>
+    <div class="pstage" data-pdp-stage style="background:radial-gradient(ellipse 80% 90% at 50% 100%,#141922,#0b0e12)">
+      <div data-bubbles data-bub-count="14" data-bub-color="var(--hero-bubble-color)" data-bub-seed="11" data-bub-rise="700" class="bubf"></div>
+      <div class="pglow"></div>
+      {% render 'fizz-bottle-product-img',
+        color_slug: color_slug,
+        alt: product.title,
+        class: 'botimg',
+        data_photo: true,
+        loading: 'eager',
+        width: 170,
+        height: 430
+      %}
+    </div>
+    <div class="thumbs">
+      {% if product.images.size > 0 %}
+        {% for image in product.images limit: 3 %}
+          <button type="button" class="thumb{% if forloop.first %} is-active{% endif %}" data-pdp-thumb data-full-src="{{ image | image_url: width: 900 }}" aria-label="View image {{ forloop.index }}">
+            {{ image | image_url: width: 300 | image_tag: loading: 'lazy', alt: image.alt | default: product.title }}
+          </button>
+        {% endfor %}
+      {% else %}
+        {% assign thumb_assets = 'fizz-lifestyle-trail.jpg,fizz-lifestyle-pod-detail.jpg,fizz-lifestyle-macro.jpg' | split: ',' %}
+        {% assign thumb_labels = 'lifestyle — trail,cap + CO₂ pod detail,fizz macro shot' | split: ',' %}
+        {% for asset in thumb_assets %}
+          <button type="button" class="thumb{% if forloop.first %} is-active{% endif %}" data-pdp-thumb data-full-src="{{ asset | asset_url }}" aria-label="{{ thumb_labels[forloop.index0] }}">
+            {% render 'fizz-img', file: asset, alt: thumb_labels[forloop.index0], class: 'thumb__img' %}
+          </button>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+
+  <div>
+    <p class="crumb">{{ section.settings.crumb | default: 'FIZZ / The Bottle' }}</p>
+    <h1 class="ptitle">{{ section.settings.title | default: product.title }}</h1>
+    {% if section.settings.tagline != blank %}
+      <p class="ptag">{{ section.settings.tagline }}</p>
+    {% endif %}
+    <p class="pdesc">{{ section.settings.description | default: product.description | strip_html }}</p>
+
+    {% if product.variants.size > 1 %}
+      <p class="optlab">Colorway — <span data-pdp-way-label>{{ current_variant.title }}</span></p>
+      <div class="swrow">
+        {% for variant in product.variants %}
+          {% capture slug %}
+            {% render 'fizz-color-slug', variant: variant %}
+          {% endcapture %}
+          {% assign slug = slug | strip %}
+          <button
+            type="button"
+            class="sw {% if variant.id == current_variant.id %}on{% endif %}"
+            data-way-swatch
+            data-target="#buy"
+            data-variant-id="{{ variant.id }}"
+            data-color="{{ variant.metafields.custom.swatch_hex | default: '#1d2a44' }}"
+            data-name="{{ variant.title }}"
+            data-price="{{ variant.price | money }}"
+            data-image="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}"
+            style="background:{{ variant.metafields.custom.swatch_hex | default: '#1d2a44' }}"
+            title="{{ variant.title }}"
+          ></button>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% for block in section.blocks %}
+      {% if block.type == 'addon' and block.settings.variant_id != blank %}
+        <div class="addon" data-addon data-addon-key="{{ block.settings.addon_key }}" data-variant-id="{{ block.settings.variant_id }}" data-addon-price="{{ block.settings.addon_price | default: 0 }}" {{ block.shopify_attributes }}>
+          <div>
+            <p class="addt">{{ block.settings.title }}</p>
+            <p class="addd">{{ block.settings.description }}</p>
+          </div>
+          <span class="addp">+{{ block.settings.price_label }}</span>
+          <span class="dot" aria-hidden="true"></span>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    <div data-pdp-form data-base-price="{{ base_price }}">
+      {% form 'product', product, id: 'fizz-pdp-form' %}
+        <input type="hidden" name="id" value="{{ current_variant.id }}" data-pdp-variant-id>
+        <button type="submit" class="bigcta" data-pdp-submit>
+          Add to cart — {{ current_variant.price | money }}
+        </button>
+      {% endform %}
+    </div>
+
+    <div class="pmeta">
+      <span>{{ section.settings.shipping_note }}</span>
+      <span>{{ section.settings.guarantee_note }}</span>
+      <span>{{ section.settings.warranty_note }}</span>
+    </div>
+
+    <div class="accs">
+      {% for block in section.blocks %}
+        {% if block.type == 'faq' %}
+          <details {{ block.shopify_attributes }}>
+            <summary>{{ block.settings.question }}</summary>
+            <p class="accbody">{{ block.settings.answer }}</p>
+          </details>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Product",
+  "settings": [
+    { "type": "text", "id": "crumb", "label": "Breadcrumb", "default": "FIZZ / The Bottle" },
+    { "type": "text", "id": "title", "label": "Title override" },
+    { "type": "text", "id": "tagline", "label": "Tagline", "default": "Sparkling water, wherever you are." },
+    { "type": "textarea", "id": "description", "label": "Description override" },
+    { "type": "color", "id": "fallback_color", "label": "Fallback bottle color", "default": "#1d2a44" },
+    { "type": "text", "id": "shipping_note", "label": "Shipping note", "default": "Free shipping over $50" },
+    { "type": "text", "id": "guarantee_note", "label": "Guarantee note", "default": "30-day fizz guarantee" },
+    { "type": "text", "id": "warranty_note", "label": "Warranty note", "default": "2-yr warranty" }
+  ],
+  "blocks": [
+    {
+      "type": "addon",
+      "name": "Add-on",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "CO₂ backup 6-pack" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "360 fizzes of backup — never carbonate-less" },
+        { "type": "text", "id": "price_label", "label": "Price label", "default": "$15" },
+        { "type": "number", "id": "addon_price", "label": "Addon price (for total display)", "default": 15 },
+        { "type": "text", "id": "addon_key", "label": "Add-on key (for ?pack= URL)", "default": "co2", "info": "e.g. co2 or flavor — matches Colorways addon_pack_query" },
+        { "type": "text", "id": "variant_id", "label": "Variant ID (numeric)" }
+      ]
+    },
+    {
+      "type": "faq",
+      "name": "FAQ item",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "What's in the box" },
+        { "type": "textarea", "id": "answer", "label": "Answer", "default": "The FIZZ bottle in your colorway, one CO₂ pod (60 fizzes), a quick-start card, and a cap tool for pod swaps." }
+      ]
+    },
+    {
+      "type": "thumb",
+      "name": "Placeholder thumb",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "lifestyle — trail" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product",
+      "blocks": [
+        {
+          "type": "addon",
+          "settings": {
+            "title": "CO₂ backup 6-pack",
+            "description": "360 fizzes of backup — never carbonate-less",
+            "price_label": "$15",
+            "addon_price": 15,
+            "addon_key": "co2"
+          }
+        },
+        {
+          "type": "addon",
+          "settings": {
+            "title": "Flavor sampler",
+            "description": "4 citrus + 4 berry packs. Real fruit, zero sugar",
+            "price_label": "$12",
+            "addon_price": 12,
+            "addon_key": "flavor"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "What's in the box",
+            "answer": "The FIZZ bottle in your colorway, one CO₂ pod (60 fizzes), a quick-start card, and a cap tool for pod swaps."
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "How the fizz works",
+            "answer": "The pod threads into the cap and releases food-grade CO₂ through a diffuser as you twist. Pressure auto-regulates, so it's leakproof even fully charged."
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Care",
+            "answer": "Cap is top-rack dishwasher safe. Hand-wash the vessel to keep the vacuum wall happy."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

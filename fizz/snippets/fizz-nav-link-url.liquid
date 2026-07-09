@@ -1,0 +1,9 @@
+{%- liquid
+  assign nav_url = url
+  case title
+    when 'Home'
+      assign nav_url = routes.all_products_collection_url
+    when 'Catalog'
+      assign nav_url = '/pages/about-us'
+  endcase
+-%}{{ nav_url }}

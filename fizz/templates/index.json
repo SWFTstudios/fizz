@@ -1,0 +1,185 @@
+{
+  "sections": {
+    "hero": {
+      "type": "fizz-ss-hero",
+      "settings": {
+        "eyebrow": "Portable sparkling water",
+        "heading": "Sparkling Water, Perfectly Portable",
+        "subheading": "Carbonate anywhere. Flavor in seconds. Fizz up your day.",
+        "cta_label": "Shop Now",
+        "cta_url": "/collections/all",
+        "secondary_label": "Explore flavors",
+        "secondary_url": "/collections/flavor-packs",
+        "fallback_slug": "coral-orange",
+        "heading_delay": "0.15",
+        "padding_vertical": "flush"
+      }
+    },
+    "marquee": {
+      "type": "fizz-ss-marquee",
+      "blocks": {
+        "m1": { "type": "item", "settings": { "text": "Wired" } },
+        "m2": { "type": "item", "settings": { "text": "Outside" } },
+        "m3": { "type": "item", "settings": { "text": "TechCrunch" } },
+        "m4": { "type": "item", "settings": { "text": "Gear Patrol" } },
+        "m5": { "type": "item", "settings": { "text": "Bon Appétit" } },
+        "m6": { "type": "item", "settings": { "text": "Fast Company" } }
+      },
+      "block_order": ["m1", "m2", "m3", "m4", "m5", "m6"],
+      "settings": {
+        "label": "As seen in",
+        "size": "sm",
+        "speed": 28,
+        "padding_vertical": "compact"
+      }
+    },
+    "intro": {
+      "type": "fizz-ss-intro-split",
+      "settings": {
+        "title_line_1": "Sparkling water",
+        "title_line_2": "without any compromise.",
+        "heading": "Carbonation made the right way",
+        "body": "Fizz is a portable carbonation bottle paired with our in-house flavor packs so you can liven up your water in seconds—anytime, anywhere.",
+        "cta_label": "Learn more",
+        "cta_url": "/pages/about",
+        "padding_vertical": "statement"
+      }
+    },
+    "lineup": {
+      "type": "fizz-ss-product-lineup",
+      "settings": {
+        "heading": "The lineup",
+        "view_all_label": "View all",
+        "view_all_url": "/collections/all",
+        "collection": "bottles",
+        "product_limit": 6,
+        "expand_variants": true,
+        "badge": "Best seller",
+        "padding_vertical": "relaxed"
+      }
+    },
+    "reviews": {
+      "type": "fizz-ss-reviews",
+      "blocks": {
+        "r1": {
+          "type": "review",
+          "settings": {
+            "title": "Super delicious",
+            "quote": "Crisp bubbles and clean flavor. Perfect straight from the bottle.",
+            "author": "Dana A.",
+            "badge": "Verified"
+          }
+        },
+        "r2": {
+          "type": "review",
+          "settings": {
+            "title": "My go-to fizz",
+            "quote": "Rich flavor with a smooth finish. Stands out from other portable options.",
+            "author": "Mike S.",
+            "badge": "Verified"
+          }
+        },
+        "r3": {
+          "type": "review",
+          "settings": {
+            "title": "Clean and refreshing",
+            "quote": "Refreshing without tasting watered down. Love the Coral Orange finish.",
+            "author": "Jordan L.",
+            "badge": "Verified"
+          }
+        },
+        "r4": {
+          "type": "review",
+          "settings": {
+            "title": "Perfectly balanced",
+            "quote": "Strong sparkle without being overpowering. Feels thoughtfully made.",
+            "author": "Sam T.",
+            "badge": "Verified"
+          }
+        },
+        "r5": {
+          "type": "review",
+          "settings": {
+            "title": "Desk essential",
+            "quote": "I keep these stocked for busy mornings and long work sessions.",
+            "author": "Riley P.",
+            "badge": "Verified"
+          }
+        },
+        "r6": {
+          "type": "review",
+          "settings": {
+            "title": "Better than cans",
+            "quote": "No bitterness, just clean sparkling water with flavor I actually want.",
+            "author": "Chris M.",
+            "badge": "Verified"
+          }
+        }
+      },
+      "block_order": ["r1", "r2", "r3", "r4", "r5", "r6"],
+      "settings": {
+        "heading": "The reviews are in",
+        "padding_vertical": "relaxed"
+      }
+    },
+    "cta": {
+      "type": "fizz-ss-cta-band",
+      "settings": {
+        "heading": "Delicious fizz made for everyday",
+        "body": "Crafted for busy days and slow moments alike.",
+        "cta_label": "Learn more",
+        "cta_url": "/pages/about",
+        "style": "accent",
+        "padding_vertical": "relaxed"
+      }
+    },
+    "benefits": {
+      "type": "fizz-ss-benefits",
+      "blocks": {
+        "b1": { "type": "benefit", "settings": { "label": "12L per cartridge" } },
+        "b2": { "type": "benefit", "settings": { "label": "Portable fizz" } },
+        "b3": { "type": "benefit", "settings": { "label": "No artificial stuff" } },
+        "b4": { "type": "benefit", "settings": { "label": "Real flavor packs" } },
+        "b5": { "type": "benefit", "settings": { "label": "Reusable bottle" } }
+      },
+      "block_order": ["b1", "b2", "b3", "b4", "b5"],
+      "settings": {
+        "heading": "Delicious fizz made for everyday",
+        "subheading": "We carbonate the right way.",
+        "body": "Crafted for busy days and slow moments alike — smooth sparkle, real flavor packs, and CO₂ that actually lasts.",
+        "padding_vertical": "relaxed"
+      }
+    },
+    "story": {
+      "type": "fizz-ss-story",
+      "settings": {
+        "heading": "Our journey began with a single sip, sparking a passion for portable sparkling water done right.",
+        "body": "Fizz was created with one simple goal: make sparkling water that tastes great and fits effortlessly into everyday life. Good hydration shouldn’t be complicated — just carefully crafted, thoughtfully portable, and ready when you are.",
+        "cta_label": "About us",
+        "cta_url": "/pages/about",
+        "padding_vertical": "statement"
+      }
+    },
+    "footer_lineup": {
+      "type": "fizz-ss-marquee",
+      "settings": {
+        "label": "",
+        "size": "lg",
+        "speed": 36,
+        "fallback_text": "Bottles | Flavor Packs | Fizz Charge | Coral Orange | Sage Green | Arctic White | Electric Blue | Charcoal Black",
+        "padding_vertical": "compact"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "marquee",
+    "intro",
+    "lineup",
+    "reviews",
+    "cta",
+    "benefits",
+    "story",
+    "footer_lineup"
+  ]
+}

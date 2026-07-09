@@ -1,0 +1,56 @@
+{
+  "sections": {
+    "hero": {
+      "type": "fizz-ss-product",
+      "blocks": {
+        "h1": { "type": "highlight", "settings": { "text": "Natural flavors" } },
+        "h2": { "type": "highlight", "settings": { "text": "One squeeze per liter" } },
+        "f1": {
+          "type": "faq",
+          "settings": {
+            "question": "How much flavor do I use?",
+            "answer": "One squeeze flavors a full bottle — adjust to taste."
+          }
+        }
+      },
+      "block_order": ["h1", "h2", "f1"],
+      "settings": {
+        "mode": "standard",
+        "eyebrow": "Flavor Pack",
+        "variant_label": "Select pack",
+        "cta_label": "Add to cart",
+        "show_faq": true,
+        "faq_heading": "Got questions?",
+        "padding_vertical": "hero"
+      }
+    },
+    "benefits": {
+      "type": "fizz-ss-benefits",
+      "blocks": {
+        "b1": { "type": "benefit", "settings": { "label": "Natural flavors" } },
+        "b2": { "type": "benefit", "settings": { "label": "No HFCS" } },
+        "b3": { "type": "benefit", "settings": { "label": "Easy dosing" } }
+      },
+      "block_order": ["b1", "b2", "b3"],
+      "settings": {
+        "heading": "Flavor your fizz",
+        "subheading": "Bold taste without the sugar crash",
+        "body": "Made with natural flavors — one squeeze per liter.",
+        "padding_vertical": "relaxed"
+      }
+    },
+    "lineup": {
+      "type": "fizz-ss-product-lineup",
+      "settings": {
+        "heading": "The lineup",
+        "view_all_label": "View all",
+        "collection": "flavor-packs",
+        "product_limit": 6,
+        "expand_variants": true,
+        "badge": "Best seller",
+        "padding_vertical": "relaxed"
+      }
+    }
+  },
+  "order": ["hero", "benefits", "lineup"]
+}

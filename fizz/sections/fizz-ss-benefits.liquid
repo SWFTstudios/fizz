@@ -1,0 +1,74 @@
+{% render 'fizz-section-spacing', section: section %}
+
+<section class="ss-section" aria-label="{{ section.settings.heading | escape }}">
+  <div class="ss-container">
+    <div class="ss-intro-split__row">
+      <div>
+        <h2 class="ss-h2" data-ss-trigger="scroll" data-ss-split="words" data-ss-duration="0.35">
+          {{ section.settings.heading }}
+        </h2>
+      </div>
+      <div>
+        {% if section.settings.subheading != blank %}
+          <h3 class="ss-h3" data-ss-trigger="scroll" data-ss-split="words" data-ss-duration="0.3" style="margin-bottom: 1rem;">
+            {{ section.settings.subheading }}
+          </h3>
+        {% endif %}
+        {% if section.settings.body != blank %}
+          <p class="ss-body" data-ss-trigger="scroll" data-ss-fade="up">{{ section.settings.body }}</p>
+        {% endif %}
+        <ul class="ss-benefits__list" data-ss-stagger>
+          {% for block in section.blocks %}
+            <li class="ss-benefits__item" {{ block.shopify_attributes }}>{{ block.settings.label }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SS Benefits",
+  "tag": "section",
+  "class": "fizz-ss-benefits fizz-section--spaced fizz-section--relaxed",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Delicious fizz made for everyday" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "We carbonate the right way." },
+    { "type": "textarea", "id": "body", "label": "Body", "default": "Crafted for busy days and slow moments alike — smooth sparkle, real flavor packs, and CO₂ that actually lasts." },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" }
+      ],
+      "default": "relaxed"
+    },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "12L per cartridge" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "SS Benefits",
+      "blocks": [
+        { "type": "benefit", "settings": { "label": "12L per cartridge" } },
+        { "type": "benefit", "settings": { "label": "Portable fizz" } },
+        { "type": "benefit", "settings": { "label": "No artificial stuff" } },
+        { "type": "benefit", "settings": { "label": "Real flavor packs" } },
+        { "type": "benefit", "settings": { "label": "Reusable bottle" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

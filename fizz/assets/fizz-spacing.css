@@ -1,0 +1,143 @@
+/* Fizz premium vertical spacing — single source of truth (8px grid) */
+
+:root {
+  --fizz-space-page-x: clamp(1.25rem, 4vw, 2.5rem);
+
+  /* Section band padding (block) */
+  --fizz-space-section-compact: clamp(3rem, 6vw, 4rem);
+  --fizz-space-section-default: clamp(3.5rem, 7vw, 6rem);
+  --fizz-space-section-relaxed: clamp(4rem, 8vw, 7.5rem);
+  --fizz-space-section-statement: clamp(5rem, 10vw, 9rem);
+  /* Single-sided gap between adjacent PDP/home bands */
+  --fizz-space-section-band: clamp(2.5rem, 5vw, 4.5rem);
+
+  /* Hero-specific */
+  --fizz-space-hero-y: clamp(3rem, 6vw, 6rem);
+  --fizz-space-hero-gap: clamp(2rem, 4vw, 5rem);
+
+  /* In-section element stacks */
+  --fizz-space-stack-sm: 0.75rem;
+  --fizz-space-stack-md: 1.25rem;
+  --fizz-space-stack-lg: 2rem;
+  --fizz-space-stack-xl: 2.5rem;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --fizz-space-section-relaxed: clamp(5rem, 8vw, 8rem);
+    --fizz-space-section-statement: clamp(6rem, 10vw, 10rem);
+    --fizz-space-hero-gap: clamp(3rem, 5vw, 5.5rem);
+    --fizz-space-stack-lg: 2.5rem;
+    --fizz-space-stack-xl: 3rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --fizz-space-section-default: clamp(4rem, 7vw, 6.5rem);
+    --fizz-space-section-relaxed: clamp(5.5rem, 8vw, 8.5rem);
+    --fizz-space-section-statement: clamp(6.5rem, 10vw, 10.5rem);
+  }
+}
+
+/* Per-section background color (theme editor → Section background) */
+.shopify-section:has([data-fizz-section-bg]) {
+  background-color: var(--fizz-section-bg);
+}
+
+.shopify-section:has([data-fizz-section-bg]) > section:first-child {
+  background: transparent !important;
+  color: inherit;
+}
+
+/* Adjustable section spacing — values set per section via fizz-section-spacing snippet */
+.shopify-section.fizz-section--spaced:not(.fizz-hero-section) {
+  padding-top: var(--fizz-section-pad-top, var(--fizz-space-section-default));
+  padding-bottom: var(--fizz-section-pad-bottom, var(--fizz-space-section-default));
+}
+
+/* Inner section roots: no vertical padding (wrapper owns block spacing) */
+.shopify-section.fizz-section--spaced:not(.fizz-hero-section) section {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* KS Tailwind horizontal gutters follow section spacing vars */
+.ks-theme .shopify-section.fizz-section--spaced:not(.fizz-hero-section) [class*='px-margin'] {
+  padding-left: var(--fizz-section-pad-left, var(--fizz-space-page-x));
+  padding-right: var(--fizz-section-pad-right, var(--fizz-space-page-x));
+}
+
+/* Full-width horizontal layout — content spans edge to edge */
+.shopify-section.fizz-section--spaced:has([data-fizz-section-full-width]) {
+  --fizz-section-pad-left: 0;
+  --fizz-section-pad-right: 0;
+}
+
+.shopify-section.fizz-section--spaced:has([data-fizz-section-full-width]) :is(section, [class*='px-margin'], [class*='max-w-']) {
+  padding-inline: 0;
+  max-width: none;
+}
+
+.shopify-section.fizz-section--spaced:has([data-fizz-section-full-width]) [class*='mx-auto'] {
+  margin-inline: 0;
+}
+
+.shopify-section.fizz-section--spaced:has([data-fizz-section-full-width]) :is(
+    .fizz-collections-rail__header,
+    .fizz-collections-rail__track,
+    .fizz-intro-inner,
+    .fizz-lifestyle-mosaic__header,
+    .fizz-lifestyle-mosaic__grid,
+    .fizz-edge-media
+  ) {
+  padding-inline: 0;
+  max-width: none;
+}
+
+/* Tier class names retained for background / layout hooks only */
+
+.fizz-pdp-page #main-content > .shopify-section.fizz-pdp-science-section:not(:has([data-fizz-section-bg])) {
+  background: #0f0f0f;
+}
+
+.fizz-pdp-page #main-content > .shopify-section.fizz-pdp-how-section:not(:has([data-fizz-section-bg])),
+.fizz-pdp-page #main-content > .shopify-section.fizz-pdp-experience-section:not(:has([data-fizz-section-bg])),
+.fizz-pdp-page #main-content > .shopify-section.fizz-pdp-faq-section:not(:has([data-fizz-section-bg])),
+.fizz-pdp-page #main-content > .shopify-section.fizz-bottle-pdp-section:not(:has([data-fizz-section-bg])) {
+  background: #0a0a0a;
+}
+
+.fizz-pdp-page #main-content > .shopify-section.fizz-pdp-elevate-section:not(:has([data-fizz-section-bg])) {
+  background: #030303;
+}
+
+/* Homepage: padding gutters match section surface (no black voids) */
+.fizz-home #main-content > .shopify-section.fizz-tiles-section:not(:has([data-fizz-section-bg])),
+.fizz-home #main-content > .shopify-section.fizz-media-columns-section:not(:has([data-fizz-section-bg])) {
+  background: transparent;
+  color: #111;
+}
+
+.fizz-home #main-content > .shopify-section.fizz-collections-rail-section:not(:has([data-fizz-section-bg])) {
+  background: #fff;
+  color: #111;
+}
+
+.fizz-home #main-content > .shopify-section.fizz-newsletter-section:not(:has([data-fizz-section-bg])) {
+  background: #184f66;
+}
+
+.fizz-home #main-content > .shopify-section.fizz-usp-grid-section:not(:has([data-fizz-section-bg])) {
+  background: #111;
+}
+
+.fizz-home #main-content > .shopify-section.fizz-lifestyle-mosaic-section:not(:has([data-fizz-section-bg])),
+.fizz-home #main-content > .shopify-section.fizz-flavors-collection-section:not(:has([data-fizz-section-bg])),
+.fizz-home #main-content > .shopify-section.fizz-co2-collection-section:not(:has([data-fizz-section-bg])) {
+  background: #030303;
+}
+
+.fizz-home #main-content > .shopify-section.fizz-promo-section:not(:has([data-fizz-section-bg])) {
+  background: #184f66;
+}

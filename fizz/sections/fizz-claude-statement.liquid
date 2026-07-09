@@ -1,0 +1,17 @@
+<div class="stmt rv" data-screen-label="Statement" style="background:var(--statement-bg);color:var(--statement-text)">
+  <p class="stx">{{ section.settings.line_1 }}</p>
+  <p class="stx" style="margin-top:2vh">{{ section.settings.line_2 }}</p>
+  <p class="stx stx2">{{ section.settings.body }}</p>
+</div>
+
+{% schema %}
+{
+  "name": "Statement",
+  "settings": [
+    { "type": "text", "id": "line_1", "label": "Line 1", "default": "Hydration was boring." },
+    { "type": "text", "id": "line_2", "label": "Line 2", "default": "So we put a CO₂ engine in a bottle." },
+    { "type": "textarea", "id": "body", "label": "Supporting copy", "default": "Twist the cap and any cold drink turns sparkling in eight seconds. Add a real-fruit flavor pack. Drink it on a trail, at the gym, at your desk — anywhere flat water used to live." }
+  ],
+  "presets": [{ "name": "Statement" }]
+}
+{% endschema %}

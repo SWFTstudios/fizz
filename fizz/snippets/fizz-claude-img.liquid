@@ -1,0 +1,12 @@
+{% comment %}
+  Theme asset image helper
+  Usage: {% render 'fizz-img', file: 'fizz-lifestyle-trail.jpg', alt: 'Trail', class: 'thumb' %}
+{% endcomment %}
+<img
+  src="{{ file | asset_url }}"
+  alt="{{ alt | default: '' | escape }}"
+  {% if class %}class="{{ class }}"{% endif %}
+  {% if width %}width="{{ width }}"{% endif %}
+  {% if height %}height="{{ height }}"{% endif %}
+  loading="{{ loading | default: 'lazy' }}"
+>

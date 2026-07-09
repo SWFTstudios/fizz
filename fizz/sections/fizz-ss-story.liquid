@@ -1,0 +1,60 @@
+{% render 'fizz-section-spacing', section: section %}
+
+<section class="ss-section" aria-label="Story">
+  <div class="ss-container">
+    <div class="ss-story">
+      <h2 class="ss-h2" data-ss-trigger="scroll" data-ss-split="words" data-ss-duration="0.35">
+        {{ section.settings.heading }}
+      </h2>
+      <div>
+        {% if section.settings.body != blank %}
+          <p class="ss-body" data-ss-trigger="scroll" data-ss-fade="up">{{ section.settings.body }}</p>
+        {% endif %}
+        {% if section.settings.cta_label != blank %}
+          <p style="margin-top: 1.5rem;" data-ss-trigger="scroll" data-ss-fade="up">
+            <a class="ss-btn ss-btn--ghost" href="{{ section.settings.cta_url | default: '/pages/about' }}">
+              {{ section.settings.cta_label }}
+            </a>
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SS Story",
+  "tag": "section",
+  "class": "fizz-ss-story fizz-section--spaced fizz-section--statement",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our journey began with a single sip, sparking a passion for portable sparkling water done right."
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Body",
+      "default": "Fizz was created with one simple goal: make sparkling water that tastes great and fits effortlessly into everyday life. Good hydration shouldn’t be complicated — just carefully crafted, thoughtfully portable, and ready when you are."
+    },
+    { "type": "text", "id": "cta_label", "label": "CTA label", "default": "About us" },
+    { "type": "url", "id": "cta_url", "label": "CTA URL" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "default", "label": "Default" }
+      ],
+      "default": "statement"
+    },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [{ "name": "SS Story" }]
+}
+{% endschema %}

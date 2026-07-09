@@ -1,0 +1,17 @@
+{
+  "layout": "account",
+  "sections": {
+    "nextfil_subscriptions": {
+      "type": "nextfil-app-wrapper",
+      "settings": {
+        "no_orders_title": "Ready to Get Fizzy?",
+        "no_orders_description": "Order your first Fizz Charge 6-pack to start on-demand CO₂ refills for $10 whenever you run low.",
+        "no_orders_button_text": "Shop CO₂ refills",
+        "color_background": "#0a1628",
+        "button_background_color": "#3b82f6",
+        "button_background_color_hover": "#2563eb"
+      }
+    }
+  },
+  "order": ["nextfil_subscriptions"]
+}

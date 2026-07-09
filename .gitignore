@@ -1,0 +1,24 @@
+# Other workspace projects
+/brooklyn-steel/
+/import-work/
+/manna-hydration/
+/tal-hydration/
+/thyme-table/
+/yellowcabgames/
+*.zip
+
+# Dependencies
+fizz/node_modules/
+fizz/package-lock.json
+
+# Secrets
+.env
+.env.*
+**/.env
+**/.env.*
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

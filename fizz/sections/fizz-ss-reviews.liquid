@@ -1,0 +1,74 @@
+{% render 'fizz-section-spacing', section: section %}
+
+<section class="ss-section" aria-label="{{ section.settings.heading | escape }}">
+  <div class="ss-container">
+    <div class="ss-section-head">
+      <h2 class="ss-h2" data-ss-trigger="scroll" data-ss-split="words" data-ss-duration="0.35">
+        {{ section.settings.heading }}
+      </h2>
+    </div>
+    <div class="ss-reviews-grid" data-ss-stagger>
+      {% for block in section.blocks %}
+        <article class="ss-review-card" {{ block.shopify_attributes }}>
+          <div class="ss-review-card__stars" aria-hidden="true">★★★★★</div>
+          {% if block.settings.title != blank %}
+            <h3 class="ss-review-card__title">{{ block.settings.title }}</h3>
+          {% endif %}
+          <p class="ss-review-card__quote">“{{ block.settings.quote }}”</p>
+          <div class="ss-review-card__meta">
+            <span>{{ block.settings.author }}</span>
+            <span>{{ block.settings.badge | default: 'Verified' }}</span>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SS Reviews",
+  "tag": "section",
+  "class": "fizz-ss-reviews fizz-section--spaced fizz-section--relaxed",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The reviews are in" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" }
+      ],
+      "default": "relaxed"
+    },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "My go-to fizz" },
+        { "type": "textarea", "id": "quote", "label": "Quote", "default": "Smooth sparkle, real flavor, and actually portable. I keep one on my desk." },
+        { "type": "text", "id": "author", "label": "Author", "default": "Alex R." },
+        { "type": "text", "id": "badge", "label": "Badge", "default": "Verified" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "SS Reviews",
+      "blocks": [
+        { "type": "review", "settings": { "title": "Super delicious", "quote": "Crisp bubbles and clean flavor. Perfect straight from the bottle.", "author": "Dana A." } },
+        { "type": "review", "settings": { "title": "My go-to fizz", "quote": "Rich flavor with a smooth finish. Stands out from other portable options.", "author": "Mike S." } },
+        { "type": "review", "settings": { "title": "Clean and refreshing", "quote": "Refreshing without tasting watered down. Love the Coral Orange finish.", "author": "Jordan L." } },
+        { "type": "review", "settings": { "title": "Perfectly balanced", "quote": "Strong sparkle without being overpowering. Feels thoughtfully made.", "author": "Sam T." } },
+        { "type": "review", "settings": { "title": "Desk essential", "quote": "I keep these stocked for busy mornings and long work sessions.", "author": "Riley P." } },
+        { "type": "review", "settings": { "title": "Better than cans", "quote": "No bitterness, just clean sparkling water with flavor I actually want.", "author": "Chris M." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

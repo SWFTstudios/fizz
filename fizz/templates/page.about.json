@@ -1,0 +1,59 @@
+{
+  "sections": {
+    "main": {
+      "type": "fizz-ss-about",
+      "blocks": {
+        "m1": {
+          "type": "milestone",
+          "settings": {
+            "year": "The start",
+            "title": "First sip",
+            "body": "A kitchen-table idea became a portable carbonation bottle."
+          }
+        },
+        "m2": {
+          "type": "milestone",
+          "settings": {
+            "year": "Next",
+            "title": "Flavor packs",
+            "body": "In-house flavors made natural taste part of the ritual."
+          }
+        },
+        "m3": {
+          "type": "milestone",
+          "settings": {
+            "year": "Today",
+            "title": "Everyday fizz",
+            "body": "Bottles, Charge, and flavors for desk, trail, and home."
+          }
+        },
+        "f1": {
+          "type": "faq",
+          "settings": {
+            "question": "How do I get started?",
+            "answer": "Pick a bottle finish, add Fizz Charge, and try a flavor pack."
+          }
+        },
+        "f2": {
+          "type": "faq",
+          "settings": {
+            "question": "Is Fizz reusable?",
+            "answer": "Yes — the bottle is built for everyday reuse with swappable Fizz Charge canisters."
+          }
+        }
+      },
+      "block_order": ["m1", "m2", "m3", "f1", "f2"],
+      "settings": {
+        "eyebrow": "Our story",
+        "heading": "Our Story",
+        "intro": "Our journey began with a simple idea: sparkling water should be portable, delicious, and easy.",
+        "story_heading": "Built for everyday life",
+        "story_body": "Fizz brings together a reusable bottle, Fizz Charge CO₂, and natural flavor packs so you can carbonate anywhere — desk, trail, kitchen, or travel.",
+        "timeline_heading": "The timeline",
+        "faq_heading": "Got questions?",
+        "padding_vertical": "default"
+      }
+    }
+  },
+  "order": ["main"]
+}

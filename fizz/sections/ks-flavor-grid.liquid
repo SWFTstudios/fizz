@@ -1,0 +1,127 @@
+{% render 'fizz-section-spacing', section: section %}
+
+<section class="px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto ks-reveal opacity-0 translate-y-10 transition-all duration-1000">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+    {% for block in section.blocks %}
+      <div class="glass-card kinetic-hover rounded-xl p-6 group" {{ block.shopify_attributes }}>
+        <div class="aspect-square mb-6 overflow-hidden rounded-lg bg-surface-container">
+          {% if block.settings.image %}
+            {{ block.settings.image | image_url: width: 600 | image_tag: class: 'w-full h-full object-cover transition-transform duration-700 group-hover:scale-110' }}
+          {% else %}
+            {% render 'ks-stitch-img', name: block.settings.fallback_image, alt: block.settings.title, class: 'w-full h-full object-cover transition-transform duration-700 group-hover:scale-110' %}
+          {% endif %}
+        </div>
+        <h3 class="font-headline-lg-mobile text-xl mb-1 uppercase tracking-tight">{{ block.settings.title }}</h3>
+        <div class="flex justify-between items-center">
+          <p class="font-label-caps text-on-surface-variant">{{ block.settings.price_label }}</p>
+          {% if block.settings.product != blank %}
+            <button type="button" class="bg-primary-container border border-outline-variant font-label-caps text-[10px] px-4 py-2 rounded-full hover:bg-primary hover:text-background transition-all uppercase" data-ks-quick-add="{{ block.settings.product.selected_or_first_available_variant.id }}">QUICK BUY</button>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "KS Flavor Grid",
+  "tag": "section",
+  "class": "ks-flavor-grid-section fizz-section--spaced fizz-section--default",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "blocks": [
+    {
+      "type": "flavor",
+      "name": "Flavor",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Blood Orange" },
+        { "type": "text", "id": "price_label", "label": "Price label", "default": "$1.50 / SACHET" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "fallback_image", "label": "Fallback asset name", "default": "flavor-blood-orange" },
+        { "type": "product", "id": "product", "label": "Product" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KS Flavor Grid",
+      "blocks": [
+        { "type": "flavor", "settings": { "title": "Blood Orange", "fallback_image": "flavor-blood-orange" } },
+        { "type": "flavor", "settings": { "title": "Zesty Lime", "fallback_image": "flavor-zesty-lime" } },
+        { "type": "flavor", "settings": { "title": "Crisp Cucumber", "fallback_image": "flavor-crisp-cucumber" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

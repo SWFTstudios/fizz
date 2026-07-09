@@ -1,0 +1,111 @@
+{% render 'fizz-section-spacing', section: section %}
+
+<section class="fizz-usp-grid" aria-label="Benefits">
+  {% for block in section.blocks %}
+    <div {{ block.shopify_attributes }}>
+      <h3>{{ block.settings.title }}</h3>
+      <p>{{ block.settings.body }}</p>
+    </div>
+  {% endfor %}
+</section>
+
+{% schema %}
+{
+  "name": "Fizz USP grid",
+  "tag": "section",
+  "class": "fizz-usp-grid-section fizz-section--spaced fizz-section--relaxed",
+  "max_blocks": 4,
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "relaxed"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "USP",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Less waste" },
+        { "type": "textarea", "id": "body", "label": "Body", "default": "One cartridge makes up to 12L of seltzer." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Fizz USP grid",
+      "blocks": [
+        { "type": "usp", "settings": { "title": "12L per cartridge", "body": "One Fizz cartridge replaces a case of cans." } },
+        { "type": "usp", "settings": { "title": "Portable fizz", "body": "Carbonation you can take anywhere." } },
+        { "type": "usp", "settings": { "title": "Real flavor", "body": "In-house flavor packs in seconds." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,32 @@
+{% comment %}
+  Layered bottle card: overhead background + transparent product cutout.
+  Usage: {% render 'fizz-bottle-card-media', color_slug: color_slug, alt: variant.title %}
+{% endcomment %}
+{% liquid
+  assign bottle_colors = 'arctic-white,charcoal-black,coral-orange,electric-blue,sage-green,steel-navy' | split: ','
+  assign has_bottle_asset = false
+  if color_slug != blank and bottle_colors contains color_slug
+    assign has_bottle_asset = true
+  endif
+%}
+{% if has_bottle_asset %}
+  <div class="fizz-bottle-card-media fizz-bottle-card-media--{{ color_slug }}">
+    <img
+      class="fizz-bottle-card-media__bg"
+      src="{{ 'fizz-bottle-card-bg-' | append: color_slug | append: '.png' | asset_url }}"
+      alt=""
+      loading="lazy"
+      width="600"
+      height="800"
+      aria-hidden="true"
+    >
+    <img
+      class="fizz-bottle-card-media__bottle"
+      src="{{ 'fizz-bottle-product-' | append: color_slug | append: '.png' | asset_url }}"
+      alt="{{ alt | default: color_slug | escape }}"
+      loading="lazy"
+      width="600"
+      height="840"
+    >
+  </div>
+{% endif %}

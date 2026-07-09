@@ -1,0 +1,560 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Fizz Kinetic Spark",
+    "theme_version": "0.1.0",
+    "theme_author": "Fizz",
+    "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
+    "theme_support_url": "https://support.shopify.com/"
+  },
+  {
+    "name": "t:general.typography",
+    "settings": [
+      {
+        "type": "header",
+        "content": "t:general.fonts"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_primary_font",
+        "default": "work_sans_n4",
+        "label": "t:general.primary"
+      }
+    ]
+  },
+  {
+    "name": "t:general.layout",
+    "settings": [
+      {
+        "type": "select",
+        "id": "max_page_width",
+        "label": "t:labels.page_width",
+        "options": [
+          {
+            "value": "90rem",
+            "label": "t:options.page_width.narrow"
+          },
+          {
+            "value": "110rem",
+            "label": "t:options.page_width.wide"
+          }
+        ],
+        "default": "90rem"
+      },
+      {
+        "type": "range",
+        "id": "min_page_margin",
+        "min": 10,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "t:labels.page_margin",
+        "default": 20
+      }
+    ]
+  },
+  {
+    "name": "t:general.colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "background_color",
+        "default": "#FFFFFF",
+        "label": "t:labels.background"
+      },
+      {
+        "type": "color",
+        "id": "foreground_color",
+        "default": "#333333",
+        "label": "t:labels.foreground"
+      },
+      {
+        "type": "range",
+        "id": "input_corner_radius",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "t:labels.input_corner_radius",
+        "default": 4
+      }
+    ]
+  },
+  {
+    "name": "Fizz Claude brand colors",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Deprecated — use Fizz Claude colorway design below."
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_accent_color",
+        "label": "Claude accent (lime)",
+        "default": "#c6f24e"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_ink_color",
+        "label": "Claude ink (background)",
+        "default": "#080a0d"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_paper_color",
+        "label": "Claude paper (light text)",
+        "default": "#f2efe7"
+      },
+      {
+        "type": "product",
+        "id": "fizz_claude_bottle_product",
+        "label": "Claude bottle product (nav CTA + colorways default)"
+      }
+    ]
+  },
+  {
+    "name": "Fizz Claude colorway design",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Preset palette"
+      },
+      {
+        "type": "select",
+        "id": "fizz_claude_colorway_preset",
+        "label": "Colorway preset",
+        "options": [
+          { "value": "lime_fizz", "label": "Lime Fizz" },
+          { "value": "steel_navy", "label": "Steel Navy" },
+          { "value": "citrus_burst", "label": "Citrus Burst" },
+          { "value": "berry_night", "label": "Berry Night" },
+          { "value": "electric_pool", "label": "Electric Pool" },
+          { "value": "arctic_light", "label": "Arctic Light" }
+        ],
+        "default": "lime_fizz"
+      },
+      {
+        "type": "paragraph",
+        "content": "Lime Fizz: high-contrast brand default. Steel Navy: cool monochromatic. Citrus Burst: warm analogous. Berry Night: purple complement. Electric Pool: triadic blue-forward. Arctic Light: inverted light-surface mode."
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_colorway_custom_enabled",
+        "label": "Use custom colors instead of preset",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Custom brand colors"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_accent",
+        "label": "Accent",
+        "default": "#c6f24e"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_ink",
+        "label": "Ink",
+        "default": "#080a0d"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_paper",
+        "label": "Paper",
+        "default": "#f2efe7"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_accent_contrast",
+        "label": "Accent contrast (text on buttons)"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_muted_text",
+        "label": "Muted text"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_surface_elevated",
+        "label": "Elevated surface"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_border",
+        "label": "Border / divider"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_link_hover",
+        "label": "Link hover"
+      },
+      {
+        "type": "header",
+        "content": "Section surfaces"
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_colorway_hero_use_global",
+        "label": "Hero — use global colorway",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_hero_bg",
+        "label": "Hero background",
+        "default": "#080a0d"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_hero_text",
+        "label": "Hero text",
+        "default": "#f2efe7"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_hero_accent",
+        "label": "Hero accent",
+        "default": "#c6f24e"
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_colorway_statement_use_global",
+        "label": "Statement — use global colorway",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_statement_bg",
+        "label": "Statement background",
+        "default": "#f2efe7"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_statement_text",
+        "label": "Statement text",
+        "default": "#080a0d"
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_colorway_how_use_global",
+        "label": "How it works — use global colorway",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_how_bg",
+        "label": "How background",
+        "default": "#080a0d"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_how_text",
+        "label": "How text",
+        "default": "#f2efe7"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_how_stroke",
+        "label": "How step stroke",
+        "default": "#c6f24e"
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_colorway_footer_use_global",
+        "label": "Footer — use global colorway",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_footer_bg",
+        "label": "Footer background",
+        "default": "#080a0d"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_footer_text",
+        "label": "Footer text",
+        "default": "#f2efe7"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_colorway_footer_stroke",
+        "label": "Footer outline stroke",
+        "default": "#c6f24e"
+      },
+      {
+        "type": "header",
+        "content": "Typography"
+      },
+      {
+        "type": "select",
+        "id": "fizz_claude_font_display",
+        "label": "Display font",
+        "options": [
+          { "value": "anton", "label": "Anton" },
+          { "value": "system", "label": "System sans" }
+        ],
+        "default": "anton"
+      },
+      {
+        "type": "select",
+        "id": "fizz_claude_font_body",
+        "label": "Body font",
+        "options": [
+          { "value": "archivo", "label": "Archivo" },
+          { "value": "system", "label": "System sans" }
+        ],
+        "default": "archivo"
+      },
+      {
+        "type": "select",
+        "id": "fizz_claude_font_accent",
+        "label": "Accent italic font",
+        "options": [
+          { "value": "bodoni", "label": "Bodoni Moda" },
+          { "value": "system", "label": "Georgia / serif" }
+        ],
+        "default": "bodoni"
+      },
+      {
+        "type": "select",
+        "id": "fizz_claude_font_label",
+        "label": "Label / mono font",
+        "options": [
+          { "value": "jetbrains", "label": "JetBrains Mono" },
+          { "value": "system", "label": "System mono" }
+        ],
+        "default": "jetbrains"
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_typo_hero_scale",
+        "min": 80,
+        "max": 120,
+        "step": 5,
+        "unit": "%",
+        "label": "Hero display scale",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_typo_body_size",
+        "min": 14,
+        "max": 18,
+        "step": 1,
+        "unit": "px",
+        "label": "Body size base",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_typo_label_spacing",
+        "min": 6,
+        "max": 30,
+        "step": 2,
+        "unit": "em",
+        "label": "Label letter-spacing (×0.01em)",
+        "default": 16
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_typo_nav_uppercase",
+        "label": "Uppercase nav links",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_typo_accent_italic",
+        "label": "Italic accent headings",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Buttons and CTAs"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_btn_primary_bg",
+        "label": "Primary button background"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_btn_primary_text",
+        "label": "Primary button text"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_btn_outline_border",
+        "label": "Outline button border"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_btn_outline_text",
+        "label": "Outline button text"
+      },
+      {
+        "type": "select",
+        "id": "fizz_claude_btn_radius",
+        "label": "Button border radius",
+        "options": [
+          { "value": "pill", "label": "Pill" },
+          { "value": "rounded", "label": "Rounded (12px)" }
+        ],
+        "default": "pill"
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_btn_hover_scale",
+        "min": 100,
+        "max": 110,
+        "step": 1,
+        "unit": "%",
+        "label": "CTA hover scale",
+        "default": 105
+      }
+    ]
+  },
+  {
+    "name": "Fizz Claude navigation",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Logo"
+      },
+      {
+        "type": "image_picker",
+        "id": "fizz_claude_nav_logo",
+        "label": "Logo image"
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_nav_logo_max_height",
+        "min": 16,
+        "max": 80,
+        "step": 2,
+        "unit": "px",
+        "label": "Logo max height",
+        "default": 24
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_nav_logo_max_width",
+        "min": 60,
+        "max": 320,
+        "step": 4,
+        "unit": "px",
+        "label": "Logo max width",
+        "default": 160
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_nav_logo_invert",
+        "label": "Invert logo colors",
+        "default": true,
+        "info": "Helps light logos read on dark hero sections"
+      },
+      {
+        "type": "header",
+        "content": "Glass background"
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_nav_glass_enabled",
+        "label": "Enable glassmorphic background",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_nav_tint_color",
+        "label": "Tint color",
+        "default": "#080a0d"
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_nav_tint_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Tint opacity",
+        "default": 55
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_nav_blur",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "label": "Blur amount",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_nav_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Bottom border opacity",
+        "default": 15
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_nav_gradient_enabled",
+        "label": "Enable gradient overlay",
+        "default": false
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_nav_gradient_start",
+        "label": "Gradient start",
+        "default": "#080a0d"
+      },
+      {
+        "type": "color",
+        "id": "fizz_claude_nav_gradient_end",
+        "label": "Gradient end",
+        "default": "#1a2230"
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_nav_gradient_angle",
+        "min": 0,
+        "max": 360,
+        "step": 15,
+        "unit": "deg",
+        "label": "Gradient angle",
+        "default": 180
+      },
+      {
+        "type": "header",
+        "content": "Colorway sync"
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_nav_sync_colorway_tint",
+        "label": "Sync nav tint to colorway ink",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Blend & effects"
+      },
+      {
+        "type": "select",
+        "id": "fizz_claude_nav_blend_mode",
+        "label": "Mix blend mode",
+        "options": [
+          { "value": "difference", "label": "Difference" },
+          { "value": "normal", "label": "Normal" },
+          { "value": "unset", "label": "None" }
+        ],
+        "default": "difference",
+        "info": "Use Normal or None when glass background is enabled"
+      }
+    ]
+  }
+]

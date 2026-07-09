@@ -1,0 +1,56 @@
+<div class="how" id="how" data-screen-label="How it works" style="background:var(--how-bg);color:var(--how-text)">
+  <div class="howstick">
+    <p class="anton howbig">{{ section.settings.title }}</p>
+    <div data-bubbles data-bub-count="12" data-bub-color="var(--how-bubble-color)" data-bub-seed="23" data-bub-rise="800" class="bubf"></div>
+    {% if section.settings.bottle_image != blank %}
+      <img class="botimg" src="{{ section.settings.bottle_image | image_url: width: 500 }}" alt="" loading="lazy" width="170">
+    {% else %}
+      <div class="botwrap">
+        <div class="bcap"></div><div class="bneck"></div>
+        <div class="bot" style="background:{{ section.settings.bottle_color }}">
+          <img src="{{ 'fizz-logo.avif' | asset_url }}" class="blogo" alt="" width="48" height="48">
+        </div>
+      </div>
+    {% endif %}
+  </div>
+  <div>
+    {% for block in section.blocks %}
+      <div class="step rv" {{ block.shopify_attributes }}>
+        <p class="anton stepnum">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</p>
+        <p class="steptitle">{{ block.settings.title }}</p>
+        <p class="stepbody">{{ block.settings.body }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "How It Works",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Background rotated title", "default": "How it works" },
+    { "type": "image_picker", "id": "bottle_image", "label": "Bottle photo (overrides CSS bottle)" },
+    { "type": "color", "id": "bottle_color", "label": "Fallback bottle color", "default": "#1d2a44" }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Fill it cold" },
+        { "type": "textarea", "id": "body", "label": "Body", "default": "Water, iced tea, juice — anything cold." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "How It Works",
+      "blocks": [
+        { "type": "step", "settings": { "title": "Fill it cold", "body": "Water, iced tea, juice — anything cold. Double-wall vacuum steel keeps 24 ounces ice-cold from first light to last set." } },
+        { "type": "step", "settings": { "title": "Twist to fizz", "body": "A recyclable CO₂ pod lives in the cap. One twist carbonates in eight seconds — dial it from gentle spritz to full bite. 60 fizzes per pod." } },
+        { "type": "step", "settings": { "title": "Drop a flavor", "body": "Real fruit, zero sugar, added electrolytes. Citrus or berry. Healthy stopped being flavorless the day we bottled it." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

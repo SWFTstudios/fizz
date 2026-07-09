@@ -1,0 +1,71 @@
+{% comment %}
+  Resolves colorway scene colors: bg|bg_end|btn|text|swatch
+  Optional variant metafields override defaults.
+{% endcomment %}
+{% liquid
+  assign slug_key = slug | default: 'steel-navy' | strip
+  assign swatch = '#1d2a44'
+  assign bg = '#0f1a2e'
+  assign bg_end = '#1d2a44'
+  assign btn = '#1d2a44'
+  assign text = '#f2efe7'
+
+  case slug_key
+    when 'electric-blue'
+      assign swatch = '#2f6fd6'
+      assign bg = '#061018'
+      assign bg_end = '#2f6fd6'
+      assign btn = '#2f6fd6'
+    when 'coral-orange'
+      assign swatch = '#f07a2e'
+      assign bg = '#1a0f08'
+      assign bg_end = '#f07a2e'
+      assign btn = '#f07a2e'
+    when 'sage-green'
+      assign swatch = '#2e8b57'
+      assign bg = '#0a1a12'
+      assign bg_end = '#2e8b57'
+      assign btn = '#2e8b57'
+    when 'charcoal-black'
+      assign swatch = '#16161a'
+      assign bg = '#080a0d'
+      assign bg_end = '#16161a'
+      assign btn = '#c6f24e'
+    when 'arctic-white'
+      assign swatch = '#efeee8'
+      assign bg = '#d4d3cc'
+      assign bg_end = '#efeee8'
+      assign btn = '#080a0d'
+      assign text = '#080a0d'
+    else
+      assign swatch = '#1d2a44'
+      assign bg = '#0f1a2e'
+      assign bg_end = '#26344f'
+      assign btn = '#1d2a44'
+  endcase
+
+  if variant != blank
+    if variant.metafields.custom.swatch_hex != blank
+      assign swatch = variant.metafields.custom.swatch_hex
+    endif
+    if variant.metafields.custom.scene_bg != blank
+      assign bg = variant.metafields.custom.scene_bg
+    endif
+    if variant.metafields.custom.scene_bg_end != blank
+      assign bg_end = variant.metafields.custom.scene_bg_end
+    endif
+    if variant.metafields.custom.scene_btn != blank
+      assign btn = variant.metafields.custom.scene_btn
+    endif
+    if variant.metafields.custom.scene_text != blank
+      assign text = variant.metafields.custom.scene_text
+    endif
+  endif
+
+  assign btn_brightness = btn | color_brightness
+  if btn_brightness > 160
+    assign btn_text = '#080a0d'
+  else
+    assign btn_text = '#f2efe7'
+  endif
+-%}{{ bg }}|{{ bg_end }}|{{ btn }}|{{ text }}|{{ swatch }}|{{ btn_text }}

@@ -1,0 +1,287 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+  capture color_slug
+    render 'fizz-pdp-color-slug', variant: current_variant
+  endcapture
+  assign color_slug = color_slug | strip
+  assign pdp_tagline = product.metafields.custom.pdp_tagline
+  assign mode = section.settings.mode | default: 'standard'
+  assign bottle_colors = 'arctic-white,charcoal-black,coral-orange,electric-blue,sage-green,steel-navy' | split: ','
+%}
+
+<section
+  id="shopify-section-{{ section.id }}"
+  class="ss-section ss-pdp fizz-pdp-hero{% if mode == 'bottle' %} fizz-product-pdp--bottle fizz-product-pdp--{{ color_slug }}{% endif %}"
+  data-fizz-pdp-hero
+  data-fizz-ss-product
+  {% if mode == 'bottle' %}data-fizz-product-bottle{% endif %}
+  data-section-id="{{ section.id }}"
+  data-product-url="{{ product.url }}"
+  data-selected-color="{{ color_slug }}"
+  data-mode="{{ mode }}"
+>
+  <div class="ss-container">
+    <div class="ss-pdp__grid">
+      <div class="ss-pdp__media" data-ss-trigger="load" data-ss-fade="up" data-ss-delay="0.1">
+        {% if mode == 'bottle' and bottle_colors contains color_slug %}
+          {% render 'fizz-bottle-product-img',
+            color_slug: color_slug,
+            alt: current_variant.title,
+            class: 'fizz-product-pdp__img',
+            width: 1200,
+            height: 1400,
+            loading: 'eager',
+            id: 'fizz-bottle-image',
+            main_image: true
+          %}
+        {% elsif product.featured_image or current_variant.image %}
+          {% assign main_img = current_variant.image | default: product.featured_image %}
+          <img
+            id="fizz-ss-main-image"
+            data-fizz-pdp-main-image
+            src="{{ main_img | image_url: width: 1400 }}"
+            alt="{{ product.title | escape }}"
+            width="1200"
+            height="1200"
+            loading="eager"
+            class="fizz-product-pdp__img"
+          >
+        {% else %}
+          {% render 'fizz-bottle-card-media', color_slug: color_slug | default: 'coral-orange', alt: product.title %}
+        {% endif %}
+      </div>
+
+      <div class="ss-pdp__buy">
+        {% if section.settings.eyebrow != blank %}
+          <p class="ss-eyebrow" data-ss-trigger="load" data-ss-fade="up">{{ section.settings.eyebrow }}</p>
+        {% endif %}
+        {% if pdp_tagline != blank %}
+          <p class="ss-body" data-ss-trigger="load" data-ss-fade="up">{{ pdp_tagline }}</p>
+        {% endif %}
+        <h1
+          class="ss-h1"
+          id="fizz-ss-title"
+          data-ss-trigger="load"
+          data-ss-split="words"
+          data-ss-duration="0.35"
+          data-ss-delay="0.15"
+        >
+          {{ product.title }}
+        </h1>
+        <p class="ss-pdp__price" data-fizz-pdp-price data-ss-trigger="load" data-ss-fade="up" data-ss-delay="0.25">
+          {{ current_variant.price | money }}
+        </p>
+
+        {% if product.description != blank %}
+          <div class="ss-body rte" data-ss-trigger="load" data-ss-fade="up" data-ss-delay="0.3">
+            {{ product.description | truncatewords: 60 }}
+          </div>
+        {% endif %}
+
+        {% if product.variants.size > 1 and mode == 'bottle' %}
+          <div>
+            <p class="ss-eyebrow">{{ section.settings.swatch_label }}</p>
+            <div class="ss-pdp__swatches" role="group" aria-label="{{ section.settings.swatch_label | escape }}">
+              {% for variant in product.variants %}
+                {% capture swatch_slug %}
+                  {% render 'fizz-pdp-color-slug', variant: variant %}
+                {% endcapture %}
+                {% assign swatch_slug = swatch_slug | strip %}
+                <button
+                  type="button"
+                  class="ss-pdp__swatch fizz-origin-swatch fizz-origin-swatch--{{ swatch_slug }}{% if variant.id == current_variant.id %} is-active{% endif %}"
+                  data-variant-id="{{ variant.id }}"
+                  data-color-slug="{{ swatch_slug }}"
+                  title="{{ variant.title | escape }}"
+                  aria-label="{{ variant.title | escape }}"
+                  aria-current="{% if variant.id == current_variant.id %}true{% else %}false{% endif %}"
+                  {% unless variant.available %}disabled{% endunless %}
+                ></button>
+              {% endfor %}
+            </div>
+          </div>
+        {% elsif product.variants.size > 1 %}
+          <div>
+            <label class="ss-eyebrow" for="fizz-ss-variant-select">{{ section.settings.variant_label }}</label>
+            <select id="fizz-ss-variant-select" name="id" form="fizz-ss-product-form" style="margin-top:0.5rem;width:100%;max-width:20rem;padding:0.75rem 1rem;border-radius:9999px;background:var(--ss-elevated);color:inherit;border:1px solid var(--ss-border);">
+              {% for variant in product.variants %}
+                <option
+                  value="{{ variant.id }}"
+                  {% if variant.id == current_variant.id %}selected{% endif %}
+                  {% unless variant.available %}disabled{% endunless %}
+                >
+                  {{ variant.title }} — {{ variant.price | money }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        {% endif %}
+
+        {% if section.blocks.size > 0 %}
+          <ul class="ss-benefits__list">
+            {% for block in section.blocks %}
+              {% if block.type == 'highlight' %}
+                <li class="ss-benefits__item" {{ block.shopify_attributes }}>{{ block.settings.text }}</li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% form 'product', product, class: 'ss-pdp__form', id: 'fizz-ss-product-form' %}
+          {% if mode == 'bottle' or product.variants.size <= 1 %}
+            <input type="hidden" name="id" value="{{ current_variant.id }}" id="fizz-bottle-variant-id">
+          {% elsif mode != 'standard' %}
+            <input type="hidden" name="id" value="{{ current_variant.id }}">
+          {% endif %}
+
+          {% if mode == 'co2' and product.selling_plan_groups.size > 0 %}
+            <fieldset class="ss-pdp__selling-plans">
+              <legend class="ss-eyebrow">{{ section.settings.plan_label }}</legend>
+              <label>
+                <input type="radio" name="selling_plan" value="" checked>
+                <span>
+                  <strong>{{ section.settings.onetime_label }}</strong>
+                  <span style="display:block;color:var(--ss-muted);font-size:0.9rem;">{{ current_variant.price | money }}</span>
+                </span>
+              </label>
+              {% for group in product.selling_plan_groups %}
+                {% for plan in group.selling_plans %}
+                  <label>
+                    <input type="radio" name="selling_plan" value="{{ plan.id }}">
+                    <span>
+                      <strong>{{ plan.name }}</strong>
+                      <span style="display:block;color:var(--ss-muted);font-size:0.9rem;">{{ section.settings.subscribe_detail }}</span>
+                    </span>
+                  </label>
+                {% endfor %}
+              {% endfor %}
+            </fieldset>
+          {% endif %}
+
+          <div class="ss-pdp__qty" data-ss-qty>
+            <button type="button" data-ss-qty-minus aria-label="Decrease quantity">−</button>
+            <input type="number" name="quantity" value="1" min="1" aria-label="Quantity">
+            <button type="button" data-ss-qty-plus aria-label="Increase quantity">+</button>
+          </div>
+
+          <button
+            type="submit"
+            class="ss-btn ss-btn--primary"
+            data-fizz-pdp-submit
+            {% unless current_variant.available %}disabled{% endunless %}
+          >
+            {% if current_variant.available %}
+              {% if mode == 'co2' and product.selling_plan_groups.size > 0 %}
+                {{ section.settings.subscribe_cta }}
+              {% else %}
+                {{ section.settings.cta_label }}
+              {% endif %}
+            {% else %}
+              {{ section.settings.sold_out_label }}
+            {% endif %}
+          </button>
+        {% endform %}
+
+        {% for block in section.blocks %}
+          {% if block.type == '@app' %}
+            {% render block %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if section.settings.show_faq and section.blocks.size > 0 %}
+      <div class="ss-faq" style="margin-top: var(--fizz-space-stack-xl); max-width: 48rem;">
+        <h2 class="ss-h2" style="margin-bottom: 1.5rem;" data-ss-trigger="scroll" data-ss-split="words">
+          {{ section.settings.faq_heading }}
+        </h2>
+        {% for block in section.blocks %}
+          {% if block.type == 'faq' %}
+            <details {{ block.shopify_attributes }}>
+              <summary>{{ block.settings.question }}</summary>
+              <div class="ss-faq__body">{{ block.settings.answer }}</div>
+            </details>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  (function () {
+    var select = document.getElementById('fizz-ss-variant-select');
+    if (!select) return;
+    select.addEventListener('change', function () {
+      var id = select.value;
+      var url = new URL(window.location.href);
+      url.searchParams.set('variant', id);
+      window.location.href = url.toString();
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "SS Product hero",
+  "tag": "section",
+  "class": "fizz-ss-product fizz-section--spaced fizz-section--hero",
+  "settings": [
+    {
+      "type": "select",
+      "id": "mode",
+      "label": "Product mode",
+      "options": [
+        { "value": "standard", "label": "Standard / flavor" },
+        { "value": "bottle", "label": "Bottle (color swatches)" },
+        { "value": "co2", "label": "CO₂ (selling plans)" }
+      ],
+      "default": "standard"
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Fizz" },
+    { "type": "text", "id": "swatch_label", "label": "Swatch label", "default": "Select color" },
+    { "type": "text", "id": "variant_label", "label": "Variant label", "default": "Select option" },
+    { "type": "text", "id": "cta_label", "label": "Add to cart label", "default": "Add to cart" },
+    { "type": "text", "id": "sold_out_label", "label": "Sold out label", "default": "Sold out" },
+    { "type": "text", "id": "plan_label", "label": "Plan picker label (CO₂)", "default": "How do you want to buy?" },
+    { "type": "text", "id": "onetime_label", "label": "One-time label", "default": "One-time purchase" },
+    { "type": "text", "id": "subscribe_detail", "label": "Subscribe detail", "default": "On-demand refills — reorder when you run low" },
+    { "type": "text", "id": "subscribe_cta", "label": "Subscribe CTA", "default": "Subscribe & refill on demand" },
+    { "type": "checkbox", "id": "show_faq", "label": "Show FAQ in hero section", "default": false },
+    { "type": "text", "id": "faq_heading", "label": "FAQ heading", "default": "Got questions?" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "hero", "label": "Hero" },
+        { "value": "default", "label": "Default" }
+      ],
+      "default": "hero"
+    },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "blocks": [
+    {
+      "type": "highlight",
+      "name": "Highlight",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Built for everyday" }
+      ]
+    },
+    {
+      "type": "faq",
+      "name": "FAQ item",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "How does Fizz work?" },
+        { "type": "textarea", "id": "answer", "label": "Answer", "default": "Fill with water, carbonate with Fizz Charge, add flavor if you like." }
+      ]
+    },
+    { "type": "@app" }
+  ],
+  "presets": [{ "name": "SS Product hero" }]
+}
+{% endschema %}

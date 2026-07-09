@@ -1,0 +1,240 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign flavor_collection = section.settings.collection
+  assign grid_heading = section.settings.heading
+  if grid_heading == blank and flavor_collection != blank
+    assign grid_heading = flavor_collection.title
+  elsif grid_heading == blank
+    assign grid_heading = collection.title
+  endif
+%}
+<section class="bg-black ks-reveal opacity-0 translate-y-10 transition-all duration-1000">
+  <div class="px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto">
+    <div class="flex justify-between items-end mb-12 border-b border-outline-variant pb-4">
+      <h2 class="font-headline-lg text-headline-lg tracking-tight uppercase">{{ grid_heading }}</h2>
+      {% if flavor_collection %}
+        <a class="font-label-caps text-primary hover:opacity-80 transition-opacity flex items-center gap-2" href="{{ flavor_collection.url }}">
+          {{ section.settings.link_label }}
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </a>
+      {% endif %}
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+      {% if flavor_collection and flavor_collection.products_count > 0 %}
+        {% liquid
+          assign use_variants = false
+          if flavor_collection.products_count == 1
+            assign flavor_parent = flavor_collection.products.first
+            if flavor_parent.variants.size > 1
+              assign use_variants = true
+            endif
+          endif
+        %}
+        {% if use_variants %}
+          {% for variant in flavor_parent.variants limit: 4 %}
+            {% liquid
+              assign pack_slug = variant.metafields.custom.pack_slug
+              if pack_slug == blank
+                assign flavor_key = variant.title | downcase
+                if flavor_key contains 'orange'
+                  assign pack_slug = 'orange-tangerine'
+                elsif flavor_key contains 'lime'
+                  assign pack_slug = 'zesty-lime'
+                elsif flavor_key contains 'berry'
+                  assign pack_slug = 'mixed-berry'
+                endif
+              endif
+            %}
+            <div class="glass-card--shop rounded-xl overflow-hidden flex flex-col md:flex-row bg-gradient-to-br from-surface-container to-surface-container-highest">
+              <div class="w-full md:w-1/2 p-8 flex items-center justify-center bg-black">
+                {% if variant.image %}
+                  {{ variant.image | image_url: width: 500 | image_tag: class: 'max-h-[360px] w-auto object-contain', alt: variant.title }}
+                {% else %}
+                  {% render 'fizz-flavor-pack-img', slug: pack_slug, alt: variant.title, class: 'max-h-[360px] w-auto object-contain' %}
+                {% endif %}
+              </div>
+              <div class="w-full md:w-1/2 p-8 flex flex-col justify-center">
+                <h3 class="font-headline-lg-mobile tracking-tight mb-2">{{ variant.title }}</h3>
+                <p class="font-body-md text-on-surface-variant mb-6">{{ flavor_parent.description | strip_html | truncate: 160 }}</p>
+                <div class="flex items-center justify-between mb-6">
+                  <span class="font-label-caps text-primary">{{ variant.price | money }}</span>
+                </div>
+                <button type="button" class="w-full py-3 rounded-full border border-white/20 text-on-surface font-label-caps uppercase tracking-widest hover:bg-white/5 transition-colors" data-ks-quick-add="{{ variant.id }}">Quick Add</button>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          {% for product in flavor_collection.products limit: 4 %}
+            <div class="glass-card--shop rounded-xl overflow-hidden flex flex-col md:flex-row bg-gradient-to-br from-surface-container to-surface-container-highest">
+              <div class="w-full md:w-1/2 p-8 flex items-center justify-center bg-black">
+                {% if product.featured_image %}
+                  {{ product.featured_image | image_url: width: 500 | image_tag: class: 'max-h-[360px] w-auto object-contain', alt: product.title }}
+                {% else %}
+                  {% render 'fizz-flavor-pack-img', slug: product.handle, alt: product.title, class: 'max-h-[360px] w-auto object-contain' %}
+                {% endif %}
+              </div>
+              <div class="w-full md:w-1/2 p-8 flex flex-col justify-center">
+                <h3 class="font-headline-lg-mobile tracking-tight mb-2">{{ product.title }}</h3>
+                <p class="font-body-md text-on-surface-variant mb-6">{{ product.description | strip_html | truncate: 160 }}</p>
+                <div class="flex items-center justify-between mb-6">
+                  <span class="font-label-caps text-primary">{{ product.price | money }}</span>
+                </div>
+                <button type="button" class="w-full py-3 rounded-full border border-white/20 text-on-surface font-label-caps uppercase tracking-widest hover:bg-white/5 transition-colors" data-ks-quick-add="{{ product.selected_or_first_available_variant.id }}">Quick Add</button>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% else %}
+        {% for block in section.blocks %}
+          <div class="glass-card--shop rounded-xl overflow-hidden flex flex-col md:flex-row bg-gradient-to-br from-surface-container to-surface-container-highest" {{ block.shopify_attributes }}>
+            <div class="w-full md:w-1/2 p-8 flex items-center justify-center bg-black">
+              {% if block.settings.image != blank %}
+                {{ block.settings.image | image_url: width: 500 | image_tag: class: 'max-h-[360px] w-auto object-contain', alt: block.settings.title }}
+              {% elsif block.settings.pack_slug != blank %}
+                {% render 'fizz-flavor-pack-img', slug: block.settings.pack_slug, alt: block.settings.title, class: 'max-h-[360px] w-auto object-contain' %}
+              {% else %}
+                {% render 'ks-stitch-img', name: block.settings.fallback_image, alt: block.settings.title, class: 'max-h-[300px] object-contain drop-shadow-2xl' %}
+              {% endif %}
+            </div>
+            <div class="w-full md:w-1/2 p-8 flex flex-col justify-center">
+              {% if block.settings.badge != blank %}
+                <span class="px-2 py-1 rounded bg-[#FF7F50]/20 text-[#FF7F50] font-label-caps text-[10px] tracking-widest uppercase mb-2 inline-block border border-[#FF7F50]/30">{{ block.settings.badge }}</span>
+              {% endif %}
+              <h3 class="font-headline-lg-mobile tracking-tight mb-2">{{ block.settings.title }}</h3>
+              <p class="font-body-md text-on-surface-variant mb-6">{{ block.settings.body }}</p>
+              <div class="flex items-center justify-between mb-6">
+                <span class="font-label-caps text-primary">{{ block.settings.price_label }}</span>
+                <span class="text-sm text-on-surface-variant">{{ block.settings.pack_label }}</span>
+              </div>
+              {% if block.settings.product != blank %}
+                <button type="button" class="w-full py-3 rounded-full border border-white/20 text-on-surface font-label-caps uppercase tracking-widest hover:bg-white/5 transition-colors" data-ks-quick-add="{{ block.settings.product.selected_or_first_available_variant.id }}">Quick Add</button>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "KS Flavor Collection Grid",
+  "tag": "section",
+  "class": "ks-flavor-collection-section fizz-section--spaced fizz-section--relaxed",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "relaxed"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "info": "Leave blank to use the linked collection title." },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "Explore All Flavors" },
+    { "type": "collection", "id": "collection", "label": "Flavors collection" },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "blocks": [
+    {
+      "type": "flavor_card",
+      "name": "Flavor card",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Orange Tangerine" },
+        { "type": "text", "id": "badge", "label": "Badge", "default": "Natural" },
+        { "type": "textarea", "id": "body", "label": "Body" },
+        { "type": "text", "id": "price_label", "label": "Price", "default": "$1.50 / SACHET" },
+        { "type": "text", "id": "pack_label", "label": "Pack label", "default": "Box of 10" },
+        {
+          "type": "select",
+          "id": "pack_slug",
+          "label": "Pack image",
+          "options": [
+            { "value": "", "label": "Use fallback image" },
+            { "value": "orange-tangerine", "label": "Orange Tangerine" },
+            { "value": "zesty-lime", "label": "Zesty Lime" },
+            { "value": "mixed-berry", "label": "Mixed Berry" }
+          ],
+          "default": "orange-tangerine"
+        },
+        { "type": "image_picker", "id": "image", "label": "Custom pack image" },
+        { "type": "text", "id": "fallback_image", "label": "Fallback stitch image", "default": "flavor-orange-tangerine" },
+        { "type": "product", "id": "product", "label": "Product" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KS Flavor Collection Grid",
+      "blocks": [
+        { "type": "flavor_card", "settings": { "title": "Orange Tangerine", "pack_slug": "orange-tangerine", "badge": "Natural", "body": "A bright citrus burst crafted from real orange and tangerine extracts.", "price_label": "$1.50 / SACHET", "pack_label": "Box of 10" } },
+        { "type": "flavor_card", "settings": { "title": "Zesty Lime", "pack_slug": "zesty-lime", "badge": "Natural", "body": "Crisp, refreshing lime flavor with a clean sparkling finish.", "price_label": "$1.50 / SACHET", "pack_label": "Box of 10" } },
+        { "type": "flavor_card", "settings": { "title": "Mixed Berry", "pack_slug": "mixed-berry", "badge": "Natural", "body": "Blueberry and raspberry notes blended for a bold berry sparkle.", "price_label": "$1.50 / SACHET", "pack_label": "Box of 10" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

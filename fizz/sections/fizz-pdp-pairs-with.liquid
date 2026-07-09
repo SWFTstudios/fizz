@@ -1,0 +1,113 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{% liquid
+  assign pairs = product.metafields.custom.pairs_with_products.value
+  assign heading = product.metafields.custom.pairs_with_heading | default: section.settings.heading
+  assign has_pairs = false
+  if pairs != blank and pairs.size > 0
+    assign has_pairs = true
+  endif
+%}
+
+{% if has_pairs or section.settings.collection != blank %}
+  <section class="fizz-pdp-pairs" aria-label="{{ heading | escape }}">
+    <div class="fizz-pdp-pairs__inner">
+      <h2>{{ heading }}</h2>
+      <div class="fizz-pdp-pairs__grid">
+        {% if has_pairs %}
+          {% for pair_product in pairs %}
+            {% render 'fizz-pdp-product-card', card_product: pair_product %}
+          {% endfor %}
+        {% elsif section.settings.collection != blank %}
+          {% for pair_product in section.settings.collection.products limit: section.settings.product_limit %}
+            {% render 'fizz-pdp-product-card', card_product: pair_product %}
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "PDP pairs with",
+  "tag": "section",
+  "class": "fizz-pdp-pairs-section fizz-section--spaced fizz-section--default",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 96
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+                { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 20
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Complete your setup" },
+    { "type": "collection", "id": "collection", "label": "Fallback collection" },
+    { "type": "range", "id": "product_limit", "label": "Max products", "min": 2, "max": 6, "step": 1, "default": 3 },
+    { "type": "header", "content": "Section background" },
+    { "type": "color", "id": "background_color", "label": "Background color" }
+  ],
+  "presets": [{ "name": "PDP pairs with" }]
+}
+{% endschema %}
