@@ -1,0 +1,25 @@
+{
+  "sections": {
+    "main": {
+      "type": "fizz-collection",
+      "blocks": {
+        "b1": { "type": "benefit", "settings": { "label": "Free shipping over $50" } },
+        "b2": { "type": "benefit", "settings": { "label": "30-day fizz guarantee" } },
+        "b3": { "type": "benefit", "settings": { "label": "2-yr warranty" } }
+      },
+      "block_order": ["b1", "b2", "b3"],
+      "settings": {
+        "eyebrow": "Shop",
+        "products_per_page": 24,
+        "expand_variants": false
+      }
+    },
+    "footer": {
+      "type": "fizz-footer",
+      "settings": {
+        "cta_link": "/collections/all"
+      }
+    }
+  },
+  "order": ["main", "footer"]
+}
