@@ -5,11 +5,26 @@
     render 'fizz-color-slug', variant: current_variant
   endcapture
   assign color_slug = color_slug | strip
+
+  capture scene_raw
+    render 'fizz-colorway-scene', slug: color_slug, variant: current_variant
+  endcapture
+  assign scene_parts = scene_raw | strip | split: '|'
+  assign stage_bg_end = scene_parts[1] | default: scene_parts[0]
+
+  assign crumb_text = section.settings.crumb
+  if crumb_text == blank
+    assign crumb_text = product.title
+  endif
 %}
 
 <div class="pdp" id="buy" data-pdp data-screen-label="Product hero">
   <div>
-    <div class="pstage" data-pdp-stage style="background:radial-gradient(ellipse 80% 90% at 50% 100%,#141922,#0b0e12)">
+    <div
+      class="pstage"
+      data-pdp-stage
+      style="background:radial-gradient(ellipse 80% 90% at 50% 100%, {{ stage_bg_end }}, var(--color-surface));"
+    >
       <div data-bubbles data-bub-count="14" data-bub-color="var(--hero-bubble-color)" data-bub-seed="11" data-bub-rise="700" class="bubf"></div>
       <div class="pglow"></div>
       {% render 'fizz-bottle-product-img',
@@ -42,7 +57,14 @@
   </div>
 
   <div>
-    <p class="crumb">{{ section.settings.crumb | default: 'FIZZ / The Bottle' }}</p>
+    <p class="crumb">
+      <span>FIZZ</span>
+      {% if collection != blank and section.settings.show_collection_link %}
+        <span aria-hidden="true"> / </span><a href="{{ collection.url }}">{{ collection.title }}</a>
+      {% endif %}
+      <span aria-hidden="true"> / </span>
+      <span>{{ crumb_text }}</span>
+    </p>
     <h1 class="ptitle">{{ section.settings.title | default: product.title }}</h1>
     {% if section.settings.tagline != blank %}
       <p class="ptag">{{ section.settings.tagline }}</p>
@@ -75,8 +97,15 @@
     {% endif %}
 
     {% for block in section.blocks %}
-      {% if block.type == 'addon' and block.settings.variant_id != blank %}
-        <div class="addon" data-addon data-addon-key="{{ block.settings.addon_key }}" data-variant-id="{{ block.settings.variant_id }}" data-addon-price="{{ block.settings.addon_price | default: 0 }}" {{ block.shopify_attributes }}>
+      {% if block.type == 'addon' %}
+        <div
+          class="addon"
+          data-addon
+          data-addon-key="{{ block.settings.addon_key }}"
+          {% if block.settings.variant_id != blank %}data-variant-id="{{ block.settings.variant_id }}"{% endif %}
+          data-addon-price="{{ block.settings.addon_price | default: 0 }}"
+          {{ block.shopify_attributes }}
+        >
           <div>
             <p class="addt">{{ block.settings.title }}</p>
             <p class="addd">{{ block.settings.description }}</p>
@@ -119,7 +148,8 @@
 {
   "name": "Product",
   "settings": [
-    { "type": "text", "id": "crumb", "label": "Breadcrumb", "default": "FIZZ / The Bottle" },
+    { "type": "text", "id": "crumb", "label": "Breadcrumb suffix", "default": "The Bottle", "info": "Shown after collection link when enabled." },
+    { "type": "checkbox", "id": "show_collection_link", "label": "Show collection in breadcrumb", "default": true },
     { "type": "text", "id": "title", "label": "Title override" },
     { "type": "text", "id": "tagline", "label": "Tagline", "default": "Sparkling water, wherever you are." },
     { "type": "textarea", "id": "description", "label": "Description override" },

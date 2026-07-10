@@ -50,6 +50,16 @@
         "tagline": "Sparkling water, wherever you are."
       }
     },
+    "related": {
+      "type": "fizz-claude-related",
+      "settings": {
+        "eyebrow": "Also try",
+        "heading": "More to fizz",
+        "product_limit": 4,
+        "view_all_label": "Shop all",
+        "view_all_url": "/collections/all"
+      }
+    },
     "footer": {
       "type": "fizz-claude-footer",
       "settings": {
@@ -57,5 +67,5 @@
       }
     }
   },
-  "order": ["main", "footer"]
+  "order": ["main", "related", "footer"]
 }

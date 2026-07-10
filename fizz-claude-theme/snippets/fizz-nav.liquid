@@ -83,6 +83,7 @@
   </a>
   <div class="navl">
     <a href="{% if template.name == 'product' %}#buy{% else %}{{ shop_url }}{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>Bottle</a>
+    <a href="{{ routes.all_products_collection_url }}"{% if template.name == 'collection' %} aria-current="page"{% endif %}>Shop</a>
     <a href="{% if template.name == 'index' %}#how{% else %}{{ routes.root_url }}#how{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>How it works</a>
     <a href="{% if template.name == 'index' %}#colors{% else %}{{ routes.root_url }}#colors{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>Colorways</a>
     <a href="{% if template.name == 'index' %}#flavors{% else %}{{ routes.root_url }}#flavors{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>Flavors</a>

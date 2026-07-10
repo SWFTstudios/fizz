@@ -194,8 +194,16 @@
     var variantInput = target.querySelector('[data-pdp-variant-id]');
     if (variantInput && variantId) variantInput.value = variantId;
 
+    var formWrap = target.querySelector('[data-pdp-form]');
+    if (formWrap && price) {
+      var parsed = parseMoney(price);
+      if (parsed) formWrap.dataset.basePrice = String(parsed);
+    }
+
     var cta = target.querySelector('[data-pdp-submit]');
     if (cta && price) cta.textContent = 'Add to cart — ' + price;
+
+    if (formWrap) updatePdpTotal();
 
     var shopCta = target.querySelector('[data-way-cta]');
     if (shopCta) {
@@ -223,6 +231,14 @@
         applySwatch(btn);
       });
     });
+  }
+
+  function initVariantFromUrl() {
+    var params = new URLSearchParams(window.location.search);
+    var variantId = params.get('variant');
+    if (!variantId) return;
+    var btn = document.querySelector('[data-way-swatch][data-variant-id="' + variantId + '"]');
+    if (btn) applySwatch(btn);
   }
 
   function initPackFromUrl() {
@@ -359,6 +375,7 @@
     initPdpForm();
     initThumbs();
     initPackFromUrl();
+    initVariantFromUrl();
     updatePdpTotal();
   }
 
