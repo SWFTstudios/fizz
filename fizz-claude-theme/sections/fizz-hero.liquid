@@ -1,5 +1,11 @@
 <div class="hero" data-screen-label="Hero" style="background:var(--hero-bg);color:var(--hero-text)">
-  <div data-bubbles data-bub-count="16" data-bub-color="var(--hero-bubble-color)" data-bub-seed="7" data-bub-rise="900" class="bubf"></div>
+  {% render 'fizz-bubbles',
+    settings: section.settings,
+    color_var: 'var(--hero-bubble-color)',
+    seed: 7,
+    rise: 900,
+    default_count: 16
+  %}
   <div class="heroin">
     <p class="mono eyebrow">{{ section.settings.eyebrow }}</p>
     <h1 class="ht">
@@ -8,6 +14,34 @@
       <span class="hl hl3"><em class="serif acc">{{ section.settings.line_3 }}</em></span>
       <span class="hl hl4">{{ section.settings.line_4 }}<span class="acc">.</span></span>
     </h1>
+    {% liquid
+      assign show_primary_cta = true
+      if section.settings.show_primary_cta == false
+        assign show_primary_cta = false
+      endif
+      assign show_secondary_cta = false
+      if section.settings.show_secondary_cta
+        assign show_secondary_cta = true
+      endif
+    %}
+    {% if show_primary_cta or show_secondary_cta %}
+      <div class="hero-ctas" data-bub-ignore>
+        {% if show_primary_cta %}
+          <a
+            class="bigcta{% if section.settings.cta_style == 'outline' %} bigcta--outline{% endif %}"
+            href="{{ section.settings.cta_link | default: routes.all_products_collection_url }}"
+            data-bub-ignore
+          >{{ section.settings.cta_label | default: 'Shop FIZZ — $89' }}</a>
+        {% endif %}
+        {% if show_secondary_cta %}
+          <a
+            class="bigcta{% unless section.settings.cta_secondary_style == 'filled' %} bigcta--outline{% endunless %}"
+            href="{{ section.settings.cta_secondary_link | default: routes.all_products_collection_url }}"
+            data-bub-ignore
+          >{{ section.settings.cta_secondary_label | default: 'How it works' }}</a>
+        {% endif %}
+      </div>
+    {% endif %}
   </div>
   <div class="herostage">
     <div class="heroglow"></div>
@@ -44,7 +78,192 @@
     { "type": "text", "id": "ticker_text", "label": "Marquee text", "default": "FIZZ ANYWHERE /// ZERO SUGAR /// REAL FRUIT /// 60 FIZZES PER POD ///" },
     { "type": "image_picker", "id": "bottle_image", "label": "Bottle photo (overrides CSS bottle)" },
     { "type": "text", "id": "bottle_alt", "label": "Bottle photo alt text" },
-    { "type": "color", "id": "bottle_color", "label": "Fallback bottle color", "default": "#1d2a44" }
+    { "type": "color", "id": "bottle_color", "label": "Fallback bottle color", "default": "#1d2a44" },
+    { "type": "header", "content": "Call to action" },
+    {
+      "type": "checkbox",
+      "id": "show_primary_cta",
+      "label": "Show primary button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Primary button label",
+      "default": "Shop FIZZ — $89",
+      "visible_if": "{{ section.settings.show_primary_cta }}"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Primary button link",
+      "visible_if": "{{ section.settings.show_primary_cta }}"
+    },
+    {
+      "type": "select",
+      "id": "cta_style",
+      "label": "Primary button style",
+      "default": "filled",
+      "options": [
+        { "value": "filled", "label": "Filled" },
+        { "value": "outline", "label": "Outline" }
+      ],
+      "visible_if": "{{ section.settings.show_primary_cta }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_cta",
+      "label": "Show secondary button",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "cta_secondary_label",
+      "label": "Secondary button label",
+      "default": "How it works",
+      "visible_if": "{{ section.settings.show_secondary_cta }}"
+    },
+    {
+      "type": "url",
+      "id": "cta_secondary_link",
+      "label": "Secondary button link",
+      "visible_if": "{{ section.settings.show_secondary_cta }}"
+    },
+    {
+      "type": "select",
+      "id": "cta_secondary_style",
+      "label": "Secondary button style",
+      "default": "outline",
+      "options": [
+        { "value": "filled", "label": "Filled" },
+        { "value": "outline", "label": "Outline" }
+      ],
+      "visible_if": "{{ section.settings.show_secondary_cta }}"
+    },
+    { "type": "header", "content": "Bubbles" },
+    {
+      "type": "checkbox",
+      "id": "bubbles_enabled",
+      "label": "Enable bubble animation",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "bubble_use_theme",
+      "label": "Use theme bubble defaults",
+      "default": true,
+      "info": "Turn off to set count, size, style, and color for this section only.",
+      "visible_if": "{{ section.settings.bubbles_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "bubble_count",
+      "label": "Ambient bubble count",
+      "min": 4,
+      "max": 40,
+      "step": 1,
+      "default": 16,
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_use_theme == false }}"
+    },
+    {
+      "type": "range",
+      "id": "bubble_size_scale",
+      "label": "Bubble size",
+      "min": 50,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 115,
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_use_theme == false }}"
+    },
+    {
+      "type": "select",
+      "id": "bubble_style",
+      "label": "Bubble style",
+      "default": "glass",
+      "options": [
+        { "value": "ring", "label": "Ring" },
+        { "value": "glass", "label": "Glass" },
+        { "value": "bold", "label": "Bold" }
+      ],
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_use_theme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "bubble_color",
+      "label": "Bubble color",
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_use_theme == false }}"
+    },
+    {
+      "type": "range",
+      "id": "bubble_peak_opacity",
+      "label": "Bubble opacity",
+      "min": 40,
+      "max": 100,
+      "step": 2,
+      "unit": "%",
+      "default": 88,
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_use_theme == false }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "bubble_wobble",
+      "label": "Wobble drift",
+      "default": false,
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_use_theme == false }}"
+    },
+    {
+      "type": "select",
+      "id": "bubble_interaction",
+      "label": "User interaction",
+      "default": "tap",
+      "options": [
+        { "value": "off", "label": "Off" },
+        { "value": "tap", "label": "Tap area" },
+        { "value": "button", "label": "Generator button" },
+        { "value": "both", "label": "Tap area + button" }
+      ],
+      "visible_if": "{{ section.settings.bubbles_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "bubble_burst_count",
+      "label": "Bubbles per tap",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "default": 10,
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_interaction != 'off' }}"
+    },
+    {
+      "type": "range",
+      "id": "bubble_max_particles",
+      "label": "Max particles",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "default": 48,
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_interaction != 'off' }}"
+    },
+    {
+      "type": "text",
+      "id": "bubble_button_label",
+      "label": "Generator button label",
+      "default": "Pop bubbles",
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_interaction == 'button' or section.settings.bubbles_enabled and section.settings.bubble_interaction == 'both' }}"
+    },
+    {
+      "type": "select",
+      "id": "bubble_button_position",
+      "label": "Generator button position",
+      "default": "bottom-left",
+      "options": [
+        { "value": "bottom-left", "label": "Bottom left" },
+        { "value": "bottom-right", "label": "Bottom right" },
+        { "value": "top-right", "label": "Top right" }
+      ],
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_interaction == 'button' or section.settings.bubbles_enabled and section.settings.bubble_interaction == 'both' }}"
+    }
   ],
   "presets": [{ "name": "Hero" }]
 }

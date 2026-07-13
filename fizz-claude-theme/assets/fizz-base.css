@@ -53,6 +53,15 @@ body.fizz{margin:0;background:var(--color-surface);color:var(--color-on-surface)
 /* bubbles */
 .bubf{position:absolute;inset:0;overflow:hidden;pointer-events:none;--bub-color:rgba(242,239,231,.45);--bub-peak:var(--bubble-peak-opacity,.88)}
 .bubf-canvas{position:absolute;inset:0;display:block;width:100%;height:100%;pointer-events:none}
+.bub-gen{position:absolute;z-index:4;display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;border:1px solid color-mix(in srgb,var(--hero-text,var(--color-text,#f2efe7)) 35%,transparent);background:color-mix(in srgb,var(--hero-bg,var(--color-surface,#080f1d)) 55%,transparent);color:var(--hero-text,var(--color-text,#f2efe7));font-family:var(--font-label,var(--font-body));font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:transform .2s,background .2s,border-color .2s;pointer-events:auto}
+.bub-gen:hover{transform:scale(1.04);border-color:color-mix(in srgb,var(--hero-text,var(--color-text,#f2efe7)) 70%,transparent)}
+.bub-gen:focus-visible{outline:2px solid var(--color-accent,#5b9dff);outline-offset:3px}
+.bub-gen--bottom-left{left:24px;bottom:24px}
+.bub-gen--bottom-right{right:24px;bottom:24px}
+.bub-gen--top-right{right:24px;top:24px}
+.hero .bub-gen--bottom-left{bottom:calc(5vh + 52px)}
+.pstage .bub-gen--bottom-left,.pstage .bub-gen--bottom-right{bottom:18px}
+.pstage .bub-gen--top-right{top:18px}
 
 /* ticker marquee */
 .tickin{display:inline-flex;gap:56px;align-items:center;will-change:transform;animation:fizzslide 28s linear infinite}
@@ -85,8 +94,8 @@ body.fizz{margin:0;background:var(--color-surface);color:var(--color-on-surface)
 .stmt__overlay{z-index:2}
 .stmt__content{position:relative;z-index:3}
 .stmt__img,.stmt__video{width:100%;height:100%;object-fit:var(--stmt-media-fit,cover);object-position:var(--stmt-media-pos,center center);transform:scale(var(--stmt-media-scale,1));display:block}
-.stx{font-family:var(--font-accent);font-style:italic;font-weight:500;font-size:5.4vw;line-height:1.14;margin:0;max-width:22ch}
-.stx2{font-size:2.6vw;font-style:normal;font-family:var(--font-body);font-weight:500;max-width:34ch;color:color-mix(in srgb,var(--statement-text) 65%,transparent);line-height:1.3;margin-top:6vh}
+.stx{font-family:var(--font-accent);font-style:italic;font-weight:500;font-size:calc(5.4vw * var(--stx-scale,1));line-height:1.14;margin:0;max-width:22ch}
+.stx2{font-size:calc(2.6vw * var(--stx-scale,1));font-style:normal;font-family:var(--font-body);font-weight:500;max-width:34ch;color:color-mix(in srgb,var(--statement-text) 65%,transparent);line-height:1.3;margin-top:6vh}
 
 /* how it works */
 .how{display:grid;grid-template-columns:1fr 1fr;background:var(--how-bg);color:var(--how-text)}
@@ -195,6 +204,9 @@ body.fizz{margin:0;background:var(--color-surface);color:var(--color-on-surface)
 .fh .out2{color:transparent;-webkit-text-stroke:2.5px var(--footer-stroke)}
 .bigcta{display:inline-flex;align-items:center;gap:14px;background:var(--btn-primary-bg);color:var(--btn-primary-text);border:none;border-radius:var(--btn-radius,999px);padding:26px 52px;font-family:var(--font-body);font-size:19px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;margin-top:7vh;transition:transform .2s;text-decoration:none}
 .bigcta:hover{transform:scale(var(--btn-hover-scale,1.05))}
+.bigcta--outline{background:transparent;color:var(--hero-text,var(--btn-primary-text));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--hero-text,var(--btn-primary-text)) 75%,transparent)}
+.hero-ctas{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:4vh}
+.hero-ctas .bigcta{margin-top:0;padding:18px 36px;font-size:15px}
 .footmeta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-top:14vh;padding-top:26px;border-top:1px solid var(--color-border);font-family:var(--font-label);font-size:11.5px;letter-spacing:.08em;color:var(--color-on-surface-muted);text-transform:uppercase}
 
 /* grain overlay */
@@ -285,7 +297,7 @@ body.fizz{margin:0;background:var(--color-surface);color:var(--color-on-surface)
   .hl,.hl3 .serif{font-size:calc(11vh * var(--typo-hero-scale,1))}
   .how{grid-template-columns:1fr}
   .howstick{position:relative;height:50vh}
-  .stx{font-size:8vw}
+  .stx{font-size:calc(8vw * var(--stx-scale,1))}
   .stx2{font-size:5vw}
   .flav{grid-template-columns:1fr;min-height:auto}
   .fpanel{min-height:60vh}

@@ -147,8 +147,23 @@ Extending to **global theme tokens** requires an explicit merchant toggle and Li
 
 ---
 
+## Bubble interaction & per-section controls (2026-07-13)
+
+| Question | Answer | Source |
+|----------|--------|--------|
+| Can merchants tune bubbles per section in the theme editor? | **Yes** — section `checkbox` / `range` / `color` / `select` / `text` | [Input settings](https://shopify.dev/docs/storefronts/themes/architecture/settings/input-settings) |
+| Can dependent bubble/CTA/typography fields hide until relevant? | **Yes** — `visible_if` | [Conditional settings](https://shopify.dev/changelog/conditional-settings-in-the-theme-editor) |
+| Can each statement line pick a Shopify library font? | **Yes** — `font_picker` (required `default`); load with `font_face` | [font_picker](https://shopify.dev/docs/storefronts/themes/architecture/settings/input-settings#font_picker), [font object](https://shopify.dev/docs/api/liquid/objects/font) |
+| Can one schema JSON fragment be shared across sections? | **No** — duplicate identical IDs; share markup via snippet | Theme architecture |
+| Can Liquid alone spawn bubbles at tap coordinates? | **No** — canvas JS (`spawnBurst`) required | Storefront runtime |
+
+**Implementation pattern:** theme-level bubble group remains global defaults; section settings override when `bubble_use_theme` is off. Interaction modes: `off` / `tap` / `button` / `both`. Hit-test section clicks (skip links/buttons/`[data-bub-ignore]`) so `.bubf` stays `pointer-events: none`.
+
+---
+
 ## Changelog
 
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-09 | Cursor agent | Initial research report; Phase 2 implementation |
+| 2026-07-13 | Cursor agent | Bubble interaction + per-section controls research |

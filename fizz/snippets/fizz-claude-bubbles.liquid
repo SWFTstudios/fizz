@@ -1,0 +1,88 @@
+{% doc %}
+  Renders the Fizz Claude bubble canvas field and optional generator button.
+  @param {object} settings - Section settings object
+  @param {string} color_var - Fallback CSS color (e.g. var(--hero-bubble-color))
+  @param {number} [seed] - PRNG seed
+  @param {number} [rise] - Legacy rise hint (unused by JS)
+  @param {number} [default_count] - Ambient count when using theme defaults
+{% enddoc %}
+{% liquid
+  assign enabled = true
+  if settings.bubbles_enabled == false
+    assign enabled = false
+  endif
+
+  assign use_theme = true
+  if settings.bubble_use_theme == false
+    assign use_theme = false
+  endif
+
+  assign bub_count = default_count | default: 14
+  assign bub_color = color_var | default: 'var(--hero-bubble-color)'
+  assign bub_peak = ''
+  assign bub_size = ''
+  assign bub_style = ''
+  assign bub_wobble = ''
+
+  unless use_theme
+    if settings.bubble_count != blank
+      assign bub_count = settings.bubble_count
+    endif
+    if settings.bubble_color != blank
+      assign bub_color = settings.bubble_color
+    endif
+    if settings.bubble_peak_opacity != blank
+      assign bub_peak = settings.bubble_peak_opacity | times: 1.0 | divided_by: 100.0
+    endif
+    if settings.bubble_size_scale != blank
+      assign bub_size = settings.bubble_size_scale | times: 1.0 | divided_by: 100.0
+    endif
+    if settings.bubble_style != blank
+      assign bub_style = settings.bubble_style
+    endif
+    if settings.bubble_wobble
+      assign bub_wobble = 'true'
+    else
+      assign bub_wobble = 'false'
+    endif
+  endunless
+
+  assign interaction = settings.bubble_interaction | default: 'tap'
+  assign burst_count = settings.bubble_burst_count | default: 10
+  assign max_particles = settings.bubble_max_particles | default: 48
+  assign btn_label = settings.bubble_button_label | default: 'Pop bubbles'
+  assign btn_pos = settings.bubble_button_position | default: 'bottom-left'
+  assign show_btn = false
+  if interaction == 'button' or interaction == 'both'
+    assign show_btn = true
+  endif
+
+  assign bub_seed = seed | default: 7
+  assign bub_rise = rise | default: 700
+%}
+{% if enabled %}
+  <div
+    data-bubbles
+    data-bub-count="{{ bub_count }}"
+    data-bub-color="{{ bub_color }}"
+    data-bub-seed="{{ bub_seed }}"
+    data-bub-rise="{{ bub_rise }}"
+    data-bub-interaction="{{ interaction }}"
+    data-bub-burst="{{ burst_count }}"
+    data-bub-max="{{ max_particles }}"
+    {% if bub_peak != blank %}data-bub-peak="{{ bub_peak }}"{% endif %}
+    {% if bub_size != blank %}data-bub-size="{{ bub_size }}"{% endif %}
+    {% if bub_style != blank %}data-bub-style="{{ bub_style }}"{% endif %}
+    {% if bub_wobble != blank %}data-bub-wobble="{{ bub_wobble }}"{% endif %}
+    class="bubf"
+  ></div>
+  {% if show_btn %}
+    <button
+      type="button"
+      class="bub-gen bub-gen--{{ btn_pos }}"
+      data-bub-gen
+      data-bub-ignore
+      aria-label="{{ btn_label | escape }}"
+    >{{ btn_label }}</button>
+  {% endif %}
+{% endif %}

@@ -25,7 +25,13 @@
       data-pdp-stage
       style="background:radial-gradient(ellipse 80% 90% at 50% 100%, {{ stage_bg_end }}, var(--color-surface));"
     >
-      <div data-bubbles data-bub-count="14" data-bub-color="var(--hero-bubble-color)" data-bub-seed="11" data-bub-rise="700" class="bubf"></div>
+      {% render 'fizz-bubbles',
+        settings: section.settings,
+        color_var: 'var(--hero-bubble-color)',
+        seed: 11,
+        rise: 700,
+        default_count: 14
+      %}
       <div class="pglow"></div>
       {% render 'fizz-bottle-product-img',
         color_slug: color_slug,
@@ -156,7 +162,132 @@
     { "type": "color", "id": "fallback_color", "label": "Fallback bottle color", "default": "#1d2a44" },
     { "type": "text", "id": "shipping_note", "label": "Shipping note", "default": "Free shipping over $50" },
     { "type": "text", "id": "guarantee_note", "label": "Guarantee note", "default": "30-day fizz guarantee" },
-    { "type": "text", "id": "warranty_note", "label": "Warranty note", "default": "2-yr warranty" }
+    { "type": "text", "id": "warranty_note", "label": "Warranty note", "default": "2-yr warranty" },
+
+    { "type": "header", "content": "Bubbles" },
+    {
+      "type": "checkbox",
+      "id": "bubbles_enabled",
+      "label": "Enable bubble animation",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "bubble_use_theme",
+      "label": "Use theme bubble defaults",
+      "default": true,
+      "info": "Turn off to set count, size, style, and color for this section only.",
+      "visible_if": "{{ section.settings.bubbles_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "bubble_count",
+      "label": "Ambient bubble count",
+      "min": 4,
+      "max": 40,
+      "step": 1,
+      "default": 14,
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_use_theme == false }}"
+    },
+    {
+      "type": "range",
+      "id": "bubble_size_scale",
+      "label": "Bubble size",
+      "min": 50,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 115,
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_use_theme == false }}"
+    },
+    {
+      "type": "select",
+      "id": "bubble_style",
+      "label": "Bubble style",
+      "default": "glass",
+      "options": [
+        { "value": "ring", "label": "Ring" },
+        { "value": "glass", "label": "Glass" },
+        { "value": "bold", "label": "Bold" }
+      ],
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_use_theme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "bubble_color",
+      "label": "Bubble color",
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_use_theme == false }}"
+    },
+    {
+      "type": "range",
+      "id": "bubble_peak_opacity",
+      "label": "Bubble opacity",
+      "min": 40,
+      "max": 100,
+      "step": 2,
+      "unit": "%",
+      "default": 88,
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_use_theme == false }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "bubble_wobble",
+      "label": "Wobble drift",
+      "default": false,
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_use_theme == false }}"
+    },
+    {
+      "type": "select",
+      "id": "bubble_interaction",
+      "label": "User interaction",
+      "default": "tap",
+      "options": [
+        { "value": "off", "label": "Off" },
+        { "value": "tap", "label": "Tap area" },
+        { "value": "button", "label": "Generator button" },
+        { "value": "both", "label": "Tap area + button" }
+      ],
+      "visible_if": "{{ section.settings.bubbles_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "bubble_burst_count",
+      "label": "Bubbles per tap",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "default": 10,
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_interaction != 'off' }}"
+    },
+    {
+      "type": "range",
+      "id": "bubble_max_particles",
+      "label": "Max particles",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "default": 48,
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_interaction != 'off' }}"
+    },
+    {
+      "type": "text",
+      "id": "bubble_button_label",
+      "label": "Generator button label",
+      "default": "Pop bubbles",
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_interaction == 'button' or section.settings.bubbles_enabled and section.settings.bubble_interaction == 'both' }}"
+    },
+    {
+      "type": "select",
+      "id": "bubble_button_position",
+      "label": "Generator button position",
+      "default": "bottom-left",
+      "options": [
+        { "value": "bottom-left", "label": "Bottom left" },
+        { "value": "bottom-right", "label": "Bottom right" },
+        { "value": "top-right", "label": "Top right" }
+      ],
+      "visible_if": "{{ section.settings.bubbles_enabled and section.settings.bubble_interaction == 'button' or section.settings.bubbles_enabled and section.settings.bubble_interaction == 'both' }}"
+    }
   ],
   "blocks": [
     {

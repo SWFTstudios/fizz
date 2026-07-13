@@ -17,7 +17,8 @@
   var bubbleIo = null;
   var bubbleResizeObs = null;
 
-  function getBubbleStyle() {
+  function getBubbleStyle(state) {
+    if (state && state.styleOverride) return state.styleOverride;
     var html = document.documentElement;
     if (html.classList.contains('bubble-style-bold')) return 'bold';
     if (html.classList.contains('bubble-style-ring')) return 'ring';
@@ -29,6 +30,12 @@
     var stroke = getComputedStyle(field).getPropertyValue('--bub-color').trim();
     if (!stroke) stroke = 'rgba(242,239,231,0.55)';
     return { stroke: stroke, fill: stroke };
+  }
+
+  function fieldWobble(state) {
+    if (state.wobbleOverride === true) return true;
+    if (state.wobbleOverride === false) return false;
+    return document.documentElement.classList.contains('bubble-wobble');
   }
 
   function BubbleParticle(x, y, opts) {
@@ -45,6 +52,7 @@
     this.spawnY = y;
     this.canvasHeight = opts.canvasHeight;
     this.peakOpacity = opts.peakOpacity;
+    this.isBurst = !!opts.isBurst;
   }
 
   BubbleParticle.prototype.move = function () {
@@ -89,12 +97,11 @@
     ctx.restore();
   };
 
-  function createBubbleParticle(rnd, w, h, style, colors, sizeScale, peakOpacity) {
+  function createBubbleParticle(rnd, w, h, style, colors, sizeScale, peakOpacity, wobble) {
     var radius = (5 + rnd() * 16) * sizeScale;
     if (style === 'bold') radius *= 1.15;
     var x = radius + rnd() * Math.max(radius, w - radius * 2);
     var y = h + rnd() * radius;
-    var wobble = document.documentElement.classList.contains('bubble-wobble');
     return new BubbleParticle(x, y, {
       radius: radius,
       dx: wobble ? (rnd() - 0.5) * 1.2 : (rnd() - 0.5) * 0.6,
@@ -109,8 +116,28 @@
     });
   }
 
-  function respawnBubbleParticle(p, rnd, w, h, style, colors, sizeScale, peakOpacity) {
-    var next = createBubbleParticle(rnd, w, h, style, colors, sizeScale, peakOpacity);
+  function createBurstParticle(rnd, x, y, w, h, style, colors, sizeScale, peakOpacity) {
+    var radius = (4 + rnd() * 14) * sizeScale;
+    if (style === 'bold') radius *= 1.15;
+    var angle = -Math.PI / 2 + (rnd() - 0.5) * 1.4;
+    var speed = 0.8 + rnd() * 1.8;
+    return new BubbleParticle(x + (rnd() - 0.5) * 12, y + (rnd() - 0.5) * 12, {
+      radius: radius,
+      dx: Math.cos(angle) * speed * 0.45 + (rnd() - 0.5) * 0.8,
+      dy: Math.max(0.5, -Math.sin(angle) * speed),
+      strokeColor: colors.stroke,
+      fillColor: colors.fill,
+      highlightOpacity: style === 'bold' ? 0.5 : style === 'glass' ? 0.35 : 0.15,
+      strokeWidth: style === 'bold' ? 2.5 : style === 'glass' ? 1.75 : 1.25,
+      fillGradient: style !== 'ring',
+      canvasHeight: h,
+      peakOpacity: peakOpacity,
+      isBurst: true,
+    });
+  }
+
+  function respawnBubbleParticle(p, rnd, w, h, style, colors, sizeScale, peakOpacity, wobble) {
+    var next = createBubbleParticle(rnd, w, h, style, colors, sizeScale, peakOpacity, wobble);
     p.x = next.x;
     p.y = next.y;
     p.radius = next.radius;
@@ -124,6 +151,7 @@
     p.spawnY = next.spawnY;
     p.canvasHeight = next.canvasHeight;
     p.peakOpacity = next.peakOpacity;
+    p.isBurst = false;
   }
 
   function resizeBubbleField(state) {
@@ -138,32 +166,100 @@
     state.canvas.style.height = state.height + 'px';
     state.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     state.colors = resolveBubbleColors(state.field, state.colorVar);
-    var style = getBubbleStyle();
+    var style = getBubbleStyle(state);
+    var wobble = fieldWobble(state);
     state.particles = [];
     for (var i = 0; i < state.count; i++) {
       state.particles.push(
-        createBubbleParticle(state.rnd, state.width, state.height, style, state.colors, state.sizeScale, state.peakOpacity)
+        createBubbleParticle(state.rnd, state.width, state.height, style, state.colors, state.sizeScale, state.peakOpacity, wobble)
       );
     }
   }
 
+  function spawnBurst(state, x, y) {
+    if (!state || state.width < 1 || state.height < 1) return;
+    var style = getBubbleStyle(state);
+    state.colors = resolveBubbleColors(state.field, state.colorVar);
+    var count = state.burstCount || 10;
+    var room = Math.max(0, (state.maxParticles || 48) - state.particles.length);
+    count = Math.min(count, room);
+    for (var i = 0; i < count; i++) {
+      state.particles.push(
+        createBurstParticle(
+          state.rnd,
+          x,
+          y,
+          state.width,
+          state.height,
+          style,
+          state.colors,
+          state.sizeScale,
+          state.peakOpacity
+        )
+      );
+    }
+    startBubbleLoop();
+  }
+
+  function isInteractiveTarget(el) {
+    if (!el || !el.closest) return false;
+    return !!el.closest('a, button, input, textarea, select, summary, label, [data-bub-ignore], [data-bub-gen]');
+  }
+
+  function bindBubbleInteraction(state) {
+    if (state.interactionBound) return;
+    state.interactionBound = true;
+    var host = state.field.parentElement || state.field;
+
+    host.addEventListener(
+      'pointerdown',
+      function (e) {
+        if (e.button != null && e.button !== 0) return;
+        var interaction = state.interaction || 'tap';
+        var genBtn = e.target && e.target.closest ? e.target.closest('[data-bub-gen]') : null;
+        if (genBtn && (interaction === 'button' || interaction === 'both')) {
+          e.preventDefault();
+          var btnRect = state.field.getBoundingClientRect();
+          var gx = e.clientX - btnRect.left;
+          var gy = e.clientY - btnRect.top;
+          var cRect = genBtn.getBoundingClientRect();
+          gx = cRect.left + cRect.width / 2 - btnRect.left;
+          gy = cRect.top + cRect.height / 2 - btnRect.top;
+          spawnBurst(state, gx, gy);
+          return;
+        }
+        if (interaction !== 'tap' && interaction !== 'both') return;
+        if (isInteractiveTarget(e.target)) return;
+        var rect = state.field.getBoundingClientRect();
+        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
+        spawnBurst(state, e.clientX - rect.left, e.clientY - rect.top);
+      },
+      { passive: false }
+    );
+  }
+
   function bubbleTick() {
     bubbleRafId = 0;
-    var style = getBubbleStyle();
     var anyActive = false;
     bubbleFields.forEach(function (state) {
       if (!state.visible || state.width < 1 || state.height < 1) return;
       anyActive = true;
+      var style = getBubbleStyle(state);
+      var wobble = fieldWobble(state);
       state.colors = resolveBubbleColors(state.field, state.colorVar);
       var ctx = state.ctx;
       ctx.clearRect(0, 0, state.width, state.height);
+      var next = [];
       state.particles.forEach(function (p) {
         p.move();
         if (p.y + p.radius < 0) {
-          respawnBubbleParticle(p, state.rnd, state.width, state.height, style, state.colors, state.sizeScale, state.peakOpacity);
+          if (p.isBurst) return;
+          respawnBubbleParticle(p, state.rnd, state.width, state.height, style, state.colors, state.sizeScale, state.peakOpacity, wobble);
         }
+        next.push(p);
         p.draw(ctx);
       });
+      state.particles = next;
     });
     if (anyActive) bubbleRafId = requestAnimationFrame(bubbleTick);
   }
@@ -189,6 +285,12 @@
       var colorVar = field.dataset.bubColor || 'rgba(242,239,231,.45)';
       var rnd = mulberry(parseInt(field.dataset.bubSeed || '7', 10));
       var peakOpacity = field.dataset.bubPeak ? parseFloat(field.dataset.bubPeak) : defaultPeak;
+      var fieldSize = field.dataset.bubSize ? parseFloat(field.dataset.bubSize) : sizeScale;
+      var styleOverride = field.dataset.bubStyle || '';
+      var wobbleOverride = field.dataset.bubWobble === 'true' ? true : field.dataset.bubWobble === 'false' ? false : null;
+      var interaction = field.dataset.bubInteraction || 'tap';
+      var burstCount = parseInt(field.dataset.bubBurst || '10', 10);
+      var maxParticles = parseInt(field.dataset.bubMax || '48', 10);
 
       if (field.dataset.bubPeak) field.style.setProperty('--bub-peak', field.dataset.bubPeak);
 
@@ -211,14 +313,21 @@
         count: count,
         colorVar: colorVar,
         rnd: rnd,
-        sizeScale: sizeScale,
+        sizeScale: fieldSize,
         peakOpacity: peakOpacity,
+        styleOverride: styleOverride || null,
+        wobbleOverride: wobbleOverride,
+        interaction: interaction,
+        burstCount: burstCount,
+        maxParticles: maxParticles,
         colors: resolveBubbleColors(field, colorVar),
+        interactionBound: false,
       };
 
       field.__bubbleCanvas = state;
       bubbleFields.push(state);
       resizeBubbleField(state);
+      if (interaction !== 'off') bindBubbleInteraction(state);
     });
 
     if (!bubbleFields.length) return;
