@@ -17,7 +17,7 @@
     '.ftliq{position:absolute;left:-12%;width:124%;height:135vh;top:100vh;will-change:transform;z-index:1}' +
     '.ftl1{background:oklch(0.9 0.22 128);border-radius:46% 54% 0 0/70px 120px 0 0}' +
     '.ftl2{background:#0b0e12;border-radius:54% 46% 0 0/120px 70px 0 0}' +
-    '.ftbub-canvas{position:absolute;inset:0;z-index:3;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen}';
+    '.ftbub-canvas{position:absolute;inset:0;z-index:3;width:100%;height:100%;pointer-events:none}';
   document.head.appendChild(style);
 
   var ov, l1, l2, bubCanvas, bubCtx, bubParticles = [], bubRaf = 0, bubActive = false;
@@ -52,11 +52,14 @@
     if (alpha <= 0.01) return;
     ctx.save();
     ctx.globalAlpha = alpha;
+    ctx.shadowColor = 'rgba(0,0,0,0.35)';
+    ctx.shadowBlur = Math.max(4, this.radius * 0.2);
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.lineWidth = Math.max(1.5, this.radius * 0.08);
+    ctx.lineWidth = Math.max(2, this.radius * 0.1);
     ctx.strokeStyle = BUB_STROKE;
     ctx.stroke();
+    ctx.shadowBlur = 0;
     var gradient = ctx.createRadialGradient(
       this.x,
       this.y,
@@ -65,7 +68,7 @@
       this.y + 0.5,
       this.radius
     );
-    gradient.addColorStop(0.3, 'rgba(255,255,255,0.55)');
+    gradient.addColorStop(0.3, 'rgba(255,255,255,0.75)');
     gradient.addColorStop(0.95, BUB_FILL);
     ctx.fillStyle = gradient;
     ctx.fill();

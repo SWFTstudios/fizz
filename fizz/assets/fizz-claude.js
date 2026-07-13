@@ -89,28 +89,29 @@
     ctx.restore();
   };
 
-  function createBubbleParticle(rnd, w, h, style, colors, sizeScale, peakOpacity) {
-    var radius = (5 + rnd() * 16) * sizeScale;
+  function createBubbleParticle(rnd, w, h, style, colors, sizeScale, peakOpacity, isHero) {
+    var radius = ((isHero ? 10 + rnd() * 30 : 5 + rnd() * 16)) * sizeScale;
     if (style === 'bold') radius *= 1.15;
+    if (isHero) radius *= 1.12;
     var x = radius + rnd() * Math.max(radius, w - radius * 2);
-    var y = h + rnd() * radius;
+    var y = isHero ? h * (0.35 + rnd() * 0.65) + rnd() * radius : h + rnd() * radius;
     var wobble = document.documentElement.classList.contains('bubble-wobble');
     return new BubbleParticle(x, y, {
       radius: radius,
-      dx: wobble ? (rnd() - 0.5) * 1.2 : (rnd() - 0.5) * 0.6,
-      dy: 0.4 + rnd() * 1.2,
+      dx: wobble ? (rnd() - 0.5) * (isHero ? 1.8 : 1.2) : (rnd() - 0.5) * (isHero ? 1.1 : 0.6),
+      dy: isHero ? 0.65 + rnd() * 1.6 : 0.4 + rnd() * 1.2,
       strokeColor: colors.stroke,
       fillColor: colors.fill,
-      highlightOpacity: style === 'bold' ? 0.5 : style === 'glass' ? 0.35 : 0.15,
-      strokeWidth: style === 'bold' ? 2.5 : style === 'glass' ? 1.75 : 1.25,
+      highlightOpacity: isHero ? 0.55 : style === 'bold' ? 0.5 : style === 'glass' ? 0.35 : 0.15,
+      strokeWidth: isHero ? 2.25 : style === 'bold' ? 2.5 : style === 'glass' ? 1.75 : 1.25,
       fillGradient: style !== 'ring',
       canvasHeight: h,
       peakOpacity: peakOpacity,
     });
   }
 
-  function respawnBubbleParticle(p, rnd, w, h, style, colors, sizeScale, peakOpacity) {
-    var next = createBubbleParticle(rnd, w, h, style, colors, sizeScale, peakOpacity);
+  function respawnBubbleParticle(p, rnd, w, h, style, colors, sizeScale, peakOpacity, isHero) {
+    var next = createBubbleParticle(rnd, w, h, style, colors, sizeScale, peakOpacity, isHero);
     p.x = next.x;
     p.y = next.y;
     p.radius = next.radius;
@@ -142,7 +143,16 @@
     state.particles = [];
     for (var i = 0; i < state.count; i++) {
       state.particles.push(
-        createBubbleParticle(state.rnd, state.width, state.height, style, state.colors, state.sizeScale, state.peakOpacity)
+        createBubbleParticle(
+          state.rnd,
+          state.width,
+          state.height,
+          style,
+          state.colors,
+          state.sizeScale,
+          state.peakOpacity,
+          state.isHero
+        )
       );
     }
   }
@@ -160,7 +170,17 @@
       state.particles.forEach(function (p) {
         p.move();
         if (p.y + p.radius < 0) {
-          respawnBubbleParticle(p, state.rnd, state.width, state.height, style, state.colors, state.sizeScale, state.peakOpacity);
+          respawnBubbleParticle(
+            p,
+            state.rnd,
+            state.width,
+            state.height,
+            style,
+            state.colors,
+            state.sizeScale,
+            state.peakOpacity,
+            state.isHero
+          );
         }
         p.draw(ctx);
       });
@@ -185,10 +205,12 @@
     document.querySelectorAll('[data-bubbles]').forEach(function (field) {
       if (field.__bubbleCanvas) return;
 
-      var count = Math.round(parseInt(field.dataset.bubCount || '14', 10) * countScale);
+      var isHero = field.classList.contains('bubf--hero') || !!field.closest('.hero');
+      var count = Math.round(parseInt(field.dataset.bubCount || '14', 10) * countScale * (isHero ? 1.6 : 1));
       var colorVar = field.dataset.bubColor || 'rgba(242,239,231,.45)';
       var rnd = mulberry(parseInt(field.dataset.bubSeed || '7', 10));
-      var peakOpacity = field.dataset.bubPeak ? parseFloat(field.dataset.bubPeak) : defaultPeak;
+      var peakOpacity = field.dataset.bubPeak ? parseFloat(field.dataset.bubPeak) : isHero ? Math.min(1, defaultPeak * 1.08) : defaultPeak;
+      var fieldSizeScale = sizeScale * (isHero ? 1.35 : 1);
 
       if (field.dataset.bubPeak) field.style.setProperty('--bub-peak', field.dataset.bubPeak);
 
@@ -211,8 +233,9 @@
         count: count,
         colorVar: colorVar,
         rnd: rnd,
-        sizeScale: sizeScale,
+        sizeScale: fieldSizeScale,
         peakOpacity: peakOpacity,
+        isHero: isHero,
         colors: resolveBubbleColors(field, colorVar),
       };
 

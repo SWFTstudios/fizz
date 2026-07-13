@@ -669,7 +669,7 @@
         "step": 1,
         "unit": "%",
         "label": "Animation peak opacity",
-        "default": 88
+        "default": 92
       },
       {
         "type": "range",
@@ -679,7 +679,7 @@
         "step": 5,
         "unit": "%",
         "label": "Bubble size",
-        "default": 115
+        "default": 125
       },
       {
         "type": "range",
@@ -689,7 +689,7 @@
         "step": 5,
         "unit": "%",
         "label": "Bubble density",
-        "default": 100
+        "default": 110
       },
       {
         "type": "header",
@@ -703,7 +703,7 @@
         "step": 1,
         "unit": "%",
         "label": "Hero & PDP alpha",
-        "default": 45
+        "default": 70
       },
       {
         "type": "range",
