@@ -1,0 +1,16 @@
+{% comment %}
+  Resolves bottle hero image URL: variant image, scene JPG, then transparent PNG.
+  Outputs URL only (no HTML).
+{% endcomment %}
+{% liquid
+  assign bottle_colors = 'arctic-white,charcoal-black,coral-orange,electric-blue,sage-green,steel-navy' | split: ','
+  assign variant_image = variant_image | default: variant.image
+  assign image_width = width | default: 1400
+
+  if variant_image != blank
+    echo variant_image | image_url: width: image_width
+  elsif color_slug != blank and bottle_colors contains color_slug
+    assign scene_file = 'fizz-bottle-scene-' | append: color_slug | append: '.jpg'
+    echo scene_file | asset_url
+  endif
+%}

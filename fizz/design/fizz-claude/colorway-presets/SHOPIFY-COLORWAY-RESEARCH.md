@@ -186,9 +186,59 @@ Extending to **global theme tokens** requires an explicit merchant toggle and Li
 
 ---
 
+## Bottle PDP bundle cards + scene hero images
+
+**Date:** 2026-07-13  
+**Scope:** `product.fizz-claude` — PlantThrive-style optional add-on cards; pre-composited colorway scene JPGs for hero
+
+### Research
+
+| Topic | Finding | Source |
+|-------|---------|--------|
+| Multi-item cart add | `POST /cart/add.js` with `{ items: [{ id, quantity }, ...] }` adds bottle + selected add-ons in one request | [Cart API — Add](https://shopify.dev/docs/api/ajax/reference/cart#post-locale-cart-add-js) |
+| Variant image override | `variant.image` still wins over theme scene JPG when assigned in Admin | [Liquid variant object](https://shopify.dev/docs/api/liquid/objects/variant) |
+| Theme assets | Scene JPGs ship as theme assets (`fizz-bottle-scene-{slug}.jpg`); not created in Admin | Theme architecture |
+| Product picker in section blocks | `addon_product` setting can resolve `selected_or_first_available_variant.id` for cart line items | Section schema `product` type |
+
+### Runtime vs editor
+
+| Layer | Responsibility |
+|-------|----------------|
+| **Theme editor** | Set bundle heading; configure add-on blocks (title, copy, price, `image_asset`, optional `addon_product` or manual `variant_id`) |
+| **Liquid** | Renders side-by-side `.bundle-card` toggles with `data-addon` / `data-variant-id`; hero uses scene URL via `fizz-bottle-scene-url` |
+| **JavaScript** | Toggle `.on` on cards; `updatePdpTotal()`; `cart/add.js` with selected variant IDs |
+| **Local script** | `fizz/scripts/generate-bottle-scene-images.py` composites transparent PNG onto colorway radial gradient |
+
+### Implementation artifacts
+
+| File | Role |
+|------|------|
+| `scripts/generate-bottle-scene-images.py` | Builds `fizz-bottle-scene-{slug}.jpg` from `fizz-bottle-product-{slug}.png` + scene colors |
+| `snippets/fizz-bottle-scene-url.liquid` | URL resolver: variant image → scene JPG |
+| `snippets/fizz-bottle-product-img.liquid` | Hero `<img>` with `botimg--scene` class when scene JPG used |
+| `sections/fizz-claude-product.liquid` | Bundle grid markup + `bundle_heading` setting |
+| `assets/fizz-claude-base.css` | `.bundle`, `.bundle-card*`, `pstage--scene`, square thumbs |
+| `templates/product.fizz-claude.json` | Default Refill + Flavor add-on blocks |
+
+### Merchant setup
+
+1. **Refill pack** — link `addon_product` to CO₂ refill product (e.g. `fizz-co2-refills`) or set **Variant ID** manually.
+2. **Flavor pack** — set **Variant ID** to flavor sampler variant in Admin (or link product when available).
+3. Regenerate scene JPGs after bottle PNG updates: `python3 fizz/scripts/generate-bottle-scene-images.py`.
+
+### Limitations
+
+- Theme code cannot create CO₂ or flavor products; variant IDs must be configured per store.
+- Scene JPGs must be generated locally and pushed with the theme (`shopify theme push`).
+- Missing source PNG for a slug skips that scene file; storefront falls back to CSS gradient + transparent bottle PNG.
+- Scope is **Fizz Claude** bottle PDP only (`product.fizz-claude`).
+
+---
+
 ## Changelog
 
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-09 | Cursor agent | Initial research report; Phase 2 implementation |
 | 2026-07-13 | Cursor agent | Variant product media research + implementation notes |
+| 2026-07-13 | Cursor agent | Bottle PDP bundle cards + scene hero image pipeline |
