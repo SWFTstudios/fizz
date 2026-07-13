@@ -6,21 +6,24 @@
         "a1": {
           "type": "addon",
           "settings": {
-            "title": "CO₂ backup 6-pack",
-            "description": "360 fizzes of backup — never carbonate-less",
+            "title": "Refill pack",
+            "description": "CO₂ backup 6-pack — 360 fizzes of backup",
             "price_label": "$15",
             "addon_price": 15,
-            "addon_key": "co2"
+            "addon_key": "co2",
+            "image_asset": "fizz-co2-charge.png",
+            "addon_product": "fizz-co2-refills"
           }
         },
         "a2": {
           "type": "addon",
           "settings": {
-            "title": "Flavor sampler",
+            "title": "Flavor pack",
             "description": "4 citrus + 4 berry packs. Real fruit, zero sugar",
             "price_label": "$12",
             "addon_price": 12,
-            "addon_key": "flavor"
+            "addon_key": "flavor",
+            "image_asset": "flavor-pack-mixed-berry.png"
           }
         },
         "f1": {
@@ -47,7 +50,8 @@
       },
       "block_order": ["a1", "a2", "f1", "f2", "f3"],
       "settings": {
-        "tagline": "Sparkling water, wherever you are."
+        "tagline": "Sparkling water, wherever you are.",
+        "bundle_heading": "Complete your bundle"
       }
     },
     "related": {

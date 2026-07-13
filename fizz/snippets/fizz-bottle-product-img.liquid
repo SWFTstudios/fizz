@@ -1,5 +1,5 @@
 {% comment %}
-  Bottle product image — Shopify variant image first, theme PNG fallback.
+  Bottle product image — variant image, scene JPG, then transparent PNG fallback.
   Usage: {% render 'fizz-bottle-product-img', variant: variant, color_slug: color_slug, alt: variant.title, class: 'botimg', data_photo: true %}
 {% endcomment %}
 {% liquid
@@ -10,11 +10,21 @@
     assign has_bottle_asset = true
   endif
 
-  assign image_width = width | default: 900
+  assign image_width = width | default: 1400
+  assign image_src = ''
+
   if variant_image != blank
     assign image_src = variant_image | image_url: width: image_width
   elsif has_bottle_asset
-    assign image_src = 'fizz-bottle-product-' | append: color_slug | append: '.png' | asset_url
+    capture scene_url
+      render 'fizz-bottle-scene-url', variant: variant, color_slug: color_slug, width: image_width
+    endcapture
+    assign scene_url = scene_url | strip
+    if scene_url != blank
+      assign image_src = scene_url
+    else
+      assign image_src = 'fizz-bottle-product-' | append: color_slug | append: '.png' | asset_url
+    endif
   endif
 %}
 {% if image_src != blank %}
@@ -24,9 +34,9 @@
     {% if main_image %}data-fizz-pdp-main-image{% endif %}
     src="{{ image_src }}"
     alt="{{ alt | default: color_slug | escape }}"
-    class="{{ class }}"
+    class="{{ class }}{% if image_src contains 'fizz-bottle-scene-' %} botimg--scene{% endif %}"
     loading="{{ loading | default: 'lazy' }}"
-    width="{{ width | default: 800 }}"
-    height="{{ height | default: 1100 }}"
+    width="{{ width | default: 900 }}"
+    height="{{ height | default: 1200 }}"
   >
 {% endif %}

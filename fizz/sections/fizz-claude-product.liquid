@@ -7,12 +7,6 @@
   endcapture
   assign color_slug = color_slug | strip
 
-  capture scene_raw
-    render 'fizz-colorway-scene', slug: color_slug, variant: current_variant
-  endcapture
-  assign scene_parts = scene_raw | strip | split: '|'
-  assign stage_bg_end = scene_parts[1] | default: scene_parts[0]
-
   assign crumb_text = section.settings.crumb
   if crumb_text == blank
     assign crumb_text = product.title
@@ -22,9 +16,8 @@
 <div class="pdp" id="buy" data-pdp data-screen-label="Product hero">
   <div>
     <div
-      class="pstage"
+      class="pstage pstage--scene"
       data-pdp-stage
-      style="background:radial-gradient(ellipse 80% 90% at 50% 100%, {{ stage_bg_end }}, var(--color-surface));"
     >
       <div data-bubbles data-bub-count="14" data-bub-color="var(--hero-bubble-color)" data-bub-seed="11" data-bub-rise="700" class="bubf"></div>
       <div class="pglow"></div>
@@ -35,14 +28,14 @@
         class: 'botimg',
         data_photo: true,
         loading: 'eager',
-        width: 170,
-        height: 430
+        width: 900,
+        height: 1200
       %}
     </div>
     <div class="thumbs">
       {% if product.images.size > 0 %}
         {% for image in product.images limit: 3 %}
-          <button type="button" class="thumb{% if forloop.first %} is-active{% endif %}" data-pdp-thumb data-full-src="{{ image | image_url: width: 900 }}" aria-label="View image {{ forloop.index }}">
+          <button type="button" class="thumb" data-pdp-thumb data-full-src="{{ image | image_url: width: 1400 }}" aria-label="View image {{ forloop.index }}">
             {{ image | image_url: width: 300 | image_tag: loading: 'lazy', alt: image.alt | default: product.title }}
           </button>
         {% endfor %}
@@ -50,8 +43,8 @@
         {% assign thumb_assets = 'fizz-lifestyle-trail.jpg,fizz-lifestyle-pod-detail.jpg,fizz-lifestyle-macro.jpg' | split: ',' %}
         {% assign thumb_labels = 'lifestyle — trail,cap + CO₂ pod detail,fizz macro shot' | split: ',' %}
         {% for asset in thumb_assets %}
-          <button type="button" class="thumb{% if forloop.first %} is-active{% endif %}" data-pdp-thumb data-full-src="{{ asset | asset_url }}" aria-label="{{ thumb_labels[forloop.index0] }}">
-            {% render 'fizz-img', file: asset, alt: thumb_labels[forloop.index0], class: 'thumb__img' %}
+          <button type="button" class="thumb" data-pdp-thumb data-full-src="{{ asset | asset_url }}" aria-label="{{ thumb_labels[forloop.index0] }}">
+            {% render 'fizz-claude-img', file: asset, alt: thumb_labels[forloop.index0], class: 'thumb__img' %}
           </button>
         {% endfor %}
       {% endif %}
@@ -82,9 +75,11 @@
           {% endcapture %}
           {% assign slug = slug | strip %}
           {% liquid
-            if variant.image
-              assign swatch_image_url = variant.image | image_url: width: 900
-            elsif bottle_colors contains slug
+            capture swatch_image_url
+              render 'fizz-bottle-scene-url', variant: variant, color_slug: slug, width: 1400
+            endcapture
+            assign swatch_image_url = swatch_image_url | strip
+            if swatch_image_url == blank and bottle_colors contains slug
               assign swatch_image_url = 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url
             endif
           %}
@@ -105,25 +100,59 @@
       </div>
     {% endif %}
 
+    {% assign has_addons = false %}
     {% for block in section.blocks %}
       {% if block.type == 'addon' %}
-        <div
-          class="addon"
-          data-addon
-          data-addon-key="{{ block.settings.addon_key }}"
-          {% if block.settings.variant_id != blank %}data-variant-id="{{ block.settings.variant_id }}"{% endif %}
-          data-addon-price="{{ block.settings.addon_price | default: 0 }}"
-          {{ block.shopify_attributes }}
-        >
-          <div>
-            <p class="addt">{{ block.settings.title }}</p>
-            <p class="addd">{{ block.settings.description }}</p>
-          </div>
-          <span class="addp">+{{ block.settings.price_label }}</span>
-          <span class="dot" aria-hidden="true"></span>
-        </div>
+        {% assign has_addons = true %}
+        {% break %}
       {% endif %}
     {% endfor %}
+
+    {% if has_addons %}
+      <p class="bundlelab">{{ section.settings.bundle_heading }}</p>
+      <div class="bundle__grid" role="group" aria-label="{{ section.settings.bundle_heading | escape }}">
+        {% for block in section.blocks %}
+          {% if block.type == 'addon' %}
+            {% liquid
+              assign addon_product = block.settings.addon_product
+              assign addon_variant_id = block.settings.variant_id
+              if addon_product != blank and addon_product != empty
+                assign addon_variant_id = addon_product.selected_or_first_available_variant.id
+              endif
+            %}
+            <button
+              type="button"
+              class="bundle-card addon"
+              data-addon
+              data-addon-key="{{ block.settings.addon_key }}"
+              {% if addon_variant_id != blank %}data-variant-id="{{ addon_variant_id }}"{% endif %}
+              data-addon-price="{{ block.settings.addon_price | default: 0 }}"
+              {{ block.shopify_attributes }}
+            >
+              <div class="bundle-card__media">
+                {% if block.settings.image_asset != blank %}
+                  <img
+                    src="{{ block.settings.image_asset | asset_url }}"
+                    alt="{{ block.settings.title | escape }}"
+                    class="bundle-card__img"
+                    loading="lazy"
+                    width="200"
+                    height="200"
+                  >
+                {% elsif addon_product.featured_image %}
+                  {{ addon_product.featured_image | image_url: width: 400 | image_tag: loading: 'lazy', alt: block.settings.title, class: 'bundle-card__img' }}
+                {% endif %}
+              </div>
+              <div class="bundle-card__body">
+                <p class="bundle-card__title">{{ block.settings.title }}</p>
+                <p class="bundle-card__desc">{{ block.settings.description }}</p>
+                <span class="bundle-card__price">+{{ block.settings.price_label }}</span>
+              </div>
+            </button>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
 
     <div data-pdp-form data-base-price="{{ base_price }}">
       {% form 'product', product, id: 'fizz-pdp-form' %}
@@ -157,6 +186,7 @@
 {
   "name": "Product",
   "settings": [
+    { "type": "text", "id": "bundle_heading", "label": "Bundle heading", "default": "Complete your bundle" },
     { "type": "text", "id": "crumb", "label": "Breadcrumb suffix", "default": "The Bottle", "info": "Shown after collection link when enabled." },
     { "type": "checkbox", "id": "show_collection_link", "label": "Show collection in breadcrumb", "default": true },
     { "type": "text", "id": "title", "label": "Title override" },
@@ -177,7 +207,9 @@
         { "type": "text", "id": "price_label", "label": "Price label", "default": "$15" },
         { "type": "number", "id": "addon_price", "label": "Addon price (for total display)", "default": 15 },
         { "type": "text", "id": "addon_key", "label": "Add-on key (for ?pack= URL)", "default": "co2", "info": "e.g. co2 or flavor — matches Colorways addon_pack_query" },
-        { "type": "text", "id": "variant_id", "label": "Variant ID (numeric)" }
+        { "type": "product", "id": "addon_product", "label": "Linked product", "info": "Optional — auto-fills variant ID from this product." },
+        { "type": "text", "id": "image_asset", "label": "Card image asset", "default": "fizz-co2-charge.png", "info": "Theme asset filename for bundle card art." },
+        { "type": "text", "id": "variant_id", "label": "Variant ID override", "info": "Numeric variant ID if not using linked product." }
       ]
     },
     {
@@ -203,21 +235,24 @@
         {
           "type": "addon",
           "settings": {
-            "title": "CO₂ backup 6-pack",
-            "description": "360 fizzes of backup — never carbonate-less",
+            "title": "Refill pack",
+            "description": "CO₂ backup 6-pack — 360 fizzes of backup",
             "price_label": "$15",
             "addon_price": 15,
-            "addon_key": "co2"
+            "addon_key": "co2",
+            "image_asset": "fizz-co2-charge.png",
+            "addon_product": "fizz-co2-refills"
           }
         },
         {
           "type": "addon",
           "settings": {
-            "title": "Flavor sampler",
+            "title": "Flavor pack",
             "description": "4 citrus + 4 berry packs. Real fruit, zero sugar",
             "price_label": "$12",
             "addon_price": 12,
-            "addon_key": "flavor"
+            "addon_key": "flavor",
+            "image_asset": "flavor-pack-mixed-berry.png"
           }
         },
         {
