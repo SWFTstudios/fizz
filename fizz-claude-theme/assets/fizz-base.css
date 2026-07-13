@@ -56,6 +56,9 @@ body.fizz{margin:0;background:var(--color-surface);color:var(--color-on-surface)
 .hero .bubf{z-index:1}
 .hero .bubf-canvas{mix-blend-mode:screen;opacity:.95}
 .bubf--hero .bubf-canvas{opacity:1}
+.stmt .bubf{z-index:1}
+.stmt .bubf-canvas{mix-blend-mode:screen;opacity:.92}
+.bubf--statement .bubf-canvas{opacity:1}
 
 /* ticker marquee */
 .tickin{display:inline-flex;gap:56px;align-items:center;will-change:transform;animation:fizzslide 28s linear infinite}

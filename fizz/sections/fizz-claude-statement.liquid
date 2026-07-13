@@ -31,6 +31,12 @@
     assign bg_style = 'background:var(--statement-bg);'
   endif
 
+  assign bubble_enabled = section.settings.bubble_enabled
+  assign bubble_count = section.settings.bubble_frequency | default: 18
+  assign bubble_color = section.settings.bubble_color | default: '#7ec8e3'
+  assign bubble_opacity = section.settings.bubble_opacity | default: 70 | times: 1.0 | divided_by: 100.0
+  assign bubble_fill = bubble_color | color_modify: 'alpha', bubble_opacity
+
   assign overlay_style = ''
   if has_media and section.settings.overlay_enabled
     assign overlay_opacity = section.settings.overlay_opacity | default: 40 | times: 1.0 | divided_by: 100.0
@@ -53,6 +59,18 @@
   style="color:var(--statement-text);{{ bg_style }}"
 >
   <div class="stmt__bg" aria-hidden="true" style="{{ bg_style }}"></div>
+
+  {% if bubble_enabled %}
+    <div
+      data-bubbles
+      data-bub-count="{{ bubble_count }}"
+      data-bub-color="{{ bubble_fill }}"
+      data-bub-seed="53"
+      data-bub-rise="850"
+      class="bubf bubf--statement"
+      aria-hidden="true"
+    ></div>
+  {% endif %}
 
   {% if has_media %}
     <div
@@ -91,12 +109,48 @@
     { "type": "text", "id": "line_1", "label": "Line 1", "default": "Hydration was boring." },
     { "type": "text", "id": "line_2", "label": "Line 2", "default": "So we put a CO₂ engine in a bottle." },
     { "type": "textarea", "id": "body", "label": "Supporting copy", "default": "Twist the cap and any cold drink turns sparkling in eight seconds. Add a real-fruit flavor pack. Drink it on a trail, at the gym, at your desk — anywhere flat water used to live." },
+    { "type": "header", "content": "Animated bubbles" },
+    {
+      "type": "checkbox",
+      "id": "bubble_enabled",
+      "label": "Enable ambient bubbles",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "bubble_color",
+      "label": "Bubble color",
+      "default": "#7ec8e3",
+      "visible_if": "{{ section.settings.bubble_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "bubble_frequency",
+      "label": "Bubble frequency",
+      "min": 4,
+      "max": 40,
+      "step": 2,
+      "default": 18,
+      "info": "How many bubbles appear on screen at once.",
+      "visible_if": "{{ section.settings.bubble_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "bubble_opacity",
+      "label": "Bubble opacity",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 70,
+      "visible_if": "{{ section.settings.bubble_enabled }}"
+    },
     { "type": "header", "content": "Background" },
     {
       "type": "select",
       "id": "bg_mode",
       "label": "Background mode",
-      "default": "theme_default",
+      "default": "color",
       "options": [
         { "value": "theme_default", "label": "Theme colorway (default)" },
         { "value": "color", "label": "Custom color" },
@@ -107,6 +161,7 @@
       "type": "color",
       "id": "bg_color",
       "label": "Background color",
+      "default": "#e8edf5",
       "visible_if": "{{ section.settings.bg_mode == 'color' }}"
     },
     {
