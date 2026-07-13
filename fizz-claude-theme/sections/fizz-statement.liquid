@@ -1,8 +1,88 @@
-<div class="stmt rv" data-screen-label="Statement" style="background:var(--statement-bg);color:var(--statement-text)">
-  <p class="stx">{{ section.settings.line_1 }}</p>
-  <p class="stx" style="margin-top:2vh">{{ section.settings.line_2 }}</p>
-  <p class="stx stx2">{{ section.settings.body }}</p>
-</div>
+{% liquid
+  assign bg_mode = section.settings.bg_mode | default: 'theme_default'
+  assign has_image = false
+  assign has_video = false
+  if section.settings.image != blank
+    assign has_image = true
+  endif
+  if section.settings.video != blank or section.settings.video_url != blank
+    assign has_video = true
+  endif
+  assign has_media = false
+  if has_image or has_video
+    assign has_media = true
+  endif
+
+  assign media_fit = section.settings.media_fit | default: 'cover'
+  assign media_position = section.settings.media_position | default: 'center center'
+  assign media_scale = section.settings.media_scale | default: 100
+
+  assign bg_style = ''
+  if bg_mode == 'color' and section.settings.bg_color != blank
+    assign bg_style = 'background:' | append: section.settings.bg_color | append: ';'
+  elsif bg_mode == 'gradient'
+    assign g_start = section.settings.bg_gradient_start | default: section.settings.bg_color
+    assign g_end = section.settings.bg_gradient_end
+    assign g_angle = section.settings.gradient_angle | default: 165
+    if g_start != blank and g_end != blank
+      assign bg_style = 'background:linear-gradient(' | append: g_angle | append: 'deg, ' | append: g_start | append: ', ' | append: g_end | append: ');'
+    endif
+  else
+    assign bg_style = 'background:var(--statement-bg);'
+  endif
+
+  assign overlay_style = ''
+  if has_media and section.settings.overlay_enabled
+    assign overlay_opacity = section.settings.overlay_opacity | default: 40 | times: 1.0 | divided_by: 100.0
+    assign overlay_color = section.settings.overlay_color | default: '#000000'
+    if section.settings.overlay_style == 'gradient'
+      assign overlay_end = section.settings.overlay_gradient_end | default: overlay_color
+      assign overlay_angle = section.settings.overlay_gradient_angle | default: 180
+      assign overlay_start_a = overlay_color | color_modify: 'alpha', overlay_opacity
+      assign overlay_end_a = overlay_end | color_modify: 'alpha', overlay_opacity
+      assign overlay_style = 'background:linear-gradient(' | append: overlay_angle | append: 'deg, ' | append: overlay_start_a | append: ', ' | append: overlay_end_a | append: ');'
+    else
+      assign overlay_style = 'background:' | append: overlay_color | color_modify: 'alpha', overlay_opacity | append: ';'
+    endif
+  endif
+%}
+
+<section
+  class="stmt rv"
+  data-screen-label="Statement"
+  style="color:var(--statement-text);{{ bg_style }}"
+>
+  <div class="stmt__bg" aria-hidden="true" style="{{ bg_style }}"></div>
+
+  {% if has_media %}
+    <div
+      class="stmt__media"
+      style="--stmt-media-fit: {{ media_fit }}; --stmt-media-pos: {{ media_position }}; --stmt-media-scale: {{ media_scale | divided_by: 100.0 }};"
+    >
+      {% if has_video %}
+        {% if section.settings.video != blank %}
+          {{ section.settings.video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, class: 'stmt__video' }}
+        {% else %}
+          <video class="stmt__video" autoplay muted loop playsinline>
+            <source src="{{ section.settings.video_url }}" type="video/mp4">
+          </video>
+        {% endif %}
+      {% elsif has_image %}
+        {{ section.settings.image | image_url: width: 2400 | image_tag: class: 'stmt__img', loading: 'lazy', alt: section.settings.image_alt | default: section.settings.line_1 }}
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if overlay_style != blank %}
+    <div class="stmt__overlay" aria-hidden="true" style="{{ overlay_style }}"></div>
+  {% endif %}
+
+  <div class="stmt__content">
+    <p class="stx">{{ section.settings.line_1 }}</p>
+    <p class="stx" style="margin-top:2vh">{{ section.settings.line_2 }}</p>
+    <p class="stx stx2">{{ section.settings.body }}</p>
+  </div>
+</section>
 
 {% schema %}
 {
@@ -10,7 +90,145 @@
   "settings": [
     { "type": "text", "id": "line_1", "label": "Line 1", "default": "Hydration was boring." },
     { "type": "text", "id": "line_2", "label": "Line 2", "default": "So we put a CO₂ engine in a bottle." },
-    { "type": "textarea", "id": "body", "label": "Supporting copy", "default": "Twist the cap and any cold drink turns sparkling in eight seconds. Add a real-fruit flavor pack. Drink it on a trail, at the gym, at your desk — anywhere flat water used to live." }
+    { "type": "textarea", "id": "body", "label": "Supporting copy", "default": "Twist the cap and any cold drink turns sparkling in eight seconds. Add a real-fruit flavor pack. Drink it on a trail, at the gym, at your desk — anywhere flat water used to live." },
+    { "type": "header", "content": "Background" },
+    {
+      "type": "select",
+      "id": "bg_mode",
+      "label": "Background mode",
+      "default": "theme_default",
+      "options": [
+        { "value": "theme_default", "label": "Theme colorway (default)" },
+        { "value": "color", "label": "Custom color" },
+        { "value": "gradient", "label": "Custom gradient" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "visible_if": "{{ section.settings.bg_mode == 'color' }}"
+    },
+    {
+      "type": "color",
+      "id": "bg_gradient_start",
+      "label": "Gradient start",
+      "visible_if": "{{ section.settings.bg_mode == 'gradient' }}"
+    },
+    {
+      "type": "color",
+      "id": "bg_gradient_end",
+      "label": "Gradient end",
+      "visible_if": "{{ section.settings.bg_mode == 'gradient' }}"
+    },
+    {
+      "type": "range",
+      "id": "gradient_angle",
+      "label": "Gradient angle",
+      "min": 0,
+      "max": 360,
+      "step": 15,
+      "unit": "deg",
+      "default": 165,
+      "visible_if": "{{ section.settings.bg_mode == 'gradient' }}"
+    },
+    { "type": "header", "content": "Background media" },
+    { "type": "image_picker", "id": "image", "label": "Background image" },
+    { "type": "text", "id": "image_alt", "label": "Image alt text" },
+    { "type": "video", "id": "video", "label": "Background video (Shopify-hosted)" },
+    { "type": "text", "id": "video_url", "label": "External video URL (MP4)", "info": "Used when no Shopify video is set." },
+    {
+      "type": "select",
+      "id": "media_fit",
+      "label": "Media fit",
+      "default": "cover",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Media position",
+      "default": "center center",
+      "options": [
+        { "value": "center center", "label": "Center" },
+        { "value": "top center", "label": "Top center" },
+        { "value": "bottom center", "label": "Bottom center" },
+        { "value": "left center", "label": "Left center" },
+        { "value": "right center", "label": "Right center" },
+        { "value": "top left", "label": "Top left" },
+        { "value": "top right", "label": "Top right" },
+        { "value": "bottom left", "label": "Bottom left" },
+        { "value": "bottom right", "label": "Bottom right" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "media_scale",
+      "label": "Media scale",
+      "min": 60,
+      "max": 160,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    { "type": "header", "content": "Overlay" },
+    {
+      "type": "checkbox",
+      "id": "overlay_enabled",
+      "label": "Enable overlay over media",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "Overlay style",
+      "default": "solid",
+      "options": [
+        { "value": "solid", "label": "Solid" },
+        { "value": "gradient", "label": "Gradient" }
+      ],
+      "visible_if": "{{ section.settings.overlay_enabled }}"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#000000",
+      "visible_if": "{{ section.settings.overlay_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay strength",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 35,
+      "info": "0% = transparent, 100% = solid black over media.",
+      "visible_if": "{{ section.settings.overlay_enabled }}"
+    },
+    {
+      "type": "color",
+      "id": "overlay_gradient_end",
+      "label": "Overlay gradient end",
+      "visible_if": "{{ section.settings.overlay_enabled and section.settings.overlay_style == 'gradient' }}"
+    },
+    {
+      "type": "range",
+      "id": "overlay_gradient_angle",
+      "label": "Overlay gradient angle",
+      "min": 0,
+      "max": 360,
+      "step": 15,
+      "unit": "deg",
+      "default": 180,
+      "visible_if": "{{ section.settings.overlay_enabled and section.settings.overlay_style == 'gradient' }}"
+    }
   ],
   "presets": [{ "name": "Statement" }]
 }

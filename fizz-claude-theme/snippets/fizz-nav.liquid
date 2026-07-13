@@ -49,44 +49,147 @@
   endif
 %}
 
-<div
-  class="{{ nav_classes }}"
-  style="
-    --nav-logo-h: {{ logo_max_h }}px;
-    --nav-logo-w: {{ logo_max_w }}px;
-    --nav-blur: {{ nav_blur }}px;
-    --nav-border-opacity: {{ border_opacity }};
-    --nav-bg: {{ nav_bg }};
-    --nav-blend-mode: {{ blend_mode }};
-  "
->
-  <a href="{{ routes.root_url }}" class="fizz-nav__logo-link">
-    {% if settings.nav_logo != blank %}
-      <img
-        src="{{ settings.nav_logo | image_url: width: 600 }}"
-        class="logo{% if settings.nav_logo_invert %} logo--invert{% endif %}"
-        alt="{{ shop.name | escape }}"
-        width="{{ settings.nav_logo.width }}"
-        height="{{ settings.nav_logo.height }}"
-        loading="eager"
+<div class="fizz-site-header" data-fizz-site-header>
+  <div
+    class="{{ nav_classes }}"
+    data-fizz-nav
+    style="
+      --nav-logo-h: {{ logo_max_h }}px;
+      --nav-logo-w: {{ logo_max_w }}px;
+      --nav-blur: {{ nav_blur }}px;
+      --nav-border-opacity: {{ border_opacity }};
+      --nav-bg: {{ nav_bg }};
+      --nav-blend-mode: {{ blend_mode }};
+    "
+  >
+    <a href="{{ routes.root_url }}" class="fizz-nav__logo-link">
+      {% if settings.nav_logo != blank %}
+        <img
+          src="{{ settings.nav_logo | image_url: width: 600 }}"
+          class="logo{% if settings.nav_logo_invert %} logo--invert{% endif %}"
+          alt="{{ shop.name | escape }}"
+          width="{{ settings.nav_logo.width }}"
+          height="{{ settings.nav_logo.height }}"
+          loading="eager"
+        >
+      {% else %}
+        <img
+          src="{{ 'fizz-logo.avif' | asset_url }}"
+          class="logo logo--invert"
+          alt="{{ shop.name | escape }}"
+          width="120"
+          height="32"
+          loading="eager"
+        >
+      {% endif %}
+    </a>
+
+    <div class="navl">
+      <a href="{% if template.name == 'product' %}#buy{% else %}{{ shop_url }}{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>Bottle</a>
+      <a href="{{ routes.all_products_collection_url }}"{% if template.name == 'collection' %} aria-current="page"{% endif %}>Shop</a>
+      <a href="{% if template.name == 'index' %}#how{% else %}{{ routes.root_url }}#how{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>How it works</a>
+      <a href="{% if template.name == 'index' %}#colors{% else %}{{ routes.root_url }}#colors{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>Colorways</a>
+      <a href="{% if template.name == 'index' %}#flavors{% else %}{{ routes.root_url }}#flavors{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>Flavors</a>
+    </div>
+
+    <div class="fizz-nav__actions">
+      <button
+        type="button"
+        class="fizz-nav__icon-btn"
+        data-fizz-search-toggle
+        aria-controls="fizz-search-drawer"
+        aria-expanded="false"
+        aria-label="Search"
       >
-    {% else %}
-      <img
-        src="{{ 'fizz-logo.avif' | asset_url }}"
-        class="logo logo--invert"
-        alt="{{ shop.name | escape }}"
-        width="120"
-        height="32"
-        loading="eager"
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="M20 20l-3.5-3.5"></path>
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        class="fizz-nav__icon-btn fizz-nav__cart-btn"
+        data-fizz-cart-toggle
+        aria-controls="fizz-cart-drawer"
+        aria-expanded="false"
+        aria-label="Cart"
       >
-    {% endif %}
-  </a>
-  <div class="navl">
-    <a href="{% if template.name == 'product' %}#buy{% else %}{{ shop_url }}{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>Bottle</a>
-    <a href="{{ routes.all_products_collection_url }}"{% if template.name == 'collection' %} aria-current="page"{% endif %}>Shop</a>
-    <a href="{% if template.name == 'index' %}#how{% else %}{{ routes.root_url }}#how{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>How it works</a>
-    <a href="{% if template.name == 'index' %}#colors{% else %}{{ routes.root_url }}#colors{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>Colorways</a>
-    <a href="{% if template.name == 'index' %}#flavors{% else %}{{ routes.root_url }}#flavors{% endif %}"{% if template.name == 'index' %} data-no-transition{% endif %}>Flavors</a>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6h15l-1.5 9H7.5L6 6z"></path>
+          <path d="M6 6L5 3H2"></path>
+          <circle cx="9" cy="20" r="1"></circle>
+          <circle cx="18" cy="20" r="1"></circle>
+        </svg>
+        <span class="fizz-nav__cart-count" data-fizz-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+      </button>
+
+      <a class="navcta" href="{{ shop_url }}">Shop — {{ shop_price }}</a>
+    </div>
   </div>
-  <a class="navcta" href="{{ shop_url }}">Shop — {{ shop_price }}</a>
+
+  <div class="fizz-nav-backdrop" data-fizz-nav-backdrop hidden></div>
+
+  <div
+    id="fizz-search-drawer"
+    class="fizz-search-drawer"
+    data-fizz-search-drawer
+    data-predictive-search-url="{{ routes.predictive_search_url }}"
+    data-search-section-id="fizz-predictive-search"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="fizz-search-drawer-title"
+    hidden
+  >
+    <div class="fizz-search-drawer__panel">
+      <div class="fizz-search-drawer__header">
+        <h2 id="fizz-search-drawer-title" class="fizz-search-drawer__title">Search</h2>
+        <button type="button" class="fizz-drawer__close" data-fizz-search-close aria-label="Close search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
+
+      <form action="{{ routes.search_url }}" method="get" role="search" class="fizz-search-drawer__form">
+        <label class="sr-only" for="fizz-search-input">Search</label>
+        <input
+          id="fizz-search-input"
+          type="search"
+          name="q"
+          class="fizz-search-drawer__input"
+          placeholder="Search products…"
+          autocomplete="off"
+          data-fizz-search-input
+        >
+        <button type="submit" class="fizz-search-drawer__submit" aria-label="Search">Go</button>
+      </form>
+
+      <div class="fizz-search-drawer__results" data-fizz-search-results aria-live="polite"></div>
+    </div>
+  </div>
+
+  <div
+    id="fizz-cart-drawer"
+    class="fizz-cart-drawer"
+    data-fizz-cart-drawer
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="fizz-cart-drawer-title"
+    hidden
+  >
+    <div class="fizz-cart-drawer__panel">
+      <div class="fizz-cart-drawer__header">
+        <h2 id="fizz-cart-drawer-title" class="fizz-cart-drawer__title">Cart</h2>
+        <button type="button" class="fizz-drawer__close" data-fizz-cart-close aria-label="Close cart">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="fizz-cart-drawer__body" data-fizz-cart-drawer-content>
+        {% render 'fizz-cart-drawer-content' %}
+      </div>
+    </div>
+  </div>
 </div>
