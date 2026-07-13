@@ -165,7 +165,6 @@
       var inner = content.querySelector("[data-fizz-cart]");
       bindCartControls(inner, {
         onUpdated: async function (cart) {
-          await refreshDrawer();
           if (inner) inner.classList.remove("fizz-cart__updating");
           updateCartBadge(cart.item_count);
         },

@@ -161,10 +161,8 @@
       var inner = content.querySelector('[data-fizz-cart]');
       bindCartControls(inner, {
         onUpdated: function (cart) {
-          return refreshDrawer().then(function () {
-            if (inner) inner.classList.remove('fizz-cart__updating');
-            updateCartBadge(cart.item_count);
-          });
+          if (inner) inner.classList.remove('fizz-cart__updating');
+          updateCartBadge(cart.item_count);
         },
       });
     }

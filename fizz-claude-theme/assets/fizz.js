@@ -346,10 +346,14 @@
           return res.json();
         })
         .then(function (cart) {
-          if (window.FizzCart) {
+          var cartRoot = (window.Shopify && window.Shopify.routes ? window.Shopify.routes.root : '/');
+          var hasDrawer = document.querySelector('[data-fizz-cart-drawer]');
+          if (window.FizzCart && hasDrawer) {
             window.FizzCart.updateCartBadge(cart.item_count);
             window.FizzCart.dispatchCartUpdated(cart);
             window.FizzCart.openDrawer();
+          } else {
+            window.location.href = cartRoot + 'cart';
           }
           if (btn) {
             btn.disabled = false;
