@@ -183,9 +183,16 @@
     endif
   endif
 
-  assign hero_bubble = hero_text | color_modify: 'alpha', 0.22
-  assign how_bubble = hero_accent | color_modify: 'alpha', 0.4
-  assign footer_bubble = footer_text | color_modify: 'alpha', 0.16
+  assign bubble_peak_opacity = settings.fizz_claude_bubble_peak_opacity | default: 88 | times: 1.0 | divided_by: 100.0
+  assign bubble_size_scale = settings.fizz_claude_bubble_size_scale | default: 115 | times: 1.0 | divided_by: 100.0
+  assign bubble_count_scale = settings.fizz_claude_bubble_count_scale | default: 100 | times: 1.0 | divided_by: 100.0
+  assign bubble_hero_alpha = settings.fizz_claude_bubble_hero_alpha | default: 45 | times: 1.0 | divided_by: 100.0
+  assign bubble_how_alpha = settings.fizz_claude_bubble_how_alpha | default: 55 | times: 1.0 | divided_by: 100.0
+  assign bubble_footer_alpha = settings.fizz_claude_bubble_footer_alpha | default: 38 | times: 1.0 | divided_by: 100.0
+
+  assign hero_bubble = hero_text | color_modify: 'alpha', bubble_hero_alpha
+  assign how_bubble = hero_accent | color_modify: 'alpha', bubble_how_alpha
+  assign footer_bubble = footer_text | color_modify: 'alpha', bubble_footer_alpha
 
   assign btn_radius_px = '999px'
   if btn_radius == 'rounded'
@@ -242,6 +249,10 @@
     --btn-outline-text: {{ btn_outline_text }};
     --btn-radius: {{ btn_radius_px }};
     --btn-hover-scale: {{ btn_hover_scale }};
+
+    --bubble-peak-opacity: {{ bubble_peak_opacity }};
+    --bubble-size-scale: {{ bubble_size_scale }};
+    --bubble-count-scale: {{ bubble_count_scale }};
 
     --acc: var(--color-accent);
     --ink: var(--color-ink);

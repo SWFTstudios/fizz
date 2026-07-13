@@ -4,6 +4,10 @@
   window.__fizzTrans = 1;
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var STORAGE_KEY = 'fizz-trans';
+  var BUB_BORDER = 'rgba(242,239,231,.72)';
+  var BUB_PEAK = 0.92;
+  var LEAVE_BURST = 26;
+  var ENTER_BURST = 20;
 
   var style = document.createElement('style');
   style.textContent =
@@ -12,7 +16,7 @@
     '.ftliq{position:absolute;left:-12%;width:124%;height:135vh;top:100vh;will-change:transform}' +
     '.ftl1{background:oklch(0.9 0.22 128);border-radius:46% 54% 0 0/70px 120px 0 0}' +
     '.ftl2{background:#0b0e12;border-radius:54% 46% 0 0/120px 70px 0 0}' +
-    '.ftbub{position:absolute;bottom:-50px;border:2px solid rgba(242,239,231,.55);border-radius:50%;opacity:0}';
+    '.ftbub{position:absolute;bottom:-50px;border:2px solid ' + BUB_BORDER + ';border-radius:50%;opacity:0}';
   document.head.appendChild(style);
 
   var ov, l1, l2;
@@ -45,7 +49,7 @@
       b.animate(
         [
           { transform: 'translateY(0) scale(.5)', opacity: 0 },
-          { opacity: 0.85, offset: 0.15 },
+          { opacity: BUB_PEAK, offset: 0.15 },
           { transform: 'translateY(-' + (105 + Math.random() * 30) + 'vh) scale(1)', opacity: 0 },
         ],
         { duration: 650 + Math.random() * 500, delay: Math.random() * 220, easing: 'cubic-bezier(.2,.6,.3,1)' }
@@ -59,7 +63,7 @@
     build();
     ov.classList.add('on');
     ov.style.pointerEvents = 'auto';
-    burst(26);
+    burst(LEAVE_BURST);
     var done = false,
       go = function () {
         if (!done) {
@@ -77,7 +81,7 @@
     ov.classList.add('on');
     l1.style.transform = COVER;
     l2.style.transform = COVER;
-    burst(20);
+    burst(ENTER_BURST);
     l2.animate([{ transform: COVER }, { transform: GONE }], { duration: 560, delay: 60, easing: EASE, fill: 'forwards' });
     var a = l1.animate([{ transform: COVER }, { transform: GONE }], { duration: 640, delay: 170, easing: EASE, fill: 'forwards' });
     a.onfinish = function () {

@@ -48,6 +48,82 @@ Then **Online Store → Themes → Add theme → Upload zip file**.
 | `assets/fizz.js` | Motion, swatches, PDP addons/cart |
 | `assets/fizz-transition.js` | Bubble page transitions |
 
+## Bubble animation
+
+Ambient rising bubbles appear in **hero**, **how it works**, **footer**, and **PDP stage**. Page-transition bubbles (on internal link clicks) are a separate system in `fizz-transition.js`.
+
+### Quick start (Theme Editor)
+
+1. Open **Online Store → Themes → Customize**
+2. Go to **Theme settings → Bubble animation**
+3. Recommended defaults:
+   - **Style:** Glass
+   - **Animation peak opacity:** 88%
+   - **Bubble size:** 115%
+   - **Hero & PDP alpha:** 45%
+   - **Footer alpha:** 38% (footer was historically the faintest)
+
+### Style presets
+
+| Style | Look | When to use |
+|-------|------|-------------|
+| Ring | Thin outline only | Minimal / performance |
+| Glass | Sphere with specular highlight | Default — reads as real bubbles |
+| Bold | Thick rim + strong fill | Dark heroes, marketing screenshots |
+
+### Opacity troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| Bubbles invisible on dark background | Raise **Hero & PDP alpha** or **How it works alpha** |
+| Bubbles too loud | Lower **Animation peak opacity** or switch style to **Ring** |
+| Footer bubbles too faint | Raise **Footer alpha** (was 16% before this update) |
+| No motion at all | Check OS **Reduce motion** setting and **Enable ambient bubbles** toggle |
+| Light colorway (e.g. Arctic Light) | Raise all section alpha sliders or switch to **Bold** style |
+
+### Per-section overrides (developers)
+
+Edit the `.bubf` container in section Liquid files (`fizz-hero.liquid`, `fizz-how.liquid`, `fizz-footer.liquid`, `fizz-product.liquid`):
+
+| Attribute | Default | Example |
+|-----------|---------|---------|
+| `data-bub-count` | 14 | `data-bub-count="20"` |
+| `data-bub-rise` | 700 | `data-bub-rise="900"` (pixels traveled upward) |
+| `data-bub-seed` | 7 | `data-bub-seed="42"` (changes random layout) |
+| `data-bub-color` | section CSS var | `data-bub-color="var(--hero-bubble-color)"` |
+| `data-bub-peak` | inherits global | `data-bub-peak="0.95"` (per-section peak opacity) |
+| `data-bub-style` | inherits global | `data-bub-style="bold"` (override ring/glass/bold) |
+
+Density and size are also scaled globally by theme settings (`--bubble-count-scale`, `--bubble-size-scale`).
+
+### CSS variable reference
+
+Output by `snippets/fizz-theme-tokens.liquid` on `:root`:
+
+| Variable | Theme setting | Purpose |
+|----------|---------------|---------|
+| `--bubble-peak-opacity` | Animation peak opacity | Max opacity during rise animation |
+| `--bubble-size-scale` | Bubble size | Diameter multiplier |
+| `--bubble-count-scale` | Bubble density | Count multiplier |
+| `--hero-bubble-color` | Hero & PDP alpha | Bubble tint in hero + PDP |
+| `--how-bubble-color` | How it works alpha | Bubble tint in how section |
+| `--footer-bubble-color` | Footer alpha | Bubble tint in footer |
+
+The `<html>` element also receives `bubble-style-glass` (or `ring` / `bold`), optional `bubble-wobble`, and `data-bubble-enabled`.
+
+### Page transition bubbles
+
+Tuned separately in `assets/fizz-transition.js`:
+
+```js
+var BUB_BORDER = 'rgba(242,239,231,.72)';  // border color + opacity
+var BUB_PEAK = 0.92;                        // animation peak opacity
+var LEAVE_BURST = 26;                       // bubbles on page leave
+var ENTER_BURST = 20;                       // bubbles on page enter
+```
+
+Raise `BUB_PEAK` or `BUB_BORDER` alpha for louder transition bursts. Lower `LEAVE_BURST` / `ENTER_BURST` for fewer bubbles.
+
 ## Preview
 
 After push, use the preview URL from CLI output or:

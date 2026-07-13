@@ -636,5 +636,101 @@
         "info": "Use Normal or None when glass background is enabled"
       }
     ]
+  },
+  {
+    "name": "Fizz Claude bubble animation",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Ambient rising bubbles in hero, how-it-works, footer, and PDP stage. See design/fizz-claude/README.md for per-section overrides."
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_bubble_enabled",
+        "label": "Enable ambient bubbles",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "fizz_claude_bubble_style",
+        "label": "Bubble style",
+        "options": [
+          { "value": "ring", "label": "Ring — thin outline" },
+          { "value": "glass", "label": "Glass — sphere with highlight (recommended)" },
+          { "value": "bold", "label": "Bold — thick rim + strong fill" }
+        ],
+        "default": "glass"
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_bubble_peak_opacity",
+        "min": 50,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Animation peak opacity",
+        "default": 88
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_bubble_size_scale",
+        "min": 75,
+        "max": 200,
+        "step": 5,
+        "unit": "%",
+        "label": "Bubble size",
+        "default": 115
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_bubble_count_scale",
+        "min": 50,
+        "max": 200,
+        "step": 5,
+        "unit": "%",
+        "label": "Bubble density",
+        "default": 100
+      },
+      {
+        "type": "header",
+        "content": "Section bubble color strength"
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_bubble_hero_alpha",
+        "min": 10,
+        "max": 80,
+        "step": 1,
+        "unit": "%",
+        "label": "Hero & PDP alpha",
+        "default": 45
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_bubble_how_alpha",
+        "min": 10,
+        "max": 80,
+        "step": 1,
+        "unit": "%",
+        "label": "How it works alpha",
+        "default": 55
+      },
+      {
+        "type": "range",
+        "id": "fizz_claude_bubble_footer_alpha",
+        "min": 10,
+        "max": 80,
+        "step": 1,
+        "unit": "%",
+        "label": "Footer alpha",
+        "default": 38
+      },
+      {
+        "type": "checkbox",
+        "id": "fizz_claude_bubble_wobble",
+        "label": "Subtle horizontal wobble",
+        "default": false
+      }
+    ]
   }
 ]
