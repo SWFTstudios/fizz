@@ -135,10 +135,36 @@
     })();
   }
 
+  function getPdpRoot(el) {
+    return el.closest('[data-pdp]') || el;
+  }
+
+  function clearPdpThumbSelection(pdp) {
+    pdp.querySelectorAll('[data-pdp-thumb]').forEach(function (t) {
+      t.classList.remove('is-active');
+    });
+  }
+
+  function setPdpMainPhoto(pdp, src) {
+    if (!pdp || !src) return;
+    var stage = pdp.querySelector('[data-pdp-stage]');
+    var main = pdp.querySelector('[data-way-photo]');
+    if (stage) {
+      stage.classList.remove('has-lifestyle');
+      var lifestyle = stage.querySelector('[data-pdp-lifestyle]');
+      if (lifestyle) lifestyle.remove();
+    }
+    if (main) {
+      main.src = src;
+      main.style.opacity = '1';
+    }
+  }
+
   function applySwatch(btn) {
     var targetSel = btn.dataset.target;
     var target = targetSel ? document.querySelector(targetSel) : btn.closest('[data-way]') || btn.closest('[data-pdp]');
     if (!target) return;
+    var pdp = getPdpRoot(target);
 
     target.querySelectorAll('[data-way-swatch]').forEach(function (b) {
       b.classList.remove('on');
@@ -179,23 +205,11 @@
     var bg = target.querySelector('[data-way-bg]');
     if (bg && hex) bg.style.background = hex;
 
-    var photo = target.querySelector('[data-way-photo]');
-    if (photo && img) {
-      photo.src = img;
-      photo.style.opacity = '1';
-    }
+    if (img) setPdpMainPhoto(pdp, img);
+    clearPdpThumbSelection(pdp);
 
-    var stage = target.querySelector('[data-pdp-stage]');
-    if (stage) {
-      if (hex) stage.style.background = 'radial-gradient(ellipse 80% 90% at 50% 100%,' + hex + '33,#0b0e12)';
-      stage.classList.remove('has-lifestyle');
-      var lifestyle = stage.querySelector('[data-pdp-lifestyle]');
-      if (lifestyle) lifestyle.remove();
-    }
-
-    target.querySelectorAll('[data-pdp-thumb]').forEach(function (t) {
-      t.classList.remove('is-active');
-    });
+    var stage = pdp.querySelector('[data-pdp-stage]');
+    if (stage && hex) stage.style.background = 'radial-gradient(ellipse 80% 90% at 50% 100%,' + hex + '33,#0b0e12)';
 
     if (variantId) {
       var url = new URL(window.location.href);
@@ -357,28 +371,10 @@
       if (thumb.__thumbBound) return;
       thumb.__thumbBound = true;
       thumb.addEventListener('click', function () {
+        var pdp = getPdpRoot(thumb);
         var src = thumb.dataset.fullSrc;
-        var stage = document.querySelector('[data-pdp-stage]');
-        var main = document.querySelector('[data-way-photo]');
-        var lifestyle = document.querySelector('[data-pdp-lifestyle]');
-
-        if (stage && src) {
-          if (!lifestyle) {
-            lifestyle = document.createElement('img');
-            lifestyle.className = 'pdp-lifestyle';
-            lifestyle.dataset.pdpLifestyle = '';
-            lifestyle.alt = '';
-            stage.appendChild(lifestyle);
-          }
-          lifestyle.src = src;
-          stage.classList.add('has-lifestyle');
-          if (main) main.style.opacity = '0';
-        } else if (main && src) {
-          main.src = src;
-          if (stage) stage.classList.remove('has-lifestyle');
-        }
-
-        document.querySelectorAll('[data-pdp-thumb]').forEach(function (t) {
+        setPdpMainPhoto(pdp, src);
+        pdp.querySelectorAll('[data-pdp-thumb]').forEach(function (t) {
           t.classList.remove('is-active');
         });
         thumb.classList.add('is-active');

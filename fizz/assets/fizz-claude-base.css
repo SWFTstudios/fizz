@@ -46,7 +46,7 @@ body.fizz{margin:0;background:var(--color-surface);color:var(--color-on-surface)
 .bot{width:170px;height:430px;border-radius:82px 82px 32px 32px;position:relative;box-shadow:inset -22px -16px 38px rgba(0,0,0,.3),inset 18px 22px 38px rgba(255,255,255,.18),inset 0 0 0 1px rgba(255,255,255,.08);transition:background .5s}
 .blogo{position:absolute;top:176px;left:50%;transform:translateX(-50%);height:19px}
 .blogo.inv{filter:invert(1)}
-.botimg{max-height:60vh;width:auto;display:block;filter:drop-shadow(0 40px 44px rgba(0,0,0,.5))}
+.botimg,[data-way-photo]{max-height:min(58vh,calc(100% - 40px));max-width:min(82%,100%);width:auto;height:auto;object-fit:contain;display:block;position:relative;z-index:1;filter:drop-shadow(0 40px 44px rgba(0,0,0,.5))}
 
 /* bubbles */
 .bubf{position:absolute;inset:0;overflow:hidden;pointer-events:none}
@@ -200,10 +200,9 @@ body.fizz{margin:0;background:var(--color-surface);color:var(--color-on-surface)
 .thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
 .thumb{height:110px;border-radius:14px;position:relative;background-color:var(--color-surface-elevated);cursor:pointer;transition:transform .2s;overflow:hidden}
 .thumb:hover{transform:translateY(-3px)}
-.thumb img,.thumb__img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb img,.thumb__img{width:100%;height:100%;object-fit:contain;display:block;padding:10px;box-sizing:border-box}
 .thumb.is-active{outline:2px solid var(--color-accent);outline-offset:3px}
-.pdp-lifestyle{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
-.pstage.has-lifestyle .botimg,.pstage.has-lifestyle .botwrap{opacity:0;transition:opacity .35s}
+.pdp-lifestyle{display:none}
 .ph{background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,.05) 0 10px,transparent 10px 22px)}
 .phc{position:absolute;left:12px;bottom:10px;font-family:var(--font-label);font-size:10.5px;font-weight:500;opacity:.5;margin:0}
 .crumb{font-family:var(--font-label);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--color-accent);margin:0}

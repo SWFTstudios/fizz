@@ -35,14 +35,14 @@
         class: 'botimg',
         data_photo: true,
         loading: 'eager',
-        width: 170,
-        height: 430
+        width: 900,
+        height: 1200
       %}
     </div>
     <div class="thumbs">
       {% if product.images.size > 0 %}
         {% for image in product.images limit: 3 %}
-          <button type="button" class="thumb{% if forloop.first %} is-active{% endif %}" data-pdp-thumb data-full-src="{{ image | image_url: width: 900 }}" aria-label="View image {{ forloop.index }}">
+          <button type="button" class="thumb" data-pdp-thumb data-full-src="{{ image | image_url: width: 1400 }}" aria-label="View image {{ forloop.index }}">
             {{ image | image_url: width: 300 | image_tag: loading: 'lazy', alt: image.alt | default: product.title }}
           </button>
         {% endfor %}
@@ -50,7 +50,7 @@
         {% assign thumb_assets = 'fizz-lifestyle-trail.jpg,fizz-lifestyle-pod-detail.jpg,fizz-lifestyle-macro.jpg' | split: ',' %}
         {% assign thumb_labels = 'lifestyle — trail,cap + CO₂ pod detail,fizz macro shot' | split: ',' %}
         {% for asset in thumb_assets %}
-          <button type="button" class="thumb{% if forloop.first %} is-active{% endif %}" data-pdp-thumb data-full-src="{{ asset | asset_url }}" aria-label="{{ thumb_labels[forloop.index0] }}">
+          <button type="button" class="thumb" data-pdp-thumb data-full-src="{{ asset | asset_url }}" aria-label="{{ thumb_labels[forloop.index0] }}">
             {% render 'fizz-img', file: asset, alt: thumb_labels[forloop.index0], class: 'thumb__img' %}
           </button>
         {% endfor %}
@@ -83,7 +83,7 @@
           {% assign slug = slug | strip %}
           {% liquid
             if variant.image
-              assign swatch_image_url = variant.image | image_url: width: 900
+              assign swatch_image_url = variant.image | image_url: width: 1400
             elsif bottle_colors contains slug
               assign swatch_image_url = 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url
             endif
