@@ -1,0 +1,53 @@
+<section class="fizz-search-page" aria-label="Search results">
+  <h1 class="fizz-search-page__title">
+    {% if search.performed %}
+      Results for “{{ search.terms | escape }}”
+    {% else %}
+      Search
+    {% endif %}
+  </h1>
+
+  <form action="{{ routes.search_url }}" method="get" role="search" class="fizz-search-page__form">
+    <input
+      type="search"
+      name="q"
+      value="{{ search.terms | escape }}"
+      placeholder="Search products…"
+      class="fizz-search-page__input"
+    >
+    <button type="submit" class="fizz-search-page__submit">Search</button>
+  </form>
+
+  {% if search.performed %}
+    {% if search.results_count == 0 %}
+      <p class="fizz-search-status">No results found.</p>
+    {% else %}
+      <div class="fizz-search-group">
+        <p class="fizz-search-group__title">{{ search.results_count }} results</p>
+        {% for item in search.results %}
+          <a href="{{ item.url }}" class="fizz-search-item">
+            <div class="fizz-search-item__media">
+              {% if item.featured_image %}
+                {{ item.featured_image | image_url: width: 104 | image_tag: loading: 'lazy', alt: item.title }}
+              {% endif %}
+            </div>
+            <div>
+              <p class="fizz-search-item__title">{{ item.title }}</p>
+              <p class="fizz-search-item__meta">{{ item.object_type | capitalize }}</p>
+            </div>
+            {% if item.object_type == 'product' %}
+              <span class="fizz-search-item__price">{{ item.price | money }}</span>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endif %}
+</section>
+
+{% schema %}
+{
+  "name": "Search results",
+  "settings": []
+}
+{% endschema %}

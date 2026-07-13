@@ -14,24 +14,31 @@
 
   function initBubbles() {
     if (reduced) return;
+    if (document.documentElement.dataset.bubbleEnabled === 'false') return;
+    var root = getComputedStyle(document.documentElement);
+    var sizeScale = parseFloat(root.getPropertyValue('--bubble-size-scale')) || 1;
+    var countScale = parseFloat(root.getPropertyValue('--bubble-count-scale')) || 1;
+    var wobble = document.documentElement.classList.contains('bubble-wobble');
+    var animName = wobble ? 'fizzrise-wobble' : 'fizzrise';
     document.querySelectorAll('[data-bubbles]').forEach(function (field) {
       if (field.__done) return;
       field.__done = true;
-      var count = parseInt(field.dataset.bubCount || '14', 10);
-      var color = field.dataset.bubColor || 'rgba(242,239,231,.2)';
+      var count = Math.round(parseInt(field.dataset.bubCount || '14', 10) * countScale);
+      var color = field.dataset.bubColor || 'rgba(242,239,231,.45)';
       var rise = parseInt(field.dataset.bubRise || '700', 10);
       var rnd = mulberry(parseInt(field.dataset.bubSeed || '7', 10));
+      field.style.setProperty('--bub-color', color);
+      if (field.dataset.bubPeak) field.style.setProperty('--bub-peak', field.dataset.bubPeak);
       var frag = document.createDocumentFragment();
       for (var i = 0; i < count; i++) {
         var b = document.createElement('span');
         b.className = 'bub';
-        var sz = 5 + rnd() * 16;
+        var sz = (5 + rnd() * 16) * sizeScale;
         b.style.left = 3 + rnd() * 94 + '%';
         b.style.width = sz + 'px';
         b.style.height = sz + 'px';
-        b.style.border = '1.5px solid ' + color;
         b.style.setProperty('--rh', '-' + rise + 'px');
-        b.style.animation = 'fizzrise ' + (5 + rnd() * 7).toFixed(1) + 's linear ' + (rnd() * 7).toFixed(1) + 's infinite';
+        b.style.animation = animName + ' ' + (5 + rnd() * 7).toFixed(1) + 's linear ' + (rnd() * 7).toFixed(1) + 's infinite';
         frag.appendChild(b);
       }
       field.appendChild(frag);
@@ -216,6 +223,15 @@
       }
     }
 
+    var bottleLink = target.querySelector('[data-way-photo-link]');
+    if (bottleLink && btn.dataset.shopUrl) bottleLink.href = btn.dataset.shopUrl;
+
+    if (variantId && section && section.id === 'colors') {
+      var url = new URL(window.location.href);
+      url.searchParams.set('variant', variantId);
+      window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+    }
+
     var stage = target.querySelector('[data-pdp-stage]');
     if (stage && hex) stage.style.background = 'radial-gradient(ellipse 80% 90% at 50% 100%,' + hex + '33,#0b0e12)';
   }
@@ -237,7 +253,8 @@
     var params = new URLSearchParams(window.location.search);
     var variantId = params.get('variant');
     if (!variantId) return;
-    var btn = document.querySelector('[data-way-swatch][data-variant-id="' + variantId + '"]');
+    var btn = document.querySelector('#colors [data-way-swatch][data-variant-id="' + variantId + '"]')
+      || document.querySelector('[data-way-swatch][data-variant-id="' + variantId + '"]');
     if (btn) applySwatch(btn);
   }
 
@@ -320,7 +337,24 @@
       })
         .then(function (res) {
           if (!res.ok) throw new Error('Add failed');
-          window.location.href = (window.Shopify && window.Shopify.routes ? window.Shopify.routes.root : '/') + 'cart';
+          return fetch((window.Shopify && window.Shopify.routes ? window.Shopify.routes.root : '/') + 'cart.js', {
+            headers: { Accept: 'application/json' },
+          });
+        })
+        .then(function (res) {
+          if (!res.ok) throw new Error('Cart fetch failed');
+          return res.json();
+        })
+        .then(function (cart) {
+          if (window.FizzCart) {
+            window.FizzCart.updateCartBadge(cart.item_count);
+            window.FizzCart.dispatchCartUpdated(cart);
+            window.FizzCart.openDrawer();
+          }
+          if (btn) {
+            btn.disabled = false;
+            updatePdpTotal();
+          }
         })
         .catch(function () {
           if (btn) {

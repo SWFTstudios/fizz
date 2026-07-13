@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ request.locale.iso_code }}" class="fizz-html">
+<html lang="{{ request.locale.iso_code }}" class="fizz-html bubble-style-{{ settings.bubble_style | default: 'glass' }}{% unless settings.bubble_enabled %} bubble-disabled{% endunless %}{% if settings.bubble_wobble %} bubble-wobble{% endif %}" data-bubble-enabled="{% if settings.bubble_enabled %}true{% else %}false{% endif %}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,17 +19,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     {{ 'fizz-fonts.css' | asset_url | stylesheet_tag }}
     {{ 'fizz-base.css' | asset_url | stylesheet_tag }}
+    {{ 'fizz-cart-drawer.css' | asset_url | stylesheet_tag }}
+    {{ 'fizz-search.css' | asset_url | stylesheet_tag }}
+    {{ 'fizz-nav.css' | asset_url | stylesheet_tag }}
     {% render 'fizz-theme-tokens' %}
   </head>
 
   <body class="fizz overflow-x-hidden">
-    {% render 'fizz-nav' %}
+    {% sections 'header-group' %}
 
     <main id="main-content">
       {{ content_for_layout }}
     </main>
 
     <div class="grain" aria-hidden="true"></div>
+    <script src="{{ 'fizz-nav.js' | asset_url }}" defer></script>
+    <script src="{{ 'fizz-cart-drawer.js' | asset_url }}" defer></script>
+    <script src="{{ 'fizz-search.js' | asset_url }}" defer></script>
     <script src="{{ 'fizz.js' | asset_url }}" defer></script>
     <script src="{{ 'fizz-transition.js' | asset_url }}" defer></script>
   </body>

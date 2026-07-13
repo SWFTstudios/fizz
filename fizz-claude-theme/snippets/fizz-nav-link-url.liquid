@@ -1,0 +1,30 @@
+{%- liquid
+  assign resolved_url = block.settings.url
+
+  case block.settings.link_type
+    when 'product'
+      if block.settings.product != blank
+        assign resolved_url = block.settings.product.url
+      endif
+    when 'collection'
+      if block.settings.collection != blank
+        assign resolved_url = block.settings.collection.url
+      endif
+    when 'page'
+      if block.settings.page != blank
+        assign resolved_url = block.settings.page.url
+      endif
+    when 'anchor'
+      assign anchor_id = block.settings.anchor_id | default: 'how'
+      if template.name == 'index'
+        assign resolved_url = '#' | append: anchor_id
+      else
+        assign resolved_url = routes.root_url | append: '#' | append: anchor_id
+      endif
+  endcase
+
+  if resolved_url == blank
+    assign resolved_url = routes.all_products_collection_url
+  endif
+-%}
+{{- resolved_url -}}

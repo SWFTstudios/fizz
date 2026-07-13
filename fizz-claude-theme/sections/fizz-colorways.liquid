@@ -83,15 +83,17 @@
   <p class="anton wayname" data-way-name>{{ first_name }}</p>
 
   <div class="waybotr" data-way-bg-wrap>
-    {% render 'fizz-bottle-product-img',
-      color_slug: first_slug,
-      alt: first_name,
-      class: 'botimg',
-      data_photo: true,
-      loading: 'eager',
-      width: 170,
-      height: 430
-    %}
+    <a href="{{ first_shop_url }}" class="waybotr__link" data-way-photo-link aria-label="Shop {{ first_name }}">
+      {% render 'fizz-bottle-product-img',
+        color_slug: first_slug,
+        alt: first_name,
+        class: 'botimg',
+        data_photo: true,
+        loading: 'eager',
+        width: 170,
+        height: 430
+      %}
+    </a>
   </div>
 
   <div class="wayui">
@@ -150,7 +152,7 @@
             data-shop-url="{{ variant_url }}"
             style="background:{{ sw_swatch }}"
             title="{{ variant.title }}"
-            aria-label="{{ variant.title }}"
+            aria-label="{{ variant.title }} — preview colorway. Cmd+click to open product page."
           ></a>
         {% endfor %}
       {% else %}
@@ -200,7 +202,7 @@
   "name": "Colorways",
   "settings": [
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The bottle — six colorways" },
-    { "type": "product", "id": "product", "label": "Bottle product" },
+    { "type": "product", "id": "product", "label": "Bottle product", "info": "Links swatches to the bottle PDP with variant pre-selected. Falls back to Theme settings → Products → Bottle product." },
     { "type": "text", "id": "cta_label", "label": "CTA label", "default": "Shop this colorway" },
     { "type": "text", "id": "addon_pack_query", "label": "PDP add-on highlight (URL param)", "default": "co2,flavor", "info": "Matches data-addon-key on Product section blocks. Example: co2,flavor" },
     {

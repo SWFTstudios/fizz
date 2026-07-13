@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "main": {
+      "type": "fizz-claude-search",
+      "settings": {}
+    },
+    "footer": {
+      "type": "fizz-claude-footer",
+      "settings": {
+        "cta_link": "/collections/all"
+      }
+    }
+  },
+  "order": ["main", "footer"]
+}

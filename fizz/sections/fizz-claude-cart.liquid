@@ -1,0 +1,13 @@
+<section class="fizz-cart-page" aria-label="Cart">
+  <h1 class="fizz-cart-page__title">Cart</h1>
+  <form action="{{ routes.cart_url }}" method="post" class="fizz-cart-page__layout">
+    {% render 'fizz-claude-cart-drawer-content', context: 'page' %}
+  </form>
+</section>
+
+{% schema %}
+{
+  "name": "Cart page",
+  "settings": []
+}
+{% endschema %}

@@ -1,0 +1,147 @@
+{% liquid
+  assign cart_context = context | default: 'drawer'
+  assign remove_label = remove_label | default: 'Remove'
+  assign checkout_label = checkout_label | default: 'Checkout'
+  assign continue_label = continue_label | default: 'Continue shopping'
+  assign subtotal_label = subtotal_label | default: 'Subtotal'
+  assign shipping_note = shipping_note | default: 'Shipping and taxes calculated at checkout.'
+  assign empty_heading = empty_heading | default: 'Your cart is empty'
+  assign empty_body = empty_body | default: 'Add a bottle, flavors, or CO₂ refills to get started.'
+  assign rec_collection = recommendations_collection | default: 'all'
+  assign rec_heading = recommendations_heading | default: 'Maybe you would like'
+  assign bottle = settings.fizz_claude_bottle_product
+%}
+
+{% if cart.item_count > 0 %}
+  {% if cart_context == 'page' %}
+    <div class="fizz-cart__lines-col">
+  {% else %}
+    <div class="fizz-cart-drawer__inner" data-fizz-cart>
+      <div class="fizz-cart-drawer__lines">
+  {% endif %}
+
+  {% for item in cart.items %}
+    <article class="fizz-cart__line{% if cart_context == 'drawer' %} fizz-cart-drawer__line{% endif %}" data-cart-line="{{ item.key }}">
+      <a href="{{ item.url }}" class="fizz-cart__line-media">
+        {% if item.image %}
+          {{ item.image | image_url: width: 240 | image_tag: loading: 'lazy', alt: item.product.title }}
+        {% endif %}
+      </a>
+
+      <div class="fizz-cart__line-body">
+        {% if cart_context == 'page' %}
+          <h2 class="fizz-cart__line-title">
+        {% else %}
+          <h3 class="fizz-cart__line-title">
+        {% endif %}
+          <a href="{{ item.url }}">{{ item.product.title }}</a>
+        {% if cart_context == 'page' %}
+          </h2>
+        {% else %}
+          </h3>
+        {% endif %}
+        {% unless item.product.has_only_default_variant %}
+          <p class="fizz-cart__line-variant">{{ item.variant.title }}</p>
+        {% endunless %}
+        <p class="fizz-cart__line-price">{{ item.final_price | money }}</p>
+
+        <div class="fizz-cart__line-actions">
+          <div class="fizz-cart__qty" data-fizz-cart-qty data-line-key="{{ item.key }}">
+            <button type="button" data-fizz-cart-minus aria-label="Decrease quantity">−</button>
+            <input type="number" value="{{ item.quantity }}" min="0" aria-label="Quantity" readonly>
+            <button type="button" data-fizz-cart-plus aria-label="Increase quantity">+</button>
+          </div>
+          <button type="button" class="fizz-cart__remove" data-fizz-cart-remove data-line-key="{{ item.key }}">
+            {{ remove_label }}
+          </button>
+        </div>
+      </div>
+
+      <p class="fizz-cart__line-total">{{ item.final_line_price | money }}</p>
+    </article>
+  {% endfor %}
+
+  {% if cart_context == 'page' %}
+    </div>
+    <aside class="fizz-cart__summary-col">
+      <div class="fizz-cart__summary">
+        <h2>Order summary</h2>
+        <div class="fizz-cart__summary-row">
+          <span>{{ subtotal_label }}</span>
+          <span>{{ cart.total_price | money }}</span>
+        </div>
+        <p class="fizz-cart__summary-note">{{ shipping_note }}</p>
+        <button type="submit" name="checkout" class="fizz-cart-drawer__checkout bigcta">{{ checkout_label }}</button>
+        <a href="{{ routes.all_products_collection_url }}" class="fizz-cart-drawer__continue">{{ continue_label }}</a>
+      </div>
+    </aside>
+  {% else %}
+      </div>
+
+      {% assign rec_products = collections[rec_collection].products | slice: 0, 4 %}
+      {% if rec_products.size > 0 %}
+        <div class="fizz-cart-recs">
+          <p class="fizz-cart-recs__heading">{{ rec_heading }}</p>
+          <div class="fizz-cart-recs__track">
+            {% for product in rec_products %}
+              <div class="fizz-cart-recs__card">
+                <a href="{{ product.url }}" class="fizz-cart-recs__media">
+                  {% if product.featured_image %}
+                    {{ product.featured_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: product.title }}
+                  {% endif %}
+                </a>
+                <p class="fizz-cart-recs__title">{{ product.title | truncate: 28 }}</p>
+                <p class="fizz-cart-recs__price">{{ product.price_min | money }}</p>
+                {% if product.first_available_variant %}
+                  <button
+                    type="button"
+                    class="fizz-cart-recs__add"
+                    data-fizz-cart-recs-add
+                    data-variant-id="{{ product.first_available_variant.id }}"
+                    aria-label="Add {{ product.title }}"
+                  >+</button>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="fizz-cart-drawer__footer">
+        <div class="fizz-cart-drawer__summary">
+          <div class="fizz-cart__summary-row">
+            <span>{{ subtotal_label }}</span>
+            <span>{{ cart.total_price | money }}</span>
+          </div>
+          <p class="fizz-cart__summary-note">{{ shipping_note }}</p>
+        </div>
+        <form action="{{ routes.cart_url }}" method="post">
+          <button type="submit" name="checkout" class="fizz-cart-drawer__checkout bigcta">{{ checkout_label }}</button>
+        </form>
+        <a href="{{ routes.all_products_collection_url }}" class="fizz-cart-drawer__continue">{{ continue_label }}</a>
+      </div>
+    </div>
+  {% endif %}
+{% else %}
+  {% if cart_context == 'page' %}
+    <div class="fizz-cart__empty">
+      <h2>{{ empty_heading }}</h2>
+      <p>{{ empty_body }}</p>
+      <div class="fizz-cart__empty-links">
+        {% if bottle != blank %}<a href="{{ bottle.url }}">Shop bottle</a>{% endif %}
+        <a href="{{ routes.all_products_collection_url }}">Shop all</a>
+      </div>
+    </div>
+  {% else %}
+    <div class="fizz-cart-drawer__inner" data-fizz-cart>
+      <div class="fizz-cart-drawer__empty">
+        <h3 class="fizz-cart-drawer__empty-heading">{{ empty_heading }}</h3>
+        <p class="fizz-cart-drawer__empty-body">{{ empty_body }}</p>
+        <div class="fizz-cart__empty-links">
+          {% if bottle != blank %}<a href="{{ bottle.url }}">Shop bottle</a>{% endif %}
+          <a href="{{ routes.all_products_collection_url }}">Shop all</a>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endif %}

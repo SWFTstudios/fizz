@@ -1,0 +1,96 @@
+{% liquid
+  capture link_url
+    render 'fizz-nav-link-url', block: block
+  endcapture
+  assign link_url = link_url | strip
+  assign link_label = block.settings.label | default: 'Shop'
+  assign has_mega = false
+  if block.settings.image != blank
+    assign has_mega = true
+  endif
+%}
+
+{% case context %}
+  {% when 'desktop' %}
+    <div class="fizz-nav-link-wrap{% if has_mega %} fizz-nav-link-wrap--mega{% endif %}" {{ block.shopify_attributes }}>
+      <a
+        href="{{ link_url }}"
+        class="fizz-nav-link"
+        {% if has_mega %}
+          data-fizz-mega-trigger
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-controls="fizz-mega-{{ block.id }}"
+        {% endif %}
+        {% if block.settings.open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        {% if block.settings.link_type == 'anchor' and template.name == 'index' %}data-no-transition{% endif %}
+      >
+        {{ link_label }}
+      </a>
+
+      {% if has_mega %}
+        <div
+          id="fizz-mega-{{ block.id }}"
+          class="fizz-mega"
+          data-fizz-mega
+          aria-hidden="true"
+        >
+          <a
+            href="{{ link_url }}"
+            class="fizz-mega__card"
+            {% if block.settings.open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+          >
+            <div class="fizz-mega__media">
+              {{
+                block.settings.image
+                | image_url: width: 1400
+                | image_tag:
+                  loading: 'lazy',
+                  widths: '420, 700, 1000, 1400',
+                  sizes: '(min-width: 1024px) 44vw, 90vw',
+                  alt: link_label
+              }}
+            </div>
+            <div class="fizz-mega__content">
+              <p class="fizz-mega__eyebrow">Explore</p>
+              <p class="fizz-mega__title">{{ link_label }}</p>
+              {% if block.settings.description != blank %}
+                <p class="fizz-mega__description">{{ block.settings.description }}</p>
+              {% endif %}
+              <span class="fizz-mega__cta">Shop now →</span>
+            </div>
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+  {% when 'mobile' %}
+    <a
+      href="{{ link_url }}"
+      class="fizz-mobile-nav__card{% unless has_mega %} fizz-mobile-nav__card--text{% endunless %}"
+      {% if block.settings.open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+      {% if block.settings.link_type == 'anchor' and template.name == 'index' %}data-no-transition{% endif %}
+      {{ block.shopify_attributes }}
+    >
+      {% if has_mega %}
+        <div class="fizz-mobile-nav__media">
+          {{
+            block.settings.image
+            | image_url: width: 320
+            | image_tag:
+              loading: 'lazy',
+              widths: '128, 192, 256, 320',
+              sizes: '72px',
+              alt: link_label
+          }}
+        </div>
+      {% endif %}
+      <div class="fizz-mobile-nav__copy">
+        <span class="fizz-mobile-nav__label">{{ link_label }}</span>
+        {% if block.settings.description != blank %}
+          <span class="fizz-mobile-nav__description">{{ block.settings.description }}</span>
+        {% endif %}
+      </div>
+      <span class="fizz-mobile-nav__arrow" aria-hidden="true">→</span>
+    </a>
+{% endcase %}

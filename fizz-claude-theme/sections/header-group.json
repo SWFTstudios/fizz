@@ -1,0 +1,68 @@
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "fizz_header": {
+      "type": "fizz-header",
+      "blocks": {
+        "bottle": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Bottle",
+            "description": "Portable sparkling water.",
+            "link_type": "anchor",
+            "anchor_id": "buy"
+          }
+        },
+        "shop": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Shop",
+            "description": "Browse the complete Fizz collection.",
+            "link_type": "url",
+            "url": "/collections/all"
+          }
+        },
+        "how": {
+          "type": "nav_link",
+          "settings": {
+            "label": "How it works",
+            "description": "Fill, twist, and fizz.",
+            "link_type": "anchor",
+            "anchor_id": "how"
+          }
+        },
+        "colorways": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Colorways",
+            "description": "Find your bottle color.",
+            "link_type": "anchor",
+            "anchor_id": "colors"
+          }
+        },
+        "flavors": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Flavors",
+            "description": "Real fruit, zero sugar.",
+            "link_type": "anchor",
+            "anchor_id": "flavors"
+          }
+        }
+      },
+      "block_order": ["bottle", "shop", "how", "colorways", "flavors"],
+      "settings": {
+        "high_contrast": true,
+        "background_color": "#080f1d",
+        "background_opacity": 95,
+        "text_color": "#f2efe7",
+        "icon_color": "#f2efe7",
+        "mobile_menu_label": "Menu",
+        "search_placeholder": "Search products…",
+        "solid_on_scroll": true
+      }
+    }
+  },
+  "order": ["fizz_header"]
+}

@@ -1,0 +1,28 @@
+{% render 'fizz-cart-drawer-content',
+  remove_label: section.settings.remove_label,
+  checkout_label: section.settings.checkout_label,
+  continue_label: section.settings.continue_label,
+  subtotal_label: section.settings.subtotal_label,
+  shipping_note: section.settings.shipping_note,
+  empty_heading: section.settings.empty_heading,
+  empty_body: section.settings.empty_body,
+  recommendations_heading: section.settings.recommendations_heading,
+  recommendations_collection: section.settings.recommendations_collection
+%}
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "settings": [
+    { "type": "text", "id": "subtotal_label", "label": "Subtotal label", "default": "Subtotal" },
+    { "type": "text", "id": "shipping_note", "label": "Shipping note", "default": "Shipping and taxes calculated at checkout." },
+    { "type": "text", "id": "checkout_label", "label": "Checkout CTA", "default": "Checkout" },
+    { "type": "text", "id": "continue_label", "label": "Continue shopping", "default": "Continue shopping" },
+    { "type": "text", "id": "remove_label", "label": "Remove label", "default": "Remove" },
+    { "type": "text", "id": "empty_heading", "label": "Empty heading", "default": "Your cart is empty" },
+    { "type": "textarea", "id": "empty_body", "label": "Empty body", "default": "Add a bottle, flavors, or CO₂ refills to get started." },
+    { "type": "text", "id": "recommendations_heading", "label": "Recommendations heading", "default": "Maybe you would like" },
+    { "type": "text", "id": "recommendations_collection", "label": "Recommendations collection handle", "default": "all" }
+  ]
+}
+{% endschema %}
