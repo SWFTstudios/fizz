@@ -146,7 +146,7 @@ Raise `BUB_PEAK` or burst counts for louder transitions. Links with `data-no-tra
 
 ```bash
 cd fizz
-shopify theme push --store g9rykd-jt.myshopify.com --theme 188486385949 \
+shopify theme push --store g9rykd-jt.myshopify.com --theme 188495003933 \
   --only templates/index.fizz-claude.json \
   --only templates/product.fizz-claude.json \
   --only layout/theme.liquid \

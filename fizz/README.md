@@ -1,7 +1,7 @@
 # Fizz — Shopify workspace
 
 **Store:** `g9rykd-jt.myshopify.com` (admin: fizz-9820)  
-**Live theme:** `fizz-test-61526` (#187955511581)
+**Live theme:** `Fizz Claude` (#188495003933) — push from `fizz-claude-theme/` (not `fizz/`)
 
 ## NextFil CO2 subscription status
 
@@ -24,11 +24,13 @@
 ## Commands
 
 ```bash
-# Pull latest theme
-shopify theme pull --path fizz --store g9rykd-jt.myshopify.com --theme 187955511581
+# Pull latest Fizz Claude theme
+shopify theme pull --path fizz-claude-theme --store g9rykd-jt.myshopify.com --theme "Fizz Claude"
 
-# Push to live
-shopify theme push --path fizz --store g9rykd-jt.myshopify.com --theme 187955511581 --allow-live
+# Push Fizz Claude to live (use fizz-claude-theme — NOT fizz/)
+shopify theme push --path fizz-claude-theme --store g9rykd-jt.myshopify.com --theme "Fizz Claude" --allow-live
+
+# Combined Kinetic Spark + Claude-suffix theme lives in fizz/ — never push that over live Fizz Claude
 
 # Verify setup
 ./fizz/scripts/verify-subscription-setup.sh

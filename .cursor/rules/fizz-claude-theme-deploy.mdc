@@ -1,0 +1,37 @@
+---
+description: Push Fizz Claude from fizz-claude-theme only — never overwrite live Claude with Kinetic Spark
+alwaysApply: true
+---
+
+# Fizz Claude theme deploy
+
+Live store theme **Fizz Claude** (`#188495003933`, store `g9rykd-jt.myshopify.com`) must be deployed from **`fizz-claude-theme/`** only.
+
+## Do
+
+```bash
+shopify theme push --path fizz-claude-theme --store g9rykd-jt.myshopify.com --theme "Fizz Claude" --allow-live
+shopify theme pull --path fizz-claude-theme --store g9rykd-jt.myshopify.com --theme "Fizz Claude"
+```
+
+- Edit Claude design in `fizz-claude-theme/` (sections like `fizz-hero`, `fizz-statement`).
+- Before push, confirm homepage is Claude: `index.json` uses `fizz-hero`, **not** `fizz-ss-hero`.
+
+## Do not
+
+```bash
+# BAD — overwrites Fizz Claude with Kinetic Spark (SS) homepage
+shopify theme push --path fizz --store g9rykd-jt.myshopify.com --theme "Fizz Claude" --allow-live
+```
+
+- Do not push `--path fizz` to theme **"Fizz Claude"** or theme id `188495003933`.
+- Do not treat `fizz-test-61526` as the live Claude theme.
+
+## Why
+
+| Folder | Default `index.json` | Role |
+|--------|----------------------|------|
+| `fizz-claude-theme/` | Claude (`fizz-hero`, …) | Live **Fizz Claude** theme |
+| `fizz/` | Kinetic Spark (`fizz-ss-*`) | Combined theme; Claude only via `*.fizz-claude.json` suffixes |
+
+If Claude edits also exist under `fizz/sections/fizz-claude-*`, keep `fizz-claude-theme/` in sync, but **only** push `fizz-claude-theme/` to the live Fizz Claude theme.

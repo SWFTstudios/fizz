@@ -4,7 +4,7 @@ After deploying theme files, add NextFil app blocks in the theme editor.
 
 ## 1. Customer subscriptions portal
 
-1. Open [theme editor](https://g9rykd-jt.myshopify.com/admin/themes/187955511581/editor)
+1. Open [theme editor](https://g9rykd-jt.myshopify.com/admin/themes/188495003933/editor)
 2. Navigate to: **Customers → Subscriptions** (`/account?view=subscriptions`)
 3. Select the **Nextfil App Wrapper** section
 4. Click **Add block** → choose NextFil blocks (e.g. subscription list, request refill)
