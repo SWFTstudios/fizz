@@ -1,0 +1,69 @@
+<div data-fizz-predictive-results>
+  {% if predictive_search.performed %}
+    {% assign total_results = predictive_search.resources.products.size | plus: predictive_search.resources.pages.size | plus: predictive_search.resources.articles.size %}
+    {% if total_results == 0 %}
+      <p class="fizz-search-status">No results for “{{ predictive_search.terms | escape }}”.</p>
+    {% else %}
+      {% if predictive_search.resources.products.size > 0 %}
+        <div class="fizz-search-group">
+          <p class="fizz-search-group__title">Products</p>
+          {% for product in predictive_search.resources.products %}
+            <a href="{{ product.url }}" class="fizz-search-item">
+              <div class="fizz-search-item__media">
+                {% if product.featured_image %}
+                  {{ product.featured_image | image_url: width: 104 | image_tag: loading: 'lazy', alt: product.title }}
+                {% endif %}
+              </div>
+              <div>
+                <p class="fizz-search-item__title">{{ product.title }}</p>
+                <p class="fizz-search-item__meta">Product</p>
+              </div>
+              <span class="fizz-search-item__price">{{ product.price_min | money }}</span>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if predictive_search.resources.pages.size > 0 %}
+        <div class="fizz-search-group">
+          <p class="fizz-search-group__title">Pages</p>
+          {% for page in predictive_search.resources.pages %}
+            <a href="{{ page.url }}" class="fizz-search-item">
+              <div></div>
+              <div>
+                <p class="fizz-search-item__title">{{ page.title }}</p>
+                <p class="fizz-search-item__meta">Page</p>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if predictive_search.resources.articles.size > 0 %}
+        <div class="fizz-search-group">
+          <p class="fizz-search-group__title">Articles</p>
+          {% for article in predictive_search.resources.articles %}
+            <a href="{{ article.url }}" class="fizz-search-item">
+              <div class="fizz-search-item__media">
+                {% if article.image %}
+                  {{ article.image | image_url: width: 104 | image_tag: loading: 'lazy', alt: article.title }}
+                {% endif %}
+              </div>
+              <div>
+                <p class="fizz-search-item__title">{{ article.title }}</p>
+                <p class="fizz-search-item__meta">Article</p>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Predictive search",
+  "settings": []
+}
+{% endschema %}

@@ -12,30 +12,259 @@
     };
   }
 
+  var bubbleFields = [];
+  var bubbleRafId = 0;
+  var bubbleIo = null;
+  var bubbleResizeObs = null;
+
+  function getBubbleStyle() {
+    var html = document.documentElement;
+    if (html.classList.contains('bubble-style-bold')) return 'bold';
+    if (html.classList.contains('bubble-style-ring')) return 'ring';
+    return 'glass';
+  }
+
+  function resolveBubbleColors(field, colorVar) {
+    field.style.setProperty('--bub-color', colorVar);
+    var stroke = getComputedStyle(field).getPropertyValue('--bub-color').trim();
+    if (!stroke) stroke = 'rgba(242,239,231,0.55)';
+    return { stroke: stroke, fill: stroke };
+  }
+
+  function BubbleParticle(x, y, opts) {
+    this.x = x;
+    this.y = y;
+    this.radius = opts.radius;
+    this.dx = opts.dx;
+    this.dy = opts.dy;
+    this.strokeColor = opts.strokeColor;
+    this.fillColor = opts.fillColor;
+    this.highlightOpacity = opts.highlightOpacity;
+    this.strokeWidth = opts.strokeWidth;
+    this.fillGradient = opts.fillGradient;
+    this.spawnY = y;
+    this.canvasHeight = opts.canvasHeight;
+    this.peakOpacity = opts.peakOpacity;
+  }
+
+  BubbleParticle.prototype.move = function () {
+    this.x += this.dx;
+    this.y -= this.dy;
+  };
+
+  BubbleParticle.prototype.getOpacity = function () {
+    var travel = this.spawnY - this.y;
+    var maxTravel = this.canvasHeight + this.radius * 2;
+    var progress = maxTravel > 0 ? travel / maxTravel : 0;
+    var peak = this.peakOpacity;
+    if (progress < 0.12) return peak * (progress / 0.12);
+    if (progress > 0.85) return peak * Math.max(0, (1 - progress) / 0.15);
+    return peak;
+  };
+
+  BubbleParticle.prototype.draw = function (ctx) {
+    var opacity = this.getOpacity();
+    if (opacity <= 0.01) return;
+    ctx.save();
+    ctx.globalAlpha = opacity;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.lineWidth = this.strokeWidth;
+    ctx.strokeStyle = this.strokeColor;
+    ctx.stroke();
+    if (this.fillGradient) {
+      var gradient = ctx.createRadialGradient(
+        this.x,
+        this.y,
+        1,
+        this.x + 0.5,
+        this.y + 0.5,
+        this.radius
+      );
+      gradient.addColorStop(0.3, 'rgba(255,255,255,' + this.highlightOpacity + ')');
+      gradient.addColorStop(0.95, this.fillColor);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    }
+    ctx.restore();
+  };
+
+  function createBubbleParticle(rnd, w, h, style, colors, sizeScale, peakOpacity) {
+    var radius = (5 + rnd() * 16) * sizeScale;
+    if (style === 'bold') radius *= 1.15;
+    var x = radius + rnd() * Math.max(radius, w - radius * 2);
+    var y = h + rnd() * radius;
+    var wobble = document.documentElement.classList.contains('bubble-wobble');
+    return new BubbleParticle(x, y, {
+      radius: radius,
+      dx: wobble ? (rnd() - 0.5) * 1.2 : (rnd() - 0.5) * 0.6,
+      dy: 0.4 + rnd() * 1.2,
+      strokeColor: colors.stroke,
+      fillColor: colors.fill,
+      highlightOpacity: style === 'bold' ? 0.5 : style === 'glass' ? 0.35 : 0.15,
+      strokeWidth: style === 'bold' ? 2.5 : style === 'glass' ? 1.75 : 1.25,
+      fillGradient: style !== 'ring',
+      canvasHeight: h,
+      peakOpacity: peakOpacity,
+    });
+  }
+
+  function respawnBubbleParticle(p, rnd, w, h, style, colors, sizeScale, peakOpacity) {
+    var next = createBubbleParticle(rnd, w, h, style, colors, sizeScale, peakOpacity);
+    p.x = next.x;
+    p.y = next.y;
+    p.radius = next.radius;
+    p.dx = next.dx;
+    p.dy = next.dy;
+    p.strokeColor = next.strokeColor;
+    p.fillColor = next.fillColor;
+    p.highlightOpacity = next.highlightOpacity;
+    p.strokeWidth = next.strokeWidth;
+    p.fillGradient = next.fillGradient;
+    p.spawnY = next.spawnY;
+    p.canvasHeight = next.canvasHeight;
+    p.peakOpacity = next.peakOpacity;
+  }
+
+  function resizeBubbleField(state) {
+    var rect = state.field.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    state.width = rect.width;
+    state.height = rect.height;
+    if (state.width < 1 || state.height < 1) return;
+    state.canvas.width = Math.max(1, Math.floor(state.width * dpr));
+    state.canvas.height = Math.max(1, Math.floor(state.height * dpr));
+    state.canvas.style.width = state.width + 'px';
+    state.canvas.style.height = state.height + 'px';
+    state.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    state.colors = resolveBubbleColors(state.field, state.colorVar);
+    var style = getBubbleStyle();
+    state.particles = [];
+    for (var i = 0; i < state.count; i++) {
+      state.particles.push(
+        createBubbleParticle(state.rnd, state.width, state.height, style, state.colors, state.sizeScale, state.peakOpacity)
+      );
+    }
+  }
+
+  function bubbleTick() {
+    bubbleRafId = 0;
+    var style = getBubbleStyle();
+    var anyActive = false;
+    bubbleFields.forEach(function (state) {
+      if (!state.visible || state.width < 1 || state.height < 1) return;
+      anyActive = true;
+      state.colors = resolveBubbleColors(state.field, state.colorVar);
+      var ctx = state.ctx;
+      ctx.clearRect(0, 0, state.width, state.height);
+      state.particles.forEach(function (p) {
+        p.move();
+        if (p.y + p.radius < 0) {
+          respawnBubbleParticle(p, state.rnd, state.width, state.height, style, state.colors, state.sizeScale, state.peakOpacity);
+        }
+        p.draw(ctx);
+      });
+    });
+    if (anyActive) bubbleRafId = requestAnimationFrame(bubbleTick);
+  }
+
+  function startBubbleLoop() {
+    if (!bubbleRafId) bubbleRafId = requestAnimationFrame(bubbleTick);
+  }
+
   function initBubbles() {
     if (reduced) return;
+    if (document.documentElement.dataset.bubbleEnabled === 'false') return;
+    if (!document.querySelector('[data-bubbles]')) return;
+
+    var root = getComputedStyle(document.documentElement);
+    var sizeScale = parseFloat(root.getPropertyValue('--bubble-size-scale')) || 1;
+    var countScale = parseFloat(root.getPropertyValue('--bubble-count-scale')) || 1;
+    var defaultPeak = parseFloat(root.getPropertyValue('--bubble-peak-opacity')) || 0.88;
+
     document.querySelectorAll('[data-bubbles]').forEach(function (field) {
-      if (field.__done) return;
-      field.__done = true;
-      var count = parseInt(field.dataset.bubCount || '14', 10);
-      var color = field.dataset.bubColor || 'rgba(242,239,231,.2)';
-      var rise = parseInt(field.dataset.bubRise || '700', 10);
+      if (field.__bubbleCanvas) return;
+
+      var count = Math.round(parseInt(field.dataset.bubCount || '14', 10) * countScale);
+      var colorVar = field.dataset.bubColor || 'rgba(242,239,231,.45)';
       var rnd = mulberry(parseInt(field.dataset.bubSeed || '7', 10));
-      var frag = document.createDocumentFragment();
-      for (var i = 0; i < count; i++) {
-        var b = document.createElement('span');
-        b.className = 'bub';
-        var sz = 5 + rnd() * 16;
-        b.style.left = 3 + rnd() * 94 + '%';
-        b.style.width = sz + 'px';
-        b.style.height = sz + 'px';
-        b.style.border = '1.5px solid ' + color;
-        b.style.setProperty('--rh', '-' + rise + 'px');
-        b.style.animation = 'fizzrise ' + (5 + rnd() * 7).toFixed(1) + 's linear ' + (rnd() * 7).toFixed(1) + 's infinite';
-        frag.appendChild(b);
-      }
-      field.appendChild(frag);
+      var peakOpacity = field.dataset.bubPeak ? parseFloat(field.dataset.bubPeak) : defaultPeak;
+
+      if (field.dataset.bubPeak) field.style.setProperty('--bub-peak', field.dataset.bubPeak);
+
+      var canvas = document.createElement('canvas');
+      canvas.className = 'bubf-canvas';
+      canvas.setAttribute('aria-hidden', 'true');
+      field.appendChild(canvas);
+
+      var ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      var state = {
+        field: field,
+        canvas: canvas,
+        ctx: ctx,
+        particles: [],
+        visible: true,
+        width: 0,
+        height: 0,
+        count: count,
+        colorVar: colorVar,
+        rnd: rnd,
+        sizeScale: sizeScale,
+        peakOpacity: peakOpacity,
+        colors: resolveBubbleColors(field, colorVar),
+      };
+
+      field.__bubbleCanvas = state;
+      bubbleFields.push(state);
+      resizeBubbleField(state);
     });
+
+    if (!bubbleFields.length) return;
+
+    if ('ResizeObserver' in window && !bubbleResizeObs) {
+      bubbleResizeObs = new ResizeObserver(function (entries) {
+        entries.forEach(function (entry) {
+          var state = entry.target.__bubbleCanvas;
+          if (state) resizeBubbleField(state);
+        });
+        startBubbleLoop();
+      });
+      bubbleFields.forEach(function (state) {
+        bubbleResizeObs.observe(state.field);
+      });
+    } else if (!window.__fizzBubbleResizeBound) {
+      window.__fizzBubbleResizeBound = true;
+      window.addEventListener(
+        'resize',
+        function () {
+          bubbleFields.forEach(function (state) {
+            resizeBubbleField(state);
+          });
+          startBubbleLoop();
+        },
+        { passive: true }
+      );
+    }
+
+    if ('IntersectionObserver' in window && !bubbleIo) {
+      bubbleIo = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            var state = entry.target.__bubbleCanvas;
+            if (state) state.visible = entry.isIntersecting;
+          });
+          startBubbleLoop();
+        },
+        { threshold: 0.05 }
+      );
+      bubbleFields.forEach(function (state) {
+        bubbleIo.observe(state.field);
+      });
+    }
+
+    startBubbleLoop();
   }
 
   function initReveal() {
@@ -216,6 +445,15 @@
       }
     }
 
+    var bottleLink = target.querySelector('[data-way-photo-link]');
+    if (bottleLink && btn.dataset.shopUrl) bottleLink.href = btn.dataset.shopUrl;
+
+    if (variantId && section && section.id === 'colors') {
+      var url = new URL(window.location.href);
+      url.searchParams.set('variant', variantId);
+      window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+    }
+
     var stage = target.querySelector('[data-pdp-stage]');
     if (stage && hex) stage.style.background = 'radial-gradient(ellipse 80% 90% at 50% 100%,' + hex + '33,#0b0e12)';
   }
@@ -237,7 +475,8 @@
     var params = new URLSearchParams(window.location.search);
     var variantId = params.get('variant');
     if (!variantId) return;
-    var btn = document.querySelector('[data-way-swatch][data-variant-id="' + variantId + '"]');
+    var btn = document.querySelector('#colors [data-way-swatch][data-variant-id="' + variantId + '"]')
+      || document.querySelector('[data-way-swatch][data-variant-id="' + variantId + '"]');
     if (btn) applySwatch(btn);
   }
 
@@ -320,7 +559,28 @@
       })
         .then(function (res) {
           if (!res.ok) throw new Error('Add failed');
-          window.location.href = (window.Shopify && window.Shopify.routes ? window.Shopify.routes.root : '/') + 'cart';
+          return fetch((window.Shopify && window.Shopify.routes ? window.Shopify.routes.root : '/') + 'cart.js', {
+            headers: { Accept: 'application/json' },
+          });
+        })
+        .then(function (res) {
+          if (!res.ok) throw new Error('Cart fetch failed');
+          return res.json();
+        })
+        .then(function (cart) {
+          var cartRoot = (window.Shopify && window.Shopify.routes ? window.Shopify.routes.root : '/');
+          var hasDrawer = document.querySelector('[data-fizz-cart-drawer]');
+          if (window.FizzCart && hasDrawer) {
+            window.FizzCart.updateCartBadge(cart.item_count);
+            window.FizzCart.dispatchCartUpdated(cart);
+            window.FizzCart.openDrawer();
+          } else {
+            window.location.href = cartRoot + 'cart';
+          }
+          if (btn) {
+            btn.disabled = false;
+            updatePdpTotal();
+          }
         })
         .catch(function () {
           if (btn) {

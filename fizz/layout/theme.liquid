@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ request.locale.iso_code }}" class="{% if template.suffix == 'fizz-claude' %}fizz-html{% elsif template.name == 'index' %}fizz-home-html{% else %}dark{% endif %}">
+<html lang="{{ request.locale.iso_code }}" class="{% if template.suffix == 'fizz-claude' %}fizz-html bubble-style-{{ settings.fizz_claude_bubble_style | default: 'glass' }}{% unless settings.fizz_claude_bubble_enabled %} bubble-disabled{% endunless %}{% if settings.fizz_claude_bubble_wobble %} bubble-wobble{% endif %}{% elsif template.name == 'index' %}fizz-home-html{% else %}dark{% endif %}"{% if template.suffix == 'fizz-claude' %} data-bubble-enabled="{% if settings.fizz_claude_bubble_enabled %}true{% else %}false{% endif %}"{% endif %}>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +10,9 @@
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       {{ 'fizz-claude-fonts.css' | asset_url | stylesheet_tag }}
       {{ 'fizz-claude-base.css' | asset_url | stylesheet_tag }}
+      {{ 'fizz-claude-cart-drawer.css' | asset_url | stylesheet_tag }}
+      {{ 'fizz-claude-search.css' | asset_url | stylesheet_tag }}
+      {{ 'fizz-claude-nav.css' | asset_url | stylesheet_tag }}
       {% render 'fizz-claude-theme-tokens' %}
     {% else %}
       <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,7 +49,7 @@
 
   <body class="{% if template.suffix == 'fizz-claude' %}fizz fizz-claude-template overflow-x-hidden{% elsif template.name == 'index' %}fizz-ss fizz-home overflow-x-hidden{% elsif template == 'product.bottle' %}fizz-ss fizz-home fizz-bottle-page fizz-pdp-page overflow-x-hidden{% elsif template.name == 'product' %}fizz-ss fizz-home fizz-pdp-page overflow-x-hidden{% elsif template.name == 'cart' %}fizz-ss fizz-home fizz-cart-page overflow-x-hidden{% else %}fizz-ss ks-theme overflow-x-hidden{% endif %}">
     {% if template.suffix == 'fizz-claude' %}
-      {% render 'fizz-claude-nav' %}
+      {% sections 'fizz-claude-header-group' %}
     {% else %}
       {% sections 'header-group' %}
     {% endif %}
@@ -61,6 +64,9 @@
 
     {% if template.suffix == 'fizz-claude' %}
       <div class="grain" aria-hidden="true"></div>
+      <script src="{{ 'fizz-claude-nav.js' | asset_url }}" defer></script>
+      <script src="{{ 'fizz-claude-cart-drawer.js' | asset_url }}" defer></script>
+      <script src="{{ 'fizz-claude-search.js' | asset_url }}" defer></script>
       <script src="{{ 'fizz-claude.js' | asset_url }}" defer></script>
       <script src="{{ 'fizz-claude-transition.js' | asset_url }}" defer></script>
     {% else %}

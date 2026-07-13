@@ -1,0 +1,189 @@
+{% liquid
+  assign bottle = settings.fizz_claude_bottle_product
+  assign shop_url = section.settings.cta_url | default: routes.all_products_collection_url
+  assign shop_price = '$89'
+  if bottle != blank
+    if section.settings.cta_url == blank
+      assign shop_url = bottle.url
+    endif
+    assign shop_price = bottle.price | money
+  endif
+
+  assign logo = section.settings.logo | default: settings.fizz_claude_nav_logo
+  assign logo_h = section.settings.logo_height | default: settings.fizz_claude_nav_logo_max_height | default: 24
+  assign logo_w = section.settings.logo_width | default: settings.fizz_claude_nav_logo_max_width | default: 160
+  assign tint = section.settings.background_color | default: settings.fizz_claude_nav_tint_color | default: '#080a0d'
+  assign tint_opacity = section.settings.background_opacity | default: settings.fizz_claude_nav_tint_opacity | default: 92
+  assign blur = section.settings.blur | default: settings.fizz_claude_nav_blur | default: 16
+  assign border_opacity = section.settings.border_opacity | default: settings.fizz_claude_nav_border_opacity | default: 20
+  assign nav_fg = section.settings.text_color | default: '#f2efe7'
+  assign icon_color = section.settings.icon_color | default: nav_fg
+  assign high_contrast = section.settings.high_contrast
+  assign blend_mode = section.settings.blend_mode | default: 'normal'
+  if high_contrast
+    assign blend_mode = 'normal'
+    assign tint_opacity = 100
+  endif
+  assign tint_alpha = tint_opacity | times: 1.0 | divided_by: 100.0
+  assign border_alpha = border_opacity | times: 1.0 | divided_by: 100.0
+  assign nav_bg = tint | color_modify: 'alpha', tint_alpha
+  assign nav_border = nav_fg | color_modify: 'alpha', border_alpha
+  assign cta_label = section.settings.cta_label
+  if cta_label == blank
+    assign cta_label = 'Shop — ' | append: shop_price
+  endif
+%}
+
+<div
+  class="fizz-site-header{% if high_contrast %} fizz-site-header--high-contrast{% endif %}"
+  data-fizz-site-header
+  data-nav-solid-on-scroll="{{ section.settings.solid_on_scroll }}"
+  style="
+    --nav-height: {{ section.settings.nav_height }}px;
+    --nav-logo-h: {{ logo_h }}px;
+    --nav-logo-w: {{ logo_w }}px;
+    --nav-blur: {{ blur }}px;
+    --nav-bg: {{ nav_bg }};
+    --nav-solid-bg: {{ tint }};
+    --nav-fg: {{ nav_fg }};
+    --nav-icon: {{ icon_color }};
+    --nav-border: {{ nav_border }};
+    --nav-blend-mode: {{ blend_mode }};
+  "
+>
+  <header class="fizz-nav" data-fizz-nav>
+    <a href="{{ routes.root_url }}" class="fizz-nav__logo-link" aria-label="{{ shop.name }} home">
+      {% if logo != blank %}
+        {{
+          logo
+          | image_url: width: 640
+          | image_tag:
+            class: 'fizz-nav__logo',
+            loading: 'eager',
+            widths: '120, 240, 360, 480, 640',
+            alt: shop.name
+        }}
+      {% else %}
+        <img src="{{ 'fizz-claude-logo.avif' | asset_url }}" class="fizz-nav__logo fizz-nav__logo--fallback" alt="{{ shop.name | escape }}" width="120" height="32" loading="eager">
+      {% endif %}
+    </a>
+
+    <nav class="fizz-nav__desktop" aria-label="Primary navigation">
+      {% for block in section.blocks %}
+        {% if block.type == 'nav_link' %}
+          {% render 'fizz-claude-nav-link', block: block, context: 'desktop' %}
+        {% endif %}
+      {% endfor %}
+    </nav>
+
+    <div class="fizz-nav__actions">
+      <button type="button" class="fizz-nav__icon-btn fizz-nav__menu-btn" data-fizz-nav-drawer-toggle aria-controls="fizz-nav-drawer" aria-expanded="false" aria-label="{{ section.settings.mobile_menu_label }}">
+        <svg class="fizz-nav__menu-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+        <svg class="fizz-nav__menu-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+      <button type="button" class="fizz-nav__icon-btn" data-fizz-search-toggle aria-controls="fizz-search-drawer" aria-expanded="false" aria-label="Search">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+      </button>
+      <button type="button" class="fizz-nav__icon-btn fizz-nav__cart-btn" data-fizz-cart-toggle aria-controls="fizz-cart-drawer" aria-expanded="false" aria-label="Cart, {{ cart.item_count }} items">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6h15l-1.5 9H7.5L6 6z"></path><path d="M6 6L5 3H2"></path><circle cx="9" cy="20" r="1"></circle><circle cx="18" cy="20" r="1"></circle></svg>
+        <span class="fizz-nav__cart-count" data-fizz-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+      </button>
+      <a class="fizz-nav__cta" href="{{ shop_url }}">{{ cta_label }}</a>
+    </div>
+  </header>
+
+  <div class="fizz-nav-backdrop" data-fizz-nav-backdrop hidden></div>
+
+  <aside id="fizz-nav-drawer" class="fizz-mobile-nav" data-fizz-nav-drawer role="dialog" aria-modal="true" aria-labelledby="fizz-mobile-nav-title" hidden>
+    <div class="fizz-mobile-nav__header">
+      <h2 id="fizz-mobile-nav-title">{{ section.settings.mobile_menu_label }}</h2>
+      <button type="button" class="fizz-drawer__close" data-fizz-nav-drawer-close aria-label="Close menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
+    <nav class="fizz-mobile-nav__body" aria-label="Mobile navigation">
+      {% for block in section.blocks %}
+        {% if block.type == 'nav_link' %}
+          {% render 'fizz-claude-nav-link', block: block, context: 'mobile' %}
+        {% endif %}
+      {% endfor %}
+    </nav>
+    <div class="fizz-mobile-nav__footer"><a class="fizz-mobile-nav__cta" href="{{ shop_url }}">{{ cta_label }}</a></div>
+  </aside>
+
+  <div id="fizz-search-drawer" class="fizz-search-drawer" data-fizz-search-drawer data-predictive-search-url="{{ routes.predictive_search_url }}" data-search-section-id="fizz-claude-predictive-search" role="dialog" aria-modal="true" aria-labelledby="fizz-search-drawer-title" aria-hidden="true" hidden>
+    <div class="fizz-search-drawer__panel">
+      <div class="fizz-search-drawer__header">
+        <h2 id="fizz-search-drawer-title" class="fizz-search-drawer__title">Search</h2>
+        <button type="button" class="fizz-drawer__close" data-fizz-search-close aria-label="Close search"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </div>
+      <form action="{{ routes.search_url }}" method="get" role="search" class="fizz-search-drawer__form">
+        <label class="sr-only" for="fizz-search-input">Search products, collections, and pages</label>
+        <input id="fizz-search-input" type="search" name="q" class="fizz-search-drawer__input" placeholder="{{ section.settings.search_placeholder }}" autocomplete="off" data-fizz-search-input>
+        <button type="submit" class="fizz-search-drawer__submit">Search</button>
+      </form>
+      <div class="fizz-search-drawer__results" data-fizz-search-results aria-live="polite" aria-atomic="true"></div>
+    </div>
+  </div>
+
+  <div id="fizz-cart-drawer" class="fizz-cart-drawer" data-fizz-cart-drawer role="dialog" aria-modal="true" aria-labelledby="fizz-cart-drawer-title" aria-hidden="true" hidden>
+    <div class="fizz-cart-drawer__panel">
+      <div class="fizz-cart-drawer__header">
+        <h2 id="fizz-cart-drawer-title" class="fizz-cart-drawer__title">Cart</h2>
+        <button type="button" class="fizz-drawer__close" data-fizz-cart-close aria-label="Close cart"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </div>
+      <div class="fizz-cart-drawer__body" data-fizz-cart-drawer-content>{% render 'fizz-claude-cart-drawer-content' %}</div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Fizz Claude header",
+  "tag": "section",
+  "class": "fizz-header-section",
+  "limit": 1,
+  "settings": [
+    { "type": "header", "content": "Brand" },
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
+    { "type": "range", "id": "logo_height", "min": 16, "max": 64, "step": 2, "unit": "px", "label": "Logo height", "default": 24 },
+    { "type": "range", "id": "logo_width", "min": 80, "max": 280, "step": 4, "unit": "px", "label": "Logo max width", "default": 160 },
+    { "type": "range", "id": "nav_height", "min": 64, "max": 104, "step": 4, "unit": "px", "label": "Header height", "default": 80 },
+    { "type": "header", "content": "Accessibility and color" },
+    { "type": "checkbox", "id": "high_contrast", "label": "High contrast mode", "default": true, "info": "Uses a solid background and explicit text colors for dependable readability." },
+    { "type": "color", "id": "background_color", "label": "Header background", "default": "#080f1d" },
+    { "type": "range", "id": "background_opacity", "min": 50, "max": 100, "step": 5, "unit": "%", "label": "Background opacity", "default": 95 },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#f2efe7" },
+    { "type": "color", "id": "icon_color", "label": "Icon color", "default": "#f2efe7" },
+    { "type": "range", "id": "blur", "min": 0, "max": 40, "step": 2, "unit": "px", "label": "Backdrop blur", "default": 16 },
+    { "type": "range", "id": "border_opacity", "min": 0, "max": 60, "step": 5, "unit": "%", "label": "Border opacity", "default": 20 },
+    { "type": "select", "id": "blend_mode", "label": "Desktop blend mode", "options": [{ "value": "normal", "label": "Normal" }, { "value": "difference", "label": "Difference" }], "default": "normal", "visible_if": "{{ section.settings.high_contrast == false }}" },
+    { "type": "checkbox", "id": "solid_on_scroll", "label": "Use solid header after scrolling", "default": true },
+    { "type": "header", "content": "Actions" },
+    { "type": "text", "id": "mobile_menu_label", "label": "Mobile menu label", "default": "Menu" },
+    { "type": "text", "id": "search_placeholder", "label": "Search placeholder", "default": "Search products…" },
+    { "type": "text", "id": "cta_label", "label": "Shop CTA label", "info": "Defaults to Shop — product price." },
+    { "type": "url", "id": "cta_url", "label": "Shop CTA link" }
+  ],
+  "blocks": [
+    {
+      "type": "nav_link",
+      "name": "Navigation link",
+      "limit": 8,
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Shop" },
+        { "type": "textarea", "id": "description", "label": "Description" },
+        { "type": "image_picker", "id": "image", "label": "Navigation image", "info": "Shown in the mobile drawer and desktop mega-menu." },
+        { "type": "select", "id": "link_type", "label": "Link type", "options": [{ "value": "url", "label": "Custom URL" }, { "value": "product", "label": "Product" }, { "value": "collection", "label": "Collection" }, { "value": "page", "label": "Page" }, { "value": "anchor", "label": "Homepage section" }], "default": "url" },
+        { "type": "url", "id": "url", "label": "Custom link", "visible_if": "{{ block.settings.link_type == 'url' }}" },
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "page", "id": "page", "label": "Page" },
+        { "type": "select", "id": "anchor_id", "label": "Homepage section", "options": [{ "value": "buy", "label": "Bottle" }, { "value": "how", "label": "How it works" }, { "value": "colors", "label": "Colorways" }, { "value": "flavors", "label": "Flavors" }], "default": "how", "visible_if": "{{ block.settings.link_type == 'anchor' }}" },
+        { "type": "checkbox", "id": "open_new_tab", "label": "Open in new tab", "default": false }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Fizz Claude header", "blocks": [{ "type": "nav_link", "settings": { "label": "Bottle", "description": "Portable sparkling water.", "link_type": "anchor", "anchor_id": "buy" } }, { "type": "nav_link", "settings": { "label": "Shop", "description": "Browse the complete Fizz collection.", "link_type": "url", "url": "/collections/all" } }, { "type": "nav_link", "settings": { "label": "How it works", "description": "Fill, twist, and fizz.", "link_type": "anchor", "anchor_id": "how" } }, { "type": "nav_link", "settings": { "label": "Colorways", "description": "Find your bottle color.", "link_type": "anchor", "anchor_id": "colors" } }, { "type": "nav_link", "settings": { "label": "Flavors", "description": "Real fruit, zero sugar.", "link_type": "anchor", "anchor_id": "flavors" } }] }]
+}
+{% endschema %}
