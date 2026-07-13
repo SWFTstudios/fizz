@@ -53,7 +53,15 @@ Nav is **not** a section — it lives in the layout snippet so `position: fixed`
 
 ## Bubble animation
 
-Ambient rising bubbles appear in **hero**, **how it works**, **footer**, and **PDP stage**. Page-transition bubbles (on internal link clicks) are a separate system in `fizz-claude-transition.js`.
+Ambient rising bubbles appear in **hero**, **how it works**, **footer**, and **PDP stage**. They are rendered with **HTML5 canvas** + `requestAnimationFrame` (inspired by [this canvas bubble tutorial](https://www.freecodecamp.org/news/how-to-create-animated-bubbles-with-html5-canvas-and-javascript/)). Page-transition bubbles (on internal link clicks) are a separate DOM system in `fizz-claude-transition.js`.
+
+### Canvas engine
+
+- Each `.bubf[data-bubbles]` container gets a `<canvas class="bubf-canvas">` inserted by `initBubbles` in `assets/fizz-claude.js`
+- Particles use `arc()` + `createRadialGradient` (specular highlight + tinted fill) like the CodePen reference
+- Ambient rising only — no click-to-spawn
+- A single shared animation loop drives all visible fields; `IntersectionObserver` pauses off-screen sections
+- `ring` / `glass` / `bold` theme presets control stroke weight, gradient fill, and highlight intensity
 
 ### Quick start (Theme Editor)
 
@@ -70,9 +78,9 @@ Ambient rising bubbles appear in **hero**, **how it works**, **footer**, and **P
 
 | Style | Look | When to use |
 |-------|------|-------------|
-| Ring | Thin outline only | Minimal / performance |
-| Glass | Sphere with specular highlight | Default — reads as real bubbles |
-| Bold | Thick rim + strong fill | Dark heroes, marketing screenshots |
+| Ring | Canvas outline, minimal fill | Lightweight / subtle |
+| Glass | Canvas radial-gradient spheres | Default — reads as real bubbles |
+| Bold | Canvas bubbles, thicker stroke + stronger highlight | Dark heroes, marketing screenshots |
 
 ### Opacity troubleshooting
 
@@ -91,7 +99,7 @@ Edit the `.bubf` container in section Liquid files (`fizz-claude-hero.liquid`, `
 | Attribute | Default | Example |
 |-----------|---------|---------|
 | `data-bub-count` | 14 | `data-bub-count="20"` |
-| `data-bub-rise` | 700 | `data-bub-rise="900"` (pixels traveled upward) |
+| `data-bub-rise` | 700 | Legacy attribute (canvas uses continuous rise speed) |
 | `data-bub-seed` | 7 | `data-bub-seed="42"` (changes random layout) |
 | `data-bub-color` | section CSS var | `data-bub-color="var(--hero-bubble-color)"` |
 | `data-bub-peak` | inherits global | `data-bub-peak="0.95"` (per-section peak opacity) |

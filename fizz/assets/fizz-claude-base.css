@@ -52,12 +52,7 @@ body.fizz{margin:0;background:var(--color-surface);color:var(--color-on-surface)
 
 /* bubbles */
 .bubf{position:absolute;inset:0;overflow:hidden;pointer-events:none;--bub-color:rgba(242,239,231,.45);--bub-peak:var(--bubble-peak-opacity,.88)}
-.bub{position:absolute;bottom:-30px;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--bub-color) 85%,white);background:transparent;box-sizing:border-box}
-html.bubble-style-ring .bubf .bub,.bubf[data-bub-style=ring] .bub{background:transparent;border-width:1.5px;box-shadow:none}
-html.bubble-style-glass .bubf .bub,.bubf[data-bub-style=glass] .bub{background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.55) 0%,rgba(255,255,255,.12) 28%,transparent 52%);border-width:1.75px;box-shadow:inset 2px 2px 6px rgba(255,255,255,.3),inset 0 -3px 6px rgba(0,0,0,.1),0 0 10px color-mix(in srgb,var(--bub-color) 25%,transparent)}
-html.bubble-style-bold .bubf .bub,.bubf[data-bub-style=bold] .bub{background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.7) 0%,rgba(255,255,255,.2) 32%,transparent 55%);border-width:2.5px;box-shadow:inset 3px 3px 8px rgba(255,255,255,.45),inset 0 -4px 8px rgba(0,0,0,.15),0 0 14px color-mix(in srgb,var(--bub-color) 35%,transparent)}
-@keyframes fizzrise{0%{transform:translateY(0) translateX(0);opacity:0}12%{opacity:var(--bub-peak,var(--bubble-peak-opacity,.88))}100%{transform:translateY(var(--rh)) translateX(0);opacity:0}}
-@keyframes fizzrise-wobble{0%{transform:translateY(0) translateX(0);opacity:0}12%{opacity:var(--bub-peak,var(--bubble-peak-opacity,.88))}50%{transform:translateY(calc(var(--rh) * .5)) translateX(8px)}100%{transform:translateY(var(--rh)) translateX(-6px);opacity:0}}
+.bubf-canvas{position:absolute;inset:0;display:block;width:100%;height:100%;pointer-events:none}
 
 /* ticker marquee */
 .tickin{display:inline-flex;gap:56px;align-items:center;will-change:transform;animation:fizzslide 28s linear infinite}

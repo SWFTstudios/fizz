@@ -536,9 +536,9 @@
         "id": "bubble_style",
         "label": "Bubble style",
         "options": [
-          { "value": "ring", "label": "Ring — thin outline" },
-          { "value": "glass", "label": "Glass — sphere with highlight (recommended)" },
-          { "value": "bold", "label": "Bold — thick rim + strong fill" }
+          { "value": "ring", "label": "Ring — canvas outline only (lightweight)" },
+          { "value": "glass", "label": "Glass — canvas bubbles with highlight (recommended)" },
+          { "value": "bold", "label": "Bold — canvas bubbles, stronger fill" }
         ],
         "default": "glass"
       },
