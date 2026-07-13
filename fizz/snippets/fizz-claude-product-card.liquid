@@ -57,6 +57,7 @@
 
     {% if is_bottle %}
       {% render 'fizz-bottle-product-img',
+        variant: card_variant,
         color_slug: color_slug,
         alt: card_title,
         class: 'shop-card__bottle',

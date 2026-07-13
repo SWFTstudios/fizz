@@ -27,6 +27,7 @@
       <div class="ss-pdp__media" data-ss-trigger="load" data-ss-fade="up" data-ss-delay="0.1">
         {% if mode == 'bottle' and bottle_colors contains color_slug %}
           {% render 'fizz-bottle-product-img',
+            variant: current_variant,
             color_slug: color_slug,
             alt: current_variant.title,
             class: 'fizz-product-pdp__img',

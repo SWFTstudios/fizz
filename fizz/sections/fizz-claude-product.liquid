@@ -1,6 +1,7 @@
 {% liquid
-  assign current_variant = product.selected_or_first_available_variant
+  assign current_variant = product.selected_variant | default: product.selected_or_first_available_variant
   assign base_price = current_variant.price | divided_by: 100.0
+  assign bottle_colors = 'arctic-white,charcoal-black,coral-orange,electric-blue,sage-green,steel-navy' | split: ','
   capture color_slug
     render 'fizz-color-slug', variant: current_variant
   endcapture
@@ -28,6 +29,7 @@
       <div data-bubbles data-bub-count="14" data-bub-color="var(--hero-bubble-color)" data-bub-seed="11" data-bub-rise="700" class="bubf"></div>
       <div class="pglow"></div>
       {% render 'fizz-bottle-product-img',
+        variant: current_variant,
         color_slug: color_slug,
         alt: product.title,
         class: 'botimg',
@@ -79,6 +81,13 @@
             {% render 'fizz-color-slug', variant: variant %}
           {% endcapture %}
           {% assign slug = slug | strip %}
+          {% liquid
+            if variant.image
+              assign swatch_image_url = variant.image | image_url: width: 900
+            elsif bottle_colors contains slug
+              assign swatch_image_url = 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url
+            endif
+          %}
           <button
             type="button"
             class="sw {% if variant.id == current_variant.id %}on{% endif %}"
@@ -88,7 +97,7 @@
             data-color="{{ variant.metafields.custom.swatch_hex | default: '#1d2a44' }}"
             data-name="{{ variant.title }}"
             data-price="{{ variant.price | money }}"
-            data-image="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}"
+            {% if swatch_image_url != blank %}data-image="{{ swatch_image_url }}"{% endif %}
             style="background:{{ variant.metafields.custom.swatch_hex | default: '#1d2a44' }}"
             title="{{ variant.title }}"
           ></button>
