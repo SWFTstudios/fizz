@@ -187,7 +187,28 @@
     if (bg && hex) bg.style.background = hex;
 
     var photo = target.querySelector('[data-way-photo]');
-    if (photo && img) photo.src = img;
+    if (photo && img) {
+      photo.src = img;
+      photo.style.opacity = '1';
+    }
+
+    var stage = target.querySelector('[data-pdp-stage]');
+    if (stage) {
+      if (hex) stage.style.background = 'radial-gradient(ellipse 80% 90% at 50% 100%,' + hex + '33,#0b0e12)';
+      stage.classList.remove('has-lifestyle');
+      var lifestyle = stage.querySelector('[data-pdp-lifestyle]');
+      if (lifestyle) lifestyle.remove();
+    }
+
+    target.querySelectorAll('[data-pdp-thumb]').forEach(function (t) {
+      t.classList.remove('is-active');
+    });
+
+    if (variantId) {
+      var url = new URL(window.location.href);
+      url.searchParams.set('variant', variantId);
+      window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+    }
 
     var label = target.querySelector('[data-way-name]');
     if (label && name) label.textContent = name;
@@ -225,15 +246,6 @@
 
     var bottleLink = target.querySelector('[data-way-photo-link]');
     if (bottleLink && btn.dataset.shopUrl) bottleLink.href = btn.dataset.shopUrl;
-
-    if (variantId && section && section.id === 'colors') {
-      var url = new URL(window.location.href);
-      url.searchParams.set('variant', variantId);
-      window.history.replaceState({}, '', url.pathname + url.search + url.hash);
-    }
-
-    var stage = target.querySelector('[data-pdp-stage]');
-    if (stage && hex) stage.style.background = 'radial-gradient(ellipse 80% 90% at 50% 100%,' + hex + '33,#0b0e12)';
   }
 
   function initColorways() {

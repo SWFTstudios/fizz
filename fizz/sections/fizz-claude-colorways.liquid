@@ -85,6 +85,7 @@
   <div class="waybotr" data-way-bg-wrap>
     <a href="{{ first_shop_url }}" class="waybotr__link" data-way-photo-link aria-label="Shop {{ first_name }}">
       {% render 'fizz-bottle-product-img',
+        variant: first_variant,
         color_slug: first_slug,
         alt: first_name,
         class: 'botimg',
@@ -133,6 +134,12 @@
             assign sw_text = sw_text | default: sw_parts[3]
             assign sw_swatch = sw_parts[4]
             assign sw_btn_text = sw_parts[5]
+            assign bottle_colors = 'arctic-white,charcoal-black,coral-orange,electric-blue,sage-green,steel-navy' | split: ','
+            if variant.image
+              assign swatch_image_url = variant.image | image_url: width: 900
+            elsif bottle_colors contains slug
+              assign swatch_image_url = 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url
+            endif
           %}
 
           <a
@@ -147,7 +154,7 @@
             data-scene-btn="{{ sw_btn }}"
             data-scene-btn-text="{{ sw_btn_text }}"
             data-scene-text="{{ sw_text }}"
-            data-image="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}"
+            {% if swatch_image_url != blank %}data-image="{{ swatch_image_url }}"{% endif %}
             data-variant-id="{{ variant.id }}"
             data-shop-url="{{ variant_url }}"
             style="background:{{ sw_swatch }}"

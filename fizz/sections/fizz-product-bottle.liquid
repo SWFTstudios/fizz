@@ -30,6 +30,7 @@
         <div class="fizz-pdp-hero__media-col fizz-commerce-panel fizz-commerce-panel--media">
           <div class="fizz-pdp-hero__main-media">
             {% render 'fizz-bottle-product-img',
+              variant: current_variant,
               color_slug: color_slug,
               alt: current_variant.title,
               class: 'fizz-product-pdp__img',
