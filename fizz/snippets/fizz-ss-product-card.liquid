@@ -17,10 +17,10 @@
     assign card_price = variant.price
     assign card_image = variant.image | default: product.featured_image
     assign badge = badge | default: 'Best seller'
-    assign color_slug = variant.metafields.custom.color_slug
-    if color_slug == blank
-      assign color_slug = variant.title | downcase | replace: ' ', '-'
-    endif
+    capture color_slug_raw
+      render 'fizz-color-slug', variant: variant
+    endcapture
+    assign color_slug = color_slug_raw | strip
     assign pack_slug = variant.metafields.custom.pack_slug
   else
     assign card_title = product.title
@@ -43,7 +43,15 @@
     {% if card_image != blank %}
       {{ card_image | image_url: width: 900 | image_tag: loading: 'lazy', alt: card_title }}
     {% elsif color_slug != blank and bottle_colors contains color_slug %}
-      {% render 'fizz-bottle-card-media', color_slug: color_slug, alt: card_title %}
+      {% render 'fizz-bottle-product-img',
+        variant: variant,
+        color_slug: color_slug,
+        alt: card_title,
+        class: 'ss-product-card__img',
+        loading: 'lazy',
+        width: 900,
+        height: 1100
+      %}
     {% elsif pack_slug != blank %}
       {% render 'fizz-flavor-pack-img', slug: pack_slug, alt: card_title %}
     {% elsif product.featured_image %}

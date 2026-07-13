@@ -147,8 +147,48 @@ Extending to **global theme tokens** requires an explicit merchant toggle and Li
 
 ---
 
+## Variant product media (storefront runtime)
+
+**Date:** 2026-07-13  
+**Scope:** Bottle PDP and collection card variant photo switching
+
+### Research
+
+| Topic | Finding | Source |
+|-------|---------|--------|
+| Variant-attached image | `variant.image` and `variant.featured_image` return the image assigned to a variant in Admin; `variant.featured_media` returns attached media | [Liquid variant object](https://shopify.dev/docs/api/liquid/objects/variant) |
+| Responsive rendering | Use `image_url` + `image_tag` (or manual `<img src="{{ variant.image \| image_url: width: 900 }}">`) | [Liquid image object](https://shopify.dev/docs/api/liquid/objects/image), [Support product media](https://shopify.dev/docs/storefronts/themes/product-merchandising/media/support-media) |
+| Admin vs storefront | Merchants assign per-variant images in Admin; theme Liquid/JS only reads and switches them at render time | Theme architecture |
+
+### Runtime vs editor
+
+| Layer | Responsibility |
+|-------|----------------|
+| **Shopify Admin** | Assign featured image/media to each bottle color variant |
+| **Liquid (`fizz-bottle-product-img`)** | Render `variant.image` first; fall back to `fizz-bottle-product-{slug}.png` theme asset |
+| **JavaScript (`fizz-claude.js`)** | On swatch click, set `[data-way-photo].src` from swatch `data-image`; reset lifestyle thumbnail overlay |
+| **Theme editor** | Cannot attach variant images; only controls section settings |
+
+### Implementation artifacts
+
+| File | Role |
+|------|------|
+| `snippets/fizz-color-slug.liquid` | Maps variant title/metafield → canonical bottle slug |
+| `snippets/fizz-bottle-product-img.liquid` | Variant-image-first render + `data-way-photo` hook |
+| `sections/fizz-claude-product.liquid` | Swatch `data-image` uses variant image URL when present |
+| `assets/fizz-claude.js` | `applySwatch()` updates photo, backdrop, URL, clears thumb overlay |
+
+### Limitations
+
+- Theme code cannot create or attach variant images in Admin.
+- Fallback PNGs (`fizz-bottle-product-*.png`) must exist in deployed theme assets when variants lack Admin images.
+- Collection card swatches remain decorative (non-interactive) by design.
+
+---
+
 ## Changelog
 
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-09 | Cursor agent | Initial research report; Phase 2 implementation |
+| 2026-07-13 | Cursor agent | Variant product media research + implementation notes |

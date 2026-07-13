@@ -1,19 +1,28 @@
 {% comment %}
-  Transparent bottle product PNG matched to lifestyle colorways.
-  Usage: {% render 'fizz-bottle-product-img', color_slug: color_slug, alt: variant.title, class: 'fizz-product-pdp__img', width: 1200, height: 1400, loading: 'eager', id: 'fizz-bottle-image' %}
+  Bottle product image — Shopify variant image first, theme PNG fallback.
+  Usage: {% render 'fizz-bottle-product-img', variant: variant, color_slug: color_slug, alt: variant.title, class: 'botimg', data_photo: true %}
 {% endcomment %}
 {% liquid
+  assign variant_image = variant_image | default: variant.image
   assign bottle_colors = 'arctic-white,charcoal-black,coral-orange,electric-blue,sage-green,steel-navy' | split: ','
   assign has_bottle_asset = false
   if color_slug != blank and bottle_colors contains color_slug
     assign has_bottle_asset = true
   endif
+
+  assign image_width = width | default: 900
+  if variant_image != blank
+    assign image_src = variant_image | image_url: width: image_width
+  elsif has_bottle_asset
+    assign image_src = 'fizz-bottle-product-' | append: color_slug | append: '.png' | asset_url
+  endif
 %}
-{% if has_bottle_asset %}
+{% if image_src != blank %}
   <img
     {% if id != blank %}id="{{ id }}"{% endif %}
+    {% if data_photo %}data-way-photo{% endif %}
     {% if main_image %}data-fizz-pdp-main-image{% endif %}
-    src="{{ 'fizz-bottle-product-' | append: color_slug | append: '.png' | asset_url }}"
+    src="{{ image_src }}"
     alt="{{ alt | default: color_slug | escape }}"
     class="{{ class }}"
     loading="{{ loading | default: 'lazy' }}"

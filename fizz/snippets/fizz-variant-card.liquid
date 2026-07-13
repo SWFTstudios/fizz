@@ -20,10 +20,10 @@
     endif
   endif
 
-  assign color_slug = variant.metafields.custom.color_slug
-  if color_slug == blank
-    assign color_slug = variant_title | downcase | replace: ' ', '-'
-  endif
+  capture color_slug_raw
+    render 'fizz-color-slug', variant: variant
+  endcapture
+  assign color_slug = color_slug_raw | strip
   assign bottle_colors = 'arctic-white,charcoal-black,coral-orange,electric-blue,sage-green,steel-navy' | split: ','
 %}
 
@@ -57,14 +57,21 @@
 {% else %}
   <a href="{{ variant_url }}" class="fizz-product-card">
     <div class="fizz-product-card__media">
-      {% render 'fizz-bottle-card-media', color_slug: color_slug, alt: variant_title %}
-      {% unless bottle_colors contains color_slug %}
-        {% if variant.image %}
-          {{ variant.image | image_url: width: 600 | image_tag: loading: 'lazy', alt: variant_title, class: 'fizz-product-card__img' }}
-        {% elsif product.featured_image %}
-          {{ product.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', alt: variant_title, class: 'fizz-product-card__img' }}
-        {% endif %}
-      {% endunless %}
+      {% if bottle_colors contains color_slug %}
+        {% render 'fizz-bottle-product-img',
+          variant: variant,
+          color_slug: color_slug,
+          alt: variant_title,
+          class: 'fizz-product-card__img',
+          loading: 'lazy',
+          width: 600,
+          height: 800
+        %}
+      {% elsif variant.image %}
+        {{ variant.image | image_url: width: 600 | image_tag: loading: 'lazy', alt: variant_title, class: 'fizz-product-card__img' }}
+      {% elsif product.featured_image %}
+        {{ product.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', alt: variant_title, class: 'fizz-product-card__img' }}
+      {% endif %}
     </div>
     <p class="fizz-product-card__title">{{ variant_title }}</p>
     <p class="fizz-product-card__price">{{ variant.price | money }}</p>
