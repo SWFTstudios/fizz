@@ -124,16 +124,17 @@ The `<html>` element receives `bubble-style-glass` (or `ring` / `bold`), optiona
 
 ### Page transition bubbles
 
-Tuned separately in `assets/fizz-claude-transition.js`:
+Rendered on a **canvas layer above the liquid waves** during internal link navigation (`assets/fizz-claude-transition.js`). Uses the same glossy radial-gradient style as ambient bubbles.
 
 ```js
-var BUB_BORDER = 'rgba(242,239,231,.72)';  // border color + opacity
-var BUB_PEAK = 0.92;                        // animation peak opacity
-var LEAVE_BURST = 26;                       // bubbles on page leave
-var ENTER_BURST = 20;                       // bubbles on page enter
+var BUB_PEAK = 0.98;       // animation peak opacity
+var LEAVE_BURST = 48;      // bubbles on page leave (+ staggered second burst)
+var ENTER_BURST = 40;      // bubbles on page enter (+ staggered second burst)
+var BUB_STROKE = 'rgba(255,255,255,0.95)';
+var BUB_FILL = 'rgba(210,248,255,0.9)';
 ```
 
-Raise `BUB_PEAK` or `BUB_BORDER` alpha for louder transition bursts. Lower `LEAVE_BURST` / `ENTER_BURST` for fewer bubbles.
+Raise `BUB_PEAK` or burst counts for louder transitions. Links with `data-no-transition` skip the effect (homepage hash nav uses this).
 
 ## Wiring products
 
