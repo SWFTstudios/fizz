@@ -78,32 +78,24 @@
       if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       document.documentElement.classList.toggle('j14-menu-open', open);
 
-      /* Lock scroll without fighting the homepage intro scrub */
       if (open) {
         scrollY = window.scrollY || window.pageYOffset || 0;
-        document.body.style.position = 'fixed';
-        document.body.style.top = '-' + scrollY + 'px';
-        document.body.style.left = '0';
-        document.body.style.right = '0';
-        document.body.style.width = '100%';
+        /* Overflow lock only — avoid body position:fixed (breaks fixed menus on iOS) */
         if (window.ScrollTrigger && typeof ScrollTrigger.getAll === 'function') {
           ScrollTrigger.getAll().forEach(function (st) {
             if (st.disable) st.disable(false);
           });
         }
+        var nav = header.querySelector('[data-j14-nav]');
+        if (nav) nav.scrollTop = 0;
       } else {
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.left = '';
-        document.body.style.right = '';
-        document.body.style.width = '';
-        window.scrollTo(0, scrollY);
         if (window.ScrollTrigger && typeof ScrollTrigger.getAll === 'function') {
           ScrollTrigger.getAll().forEach(function (st) {
             if (st.enable) st.enable();
           });
           if (typeof ScrollTrigger.refresh === 'function') ScrollTrigger.refresh();
         }
+        window.scrollTo(0, scrollY);
       }
     }
 
@@ -129,7 +121,7 @@
 {% schema %}
 {
   "name": "J14 Header",
-  "tag": "header",
+  "tag": "div",
   "class": "j14-header-section",
   "settings": [
     {
