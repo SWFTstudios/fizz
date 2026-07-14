@@ -1,12 +1,13 @@
 {%- comment -%}
   Product card — collection / related / search grids.
-  Washes and swatches stay legible on every Theme style via --j14-* tokens.
+  Bottles (colorway options) sit contained on a wash.
+  Pack / accessory photography fills the frame so black studio boxes do not float.
 {%- endcomment -%}
 
 {%- liquid
   assign show_swatches = show_swatches | default: true
   assign show_quick_add = show_quick_add | default: false
-  assign media_ratio = media_ratio | default: 'auto'
+  assign media_ratio = media_ratio | default: '4 / 5'
   assign featured = product.featured_media
   assign color_option = blank
   for option in product.options_with_values
@@ -16,6 +17,15 @@
       break
     endif
   endfor
+
+  assign is_bottle = false
+  if color_option != blank and color_option.values.size > 1
+    assign is_bottle = true
+  endif
+  assign title_down = product.title | downcase
+  if title_down contains 'bottle'
+    assign is_bottle = true
+  endif
 
   assign scene = 'lime'
   if color_option != blank and color_option.values.size > 0
@@ -56,12 +66,25 @@
         assign scene = 'steel'
     endcase
   endif
+
+  if media_ratio == 'auto'
+    if is_bottle
+      assign media_ratio = '3 / 4'
+    else
+      assign media_ratio = '4 / 5'
+    endif
+  endif
+
+  assign media_fit = 'cover'
+  if is_bottle
+    assign media_fit = 'contain'
+  endif
 -%}
 
-<article class="j14-card" data-j14-card>
+<article class="j14-card j14-card--{{ media_fit }}" data-j14-card>
   <a class="j14-card__media-link" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
     <div
-      class="j14-card__media j14-card__media--{{ scene }}"
+      class="j14-card__media j14-card__media--{{ scene }} j14-card__media--{{ media_fit }}"
       data-j14-card-media
       style="--j14-card-ratio: {{ media_ratio }};"
     >

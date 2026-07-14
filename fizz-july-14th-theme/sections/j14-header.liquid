@@ -18,22 +18,6 @@
       {%- endif -%}
     </a>
 
-    <nav class="j14-header__nav" id="j14-nav" aria-label="Main">
-      <ul class="j14-header__list">
-        {%- for block in section.blocks -%}
-          {%- liquid
-            assign href = block.settings.url
-            if block.settings.anchor_id != blank
-              assign href = routes.root_url | append: '#' | append: block.settings.anchor_id
-            endif
-          -%}
-          <li {{ block.shopify_attributes }}>
-            <a class="j14-header__link" href="{{ href | default: routes.root_url }}">{{ block.settings.label | escape }}</a>
-          </li>
-        {%- endfor -%}
-      </ul>
-    </nav>
-
     <div class="j14-header__actions">
       <a class="j14-header__cart" href="{{ routes.cart_url }}" aria-label="{{ 'cart.general.title' | t }}">
         <svg class="j14-header__cart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -55,6 +39,27 @@
       </button>
     </div>
   </div>
+
+  <nav class="j14-header__nav" id="j14-nav" aria-label="Main" data-j14-nav>
+    <div class="j14-header__glass" aria-hidden="true">
+      <span class="j14-header__frost"></span>
+      <span class="j14-header__condensation"></span>
+      <span class="j14-header__mist"></span>
+    </div>
+    <ul class="j14-header__list">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign href = block.settings.url
+          if block.settings.anchor_id != blank
+            assign href = routes.root_url | append: '#' | append: block.settings.anchor_id
+          endif
+        -%}
+        <li {{ block.shopify_attributes }}>
+          <a class="j14-header__link" href="{{ href | default: routes.root_url }}">{{ block.settings.label | escape }}</a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
 </header>
 
 <script>

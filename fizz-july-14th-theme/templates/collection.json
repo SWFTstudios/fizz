@@ -36,7 +36,7 @@
         "show_count": true,
         "products_per_page": 12,
         "grid_gap": 20,
-        "card_media_ratio": "auto",
+        "card_media_ratio": "4 / 5",
         "show_swatches": true,
         "show_quick_add": true,
         "empty_text": "No products in this collection yet.",
