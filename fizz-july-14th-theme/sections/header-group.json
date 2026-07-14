@@ -2,8 +2,8 @@
   "type": "header",
   "name": "Header group",
   "sections": {
-    "j14_header": {
-      "type": "j14-header",
+    "j14_site_header": {
+      "type": "j14-site-header",
       "blocks": {
         "colors": {
           "type": "nav_link",
@@ -48,5 +48,5 @@
       }
     }
   },
-  "order": ["j14_header"]
+  "order": ["j14_site_header"]
 }
