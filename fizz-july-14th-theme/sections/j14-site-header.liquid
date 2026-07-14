@@ -4,10 +4,9 @@
 <div
   class="j14-header{% if section.settings.transparent_home and template.name == 'index' %} j14-header--transparent{% endif %}"
   data-j14-header
-  data-j14-header-build="20260714b"
   role="banner"
 >
-  <div class="j14-header__inner">
+  <div class="j14-header__bar">
     <a href="{{ routes.root_url }}" class="j14-header__logo" aria-label="{{ shop.name | escape }}">
       {%- if section.settings.logo != blank -%}
         {{
@@ -42,13 +41,33 @@
     </div>
   </div>
 
-  <nav class="j14-header__nav" id="j14-nav" aria-label="Main" data-j14-nav>
-    <div class="j14-header__glass" aria-hidden="true">
-      <span class="j14-header__frost"></span>
-      <span class="j14-header__condensation"></span>
-      <span class="j14-header__mist"></span>
+  {%- comment -%} Full-viewport overlay; JS mounts this on document.body while open {%- endcomment -%}
+  <nav class="j14-menu" id="j14-nav" aria-label="Main" data-j14-menu hidden>
+    <div class="j14-menu__panel">
+      <p class="j14-menu__eyebrow">Menu</p>
+      <ul class="j14-menu__list" role="list">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign href = block.settings.url
+            if block.settings.anchor_id != blank
+              assign href = routes.root_url | append: '#' | append: block.settings.anchor_id
+            endif
+          -%}
+          <li {{ block.shopify_attributes }}>
+            <a
+              class="j14-menu__link"
+              href="{{ href | default: routes.root_url }}"
+              data-no-transition
+            >{{ block.settings.label | escape }}</a>
+          </li>
+        {%- endfor -%}
+      </ul>
     </div>
-    <ul class="j14-header__list">
+  </nav>
+
+  {%- comment -%} Desktop inline links (same destinations) {%- endcomment -%}
+  <nav class="j14-header__desktop-nav" aria-label="Main desktop">
+    <ul class="j14-header__desktop-list" role="list">
       {%- for block in section.blocks -%}
         {%- liquid
           assign href = block.settings.url
@@ -57,68 +76,16 @@
           endif
         -%}
         <li {{ block.shopify_attributes }}>
-          <a
-            class="j14-header__link"
-            href="{{ href | default: routes.root_url }}"
-            {% if block.settings.anchor_id != blank %}data-no-transition{% endif %}
-          >{{ block.settings.label | escape }}</a>
+          <a class="j14-header__desktop-link" href="{{ href | default: routes.root_url }}">
+            {{- block.settings.label | escape -}}
+          </a>
         </li>
       {%- endfor -%}
     </ul>
   </nav>
 </div>
 
-<script>
-  (function () {
-    var header = document.querySelector('[data-j14-header]');
-    if (!header) return;
-    var toggle = header.querySelector('[data-j14-menu-toggle]');
-    var scrollY = 0;
-
-    function setMenuOpen(open) {
-      header.classList.toggle('is-open', open);
-      if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      document.documentElement.classList.toggle('j14-menu-open', open);
-
-      if (open) {
-        scrollY = window.scrollY || window.pageYOffset || 0;
-        /* Overflow lock only — avoid body position:fixed (breaks fixed menus on iOS) */
-        if (window.ScrollTrigger && typeof ScrollTrigger.getAll === 'function') {
-          ScrollTrigger.getAll().forEach(function (st) {
-            if (st.disable) st.disable(false);
-          });
-        }
-        var nav = header.querySelector('[data-j14-nav]');
-        if (nav) nav.scrollTop = 0;
-      } else {
-        if (window.ScrollTrigger && typeof ScrollTrigger.getAll === 'function') {
-          ScrollTrigger.getAll().forEach(function (st) {
-            if (st.enable) st.enable();
-          });
-          if (typeof ScrollTrigger.refresh === 'function') ScrollTrigger.refresh();
-        }
-        window.scrollTo(0, scrollY);
-      }
-    }
-
-    if (toggle) {
-      toggle.addEventListener('click', function () {
-        setMenuOpen(!header.classList.contains('is-open'));
-      });
-      header.querySelectorAll('.j14-header__link').forEach(function (link) {
-        link.addEventListener('click', function () {
-          setMenuOpen(false);
-        });
-      });
-    }
-    var onScroll = function () {
-      if (document.documentElement.classList.contains('j14-menu-open')) return;
-      header.classList.toggle('is-scrolled', window.scrollY > 24);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-  })();
-</script>
+<script src="{{ 'j14-menu.js' | asset_url }}" defer></script>
 
 {% schema %}
 {

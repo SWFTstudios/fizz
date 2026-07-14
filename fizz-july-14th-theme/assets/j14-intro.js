@@ -171,8 +171,9 @@
     window.removeEventListener('keydown', this._cancelAuto);
   };
 
-  Intro.prototype.cancelAutoPlay = function () {
-    if (!this.autoPlaying) return;
+  Intro.prototype.cancelAutoPlay = function (opts) {
+    if (!this.autoPlaying && !this.autoTween) return;
+    var soft = opts && opts.soft;
     var progress = this.tl ? this.tl.progress() : 0;
     this.autoPlaying = false;
     this.section.classList.remove('is-auto-scrolling');
@@ -182,11 +183,18 @@
     }
     this.unbindAutoCancel();
 
+    if (soft) {
+      /* Menu open: stop the tween only — do not touch ScrollTrigger / scroll */
+      return;
+    }
+
     /* Match scroll to current visual progress, then re-enable scrub */
-    var endY = this.trackEndY();
-    window.scrollTo(0, endY * progress);
-    if (this.st && this.st.enable) this.st.enable();
-    if (typeof ScrollTrigger.update === 'function') ScrollTrigger.update();
+    try {
+      var endY = this.trackEndY();
+      window.scrollTo(0, endY * progress);
+      if (this.st && this.st.enable) this.st.enable();
+      if (typeof ScrollTrigger.update === 'function') ScrollTrigger.update();
+    } catch (err) {}
     this.syncProgress(progress);
   };
 
@@ -382,11 +390,9 @@
     });
   });
 
-  var menuObserver = new MutationObserver(function () {
-    if (!document.documentElement.classList.contains('j14-menu-open')) return;
+  window.addEventListener('j14:menu-open', function () {
     instances.forEach(function (inst) {
-      inst.cancelAutoPlay();
+      inst.cancelAutoPlay({ soft: true });
     });
   });
-  menuObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 })();
