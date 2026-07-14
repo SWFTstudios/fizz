@@ -1785,6 +1785,7 @@ html:not(.j14-js) .j14-how__step {
 
 /* =============================================================
    Bubble page transitions (j14-transition.js)
+   Bubbles ride with the swipe stage while covering.
    ============================================================= */
 #j14-tx {
   position: fixed;
@@ -1797,6 +1798,10 @@ html:not(.j14-js) .j14-how__step {
 #j14-tx.is-active {
   visibility: visible;
 }
+.j14-tx__stage {
+  position: absolute;
+  inset: 0;
+}
 .j14-tx__swipe {
   position: absolute;
   inset: 0;
@@ -1804,6 +1809,7 @@ html:not(.j14-js) .j14-how__step {
   background: linear-gradient(115deg, var(--j14-dark) 0%, #142018 52%, #3d4a18 100%);
   transition: transform 0.58s cubic-bezier(0.65, 0, 0.25, 1);
   will-change: transform;
+  z-index: 1;
 }
 .j14-tx__swipe.is-cover {
   transform: translateX(0);
@@ -1820,6 +1826,12 @@ html:not(.j14-js) .j14-how__step {
   z-index: 2;
   pointer-events: none;
   mix-blend-mode: screen;
+  transition: transform 0.58s cubic-bezier(0.65, 0, 0.25, 1);
+  will-change: transform;
+}
+/* Keep the fizz layer pinned to the covering panel edge as it sweeps */
+#j14-tx.is-covering .j14-tx__bubbles {
+  transform: translateX(0);
 }
 .j14-no-motion #j14-tx {
   display: none !important;

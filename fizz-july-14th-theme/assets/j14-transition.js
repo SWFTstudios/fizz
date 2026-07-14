@@ -1,13 +1,12 @@
 /*
   July 14th — sparkling page transitions.
 
-  Sequence (must stay in this order):
-    1. Click a same-origin link / button-with-href
-    2. Prefetch destination immediately
-    3. Bubbles appear + grow fast (fizz) — FULL animation finishes
-    4. Swipe cover completes
-    5. Navigate (only after 3 + 4 + prefetch settle / timeout)
-    6. Enter: reverse swipe reveal on the new page
+  Leave sequence:
+    1. Prefetch destination immediately
+    2. Bubbles burst + grow (fizz)
+    3. Swipe cover starts ~150ms later WHILE bubbles keep rising/riding right
+    4. Navigate only after swipe cover completes + prefetch settles
+  Enter: reverse swipe with a lighter accompanying burst
 */
 (function () {
   'use strict';
@@ -23,10 +22,9 @@
   if (reduced) document.documentElement.classList.add('j14-no-motion');
 
   var busy = false;
+  var covering = false;
   var prefetchCache = {};
   var ov, swipe, canvas, ctx, rafId = 0, particles = [];
-
-  /* ---------- Overlay DOM ---------- */
 
   function ensureOverlay() {
     if (ov) return;
@@ -34,8 +32,10 @@
     ov.id = 'j14-tx';
     ov.setAttribute('aria-hidden', 'true');
     ov.innerHTML =
+      '<div class="j14-tx__stage" data-j14-tx-stage>' +
       '<div class="j14-tx__swipe" data-j14-tx-swipe></div>' +
-      '<canvas class="j14-tx__bubbles" data-j14-tx-canvas></canvas>';
+      '<canvas class="j14-tx__bubbles" data-j14-tx-canvas></canvas>' +
+      '</div>';
     document.body.appendChild(ov);
     swipe = ov.querySelector('[data-j14-tx-swipe]');
     canvas = ov.querySelector('[data-j14-tx-canvas]');
@@ -56,8 +56,6 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
-  /* ---------- Bubbles ---------- */
-
   function Bubble(seed) {
     var w = window.innerWidth;
     var h = window.innerHeight;
@@ -65,23 +63,24 @@
     this.y = seed.y != null ? seed.y : h * (0.55 + Math.random() * 0.45);
     this.rMax = seed.rMax != null ? seed.rMax : 10 + Math.random() * 38;
     this.r = 1 + Math.random() * 3;
-    this.grow = 0.45 + Math.random() * 0.9; /* grows fast — fizz pop */
-    this.vx = (Math.random() - 0.5) * 1.8;
+    this.grow = 0.45 + Math.random() * 0.9;
+    this.vx = (Math.random() - 0.5) * 1.4;
     this.vy = 3.2 + Math.random() * 5.5;
     this.life = 0;
-    this.maxLife = 42 + Math.floor(Math.random() * 36);
+    this.maxLife = 48 + Math.floor(Math.random() * 40);
     this.wobble = Math.random() * Math.PI * 2;
   }
 
   Bubble.prototype.step = function () {
     this.life += 1;
     this.wobble += 0.12;
-    /* Fast growth early, then hold */
     if (this.r < this.rMax) {
       this.r += (this.rMax - this.r) * this.grow * 0.35 + this.grow;
       if (this.r > this.rMax) this.r = this.rMax;
     }
-    this.x += this.vx + Math.sin(this.wobble) * 0.6;
+    /* While covering, push bubbles with the swipe direction */
+    var ride = covering ? 7.5 : 0;
+    this.x += this.vx + ride + Math.sin(this.wobble) * 0.6;
     this.y -= this.vy;
   };
 
@@ -124,7 +123,7 @@
       var seed = {};
       if (origin) {
         seed.x = origin.x + (Math.random() - 0.5) * 120;
-        seed.y = origin.y + (Math.random() - 0.5) * 80 + window.innerHeight * 0.15;
+        seed.y = origin.y + (Math.random() - 0.5) * 80 + window.innerHeight * 0.1;
       }
       particles.push(new Bubble(seed));
     }
@@ -139,7 +138,7 @@
     ctx.clearRect(0, 0, w, h);
     particles = particles.filter(function (p) {
       p.step();
-      if (p.life >= p.maxLife || p.y + p.r < -40) return false;
+      if (p.life >= p.maxLife || p.y + p.r < -40 || p.x - p.r > w + 80) return false;
       p.draw(ctx);
       return true;
     });
@@ -160,29 +159,6 @@
     }
     if (ctx) ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
   }
-
-  function waitForBubbles(minMs) {
-    return new Promise(function (resolve) {
-      var start = performance.now();
-      function check() {
-        var elapsed = performance.now() - start;
-        if (elapsed >= minMs && particles.length === 0) {
-          resolve();
-          return;
-        }
-        /* Soft cap so a stray particle cannot trap navigation */
-        if (elapsed >= minMs + 900) {
-          clearBubbles();
-          resolve();
-          return;
-        }
-        requestAnimationFrame(check);
-      }
-      requestAnimationFrame(check);
-    });
-  }
-
-  /* ---------- Prefetch ---------- */
 
   function prefetch(url) {
     if (prefetchCache[url]) return prefetchCache[url];
@@ -214,22 +190,19 @@
           done();
         });
 
-      /* Never block navigation forever */
       setTimeout(done, 3200);
     });
     return prefetchCache[url];
   }
 
-  /* ---------- Swipe ---------- */
-
   function animateSwipeCover() {
     return new Promise(function (resolve) {
       ensureOverlay();
-      ov.classList.add('is-active');
+      ov.classList.add('is-active', 'is-covering');
       ov.style.pointerEvents = 'auto';
       swipe.classList.remove('is-exit');
-      /* Force reflow so enter transition runs from left */
       void swipe.offsetWidth;
+      covering = true;
       swipe.classList.add('is-cover');
       var finished = false;
       var finish = function () {
@@ -245,17 +218,20 @@
   function animateSwipeReveal() {
     return new Promise(function (resolve) {
       ensureOverlay();
-      ov.classList.add('is-active');
+      ov.classList.add('is-active', 'is-covering');
       swipe.classList.add('is-cover');
+      covering = true;
       void swipe.offsetWidth;
       requestAnimationFrame(function () {
+        covering = false;
         swipe.classList.add('is-exit');
         swipe.classList.remove('is-cover');
+        ov.classList.remove('is-covering');
         var finished = false;
         var finish = function () {
           if (finished) return;
           finished = true;
-          ov.classList.remove('is-active');
+          ov.classList.remove('is-active', 'is-covering');
           swipe.classList.remove('is-exit', 'is-cover');
           ov.style.pointerEvents = 'none';
           clearBubbles();
@@ -266,8 +242,6 @@
       });
     });
   }
-
-  /* ---------- Navigation gate ---------- */
 
   function shouldAnimate(el, href) {
     if (!enabled || motionOff) return false;
@@ -286,7 +260,6 @@
     if (/\/cart\/add|\/cart\/change|\/cart\/update|\/checkout|\/account\/logout|\/admin\b/i.test(url.pathname)) {
       return false;
     }
-    /* Same path + query with only a hash — allow native jump */
     if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) {
       return false;
     }
@@ -307,25 +280,29 @@
 
     var ready = prefetch(href);
 
-    /* Phase 1 — fizz bubbles grow + rise to completion */
+    /* Fizz first */
     burst(36, origin);
     setTimeout(function () {
       burst(22, origin);
     }, 90);
     setTimeout(function () {
-      burst(14, origin);
-    }, 200);
+      burst(16, origin);
+    }, 180);
 
-    waitForBubbles(720)
+    /* Swipe starts while bubbles are still alive — they ride with it */
+    var swipeDelay = new Promise(function (resolve) {
+      setTimeout(resolve, 150);
+    });
+
+    swipeDelay
       .then(function () {
-        /* Phase 2 — swipe cover (only after bubbles finish) */
         return animateSwipeCover();
       })
       .then(function () {
         return Promise.race([
           ready,
           new Promise(function (r) {
-            setTimeout(r, 200);
+            setTimeout(r, 180);
           })
         ]);
       })
@@ -337,6 +314,7 @@
       })
       .catch(function () {
         busy = false;
+        covering = false;
         window.location.href = href;
       });
   }
@@ -355,7 +333,6 @@
     true
   );
 
-  /* Hover prefetch for snappier feel once intentional */
   document.addEventListener(
     'pointerenter',
     function (e) {
@@ -379,9 +356,10 @@
     if (!flag || motionOff || !enabled) return;
 
     ensureOverlay();
-    ov.classList.add('is-active');
+    ov.classList.add('is-active', 'is-covering');
     swipe.classList.add('is-cover');
-    burst(28, { x: window.innerWidth * 0.5, y: window.innerHeight * 0.85 });
+    covering = true;
+    burst(28, { x: window.innerWidth * 0.35, y: window.innerHeight * 0.8 });
     requestAnimationFrame(function () {
       animateSwipeReveal();
     });

@@ -44,13 +44,17 @@ Verified in the section schema reference
 
 ### 3. Theme presets and JSON parsing (carried over from prior research)
 
-- `settings_data.json` supports at most **5 theme presets** (source:
-  `fizz-claude-theme/design/colorway-presets/SHOPIFY-COLORWAY-RESEARCH.md`,
-  verified against shopify.dev during that project). This theme ships **1**
-  preset ("July 14th").
-- **Liquid cannot parse JSON files at runtime**, so colorway palette data is
-  mirrored as Liquid case statements in `snippets/j14-colorway-scene.liquid`
-  (same approach proven in `fizz-claude-theme`), with per-variant metafield
+- `settings_data.json` supports at most **5 theme presets / Theme styles**
+  (source: Shopify docs + prior colorway research). This theme ships **5**:
+  Lime Fizz, Steel Navy, Citrus Burst, Berry Night, Electric Pool.
+- Storefront colors resolve from `settings.colorway_preset` via
+  `snippets/j14-colorway-preset-data.liquid` → `j14-theme-tokens.liquid`.
+  Merchants can enable **Use custom colors** to override with pickers
+  (`visible_if`). Theme style dropdown values mirror the same tokens so
+  editor pickers match the live palette when switching styles.
+- **Liquid cannot parse JSON files at runtime**, so bottle/scene colorway
+  data remains mirrored as Liquid case statements in
+  `snippets/j14-colorway-scene.liquid`, with per-variant metafield
   overrides (`custom.color_slug`, `custom.swatch_hex`, `custom.scene_bg`,
   `custom.scene_bg_end`, `custom.scene_btn`, `custom.scene_text`).
 
@@ -73,7 +77,7 @@ Verified in the section schema reference
 | `video` setting has no `default` | input-settings reference (see URL above) | Theme-asset fallback + `placeholder_svg_tag` |
 | Autoplay requires muted video | Browser autoplay policies (Chrome/Safari) | `video_tag` rendered with `muted`, `playsinline`, `loop` |
 | Max 50 blocks/section | section-schema reference | `max_blocks` set per section |
-| Max 5 theme presets | settings_data docs / prior colorway research | 1 preset shipped |
+| Max 5 theme presets | settings_data docs / prior colorway research | 5 Theme styles shipped |
 | No JSON parse in Liquid | Liquid docs / prior colorway research | Palette mirrored in Liquid snippet |
 | CSS scroll-driven animations not cross-browser | caniuse (animation-timeline) | rAF + IntersectionObserver JS engine; `prefers-reduced-motion` gets a static layout |
 

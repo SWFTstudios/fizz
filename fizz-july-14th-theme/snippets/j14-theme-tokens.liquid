@@ -1,11 +1,45 @@
 {% comment %}
-  Global CSS design tokens driven by theme settings.
-  Rendered once in layout/theme.liquid <head>.
+  Global CSS design tokens.
+  Colors resolve from colorway_preset (or custom pickers when enabled).
 {% endcomment %}
 {%- liquid
   assign heading_font = settings.font_heading
   assign body_font = settings.font_body
   assign body_font_bold = body_font | font_modify: 'weight', 'bolder'
+
+  assign preset_id = settings.colorway_preset | default: 'lime_fizz'
+  capture preset_raw
+    render 'j14-colorway-preset-data', preset: preset_id
+  endcapture
+  assign preset_parts = preset_raw | strip | split: '|'
+
+  assign paper = preset_parts[0]
+  assign ink = preset_parts[1]
+  assign accent = preset_parts[2]
+  assign surface = preset_parts[3]
+  assign dark = preset_parts[4]
+  assign dark_text = preset_parts[5]
+
+  if settings.colorway_custom_enabled
+    if settings.color_paper != blank
+      assign paper = settings.color_paper
+    endif
+    if settings.color_ink != blank
+      assign ink = settings.color_ink
+    endif
+    if settings.color_accent != blank
+      assign accent = settings.color_accent
+    endif
+    if settings.color_surface != blank
+      assign surface = settings.color_surface
+    endif
+    if settings.color_dark != blank
+      assign dark = settings.color_dark
+    endif
+    if settings.color_dark_text != blank
+      assign dark_text = settings.color_dark_text
+    endif
+  endif
 -%}
 <style>
   {{ heading_font | font_face: font_display: 'swap' }}
@@ -13,14 +47,14 @@
   {% if body_font_bold %}{{ body_font_bold | font_face: font_display: 'swap' }}{% endif %}
 
   :root {
-    --j14-paper: {{ settings.color_paper }};
-    --j14-ink: {{ settings.color_ink }};
-    --j14-accent: {{ settings.color_accent }};
-    --j14-surface: {{ settings.color_surface }};
-    --j14-dark: {{ settings.color_dark }};
-    --j14-dark-text: {{ settings.color_dark_text }};
-    --j14-ink-rgb: {{ settings.color_ink | color_to_rgb | remove: 'rgb(' | remove: ')' }};
-    --j14-paper-rgb: {{ settings.color_paper | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+    --j14-paper: {{ paper }};
+    --j14-ink: {{ ink }};
+    --j14-accent: {{ accent }};
+    --j14-surface: {{ surface }};
+    --j14-dark: {{ dark }};
+    --j14-dark-text: {{ dark_text }};
+    --j14-ink-rgb: {{ ink | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+    --j14-paper-rgb: {{ paper | color_to_rgb | remove: 'rgb(' | remove: ')' }};
 
     --j14-font-heading: {{ heading_font.family }}, {{ heading_font.fallback_families }};
     --j14-font-heading-weight: {{ heading_font.weight }};
