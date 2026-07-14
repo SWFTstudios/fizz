@@ -1,42 +1,123 @@
-{% comment %}
-  Product card for collection grids, search results and related products.
-  Params: product (required), heading_level (string, default 'h3')
-{% endcomment %}
+{%- comment -%}
+  Product card — collection / related / search grids.
+  Washes and swatches stay legible on every Theme style via --j14-* tokens.
+{%- endcomment -%}
+
 {%- liquid
-  assign hl = heading_level | default: 'h3'
+  assign show_swatches = show_swatches | default: true
+  assign show_quick_add = show_quick_add | default: false
+  assign media_ratio = media_ratio | default: 'auto'
+  assign featured = product.featured_media
+  assign color_option = blank
+  for option in product.options_with_values
+    assign on = option.name | downcase
+    if on == 'color' or on == 'colour' or on == 'colorway'
+      assign color_option = option
+      break
+    endif
+  endfor
+
+  assign scene = 'lime'
+  if color_option != blank and color_option.values.size > 0
+    assign first_color = color_option.values.first | strip | downcase
+    case first_color
+      when 'black', 'onyx', 'charcoal', 'charcoal black', 'charcoal-black'
+        assign scene = 'steel'
+      when 'white', 'cloud', 'arctic', 'arctic white', 'arctic-white'
+        assign scene = 'pool'
+      when 'orange', 'citrus', 'coral', 'coral orange', 'coral-orange'
+        assign scene = 'citrus'
+      when 'sage', 'fern', 'green', 'sage green', 'sage-green', 'lime', 'lime fizz'
+        assign scene = 'lime'
+      when 'blue', 'ocean', 'electric', 'electric blue', 'electric-blue'
+        assign scene = 'pool'
+      when 'navy', 'steel', 'steel navy', 'steel-navy'
+        assign scene = 'steel'
+      when 'berry', 'berry night', 'berry-night', 'purple', 'violet'
+        assign scene = 'berry'
+      else
+        assign scene = first_color | handleize | split: '-' | first
+    endcase
+  elsif product.selected_or_first_available_variant
+    capture slug
+      render 'j14-color-slug', variant: product.selected_or_first_available_variant
+    endcapture
+    assign slug = slug | strip
+    case slug
+      when 'coral-orange'
+        assign scene = 'citrus'
+      when 'sage-green', 'lime', 'lime-fizz'
+        assign scene = 'lime'
+      when 'electric-blue'
+        assign scene = 'pool'
+      when 'berry', 'berry-night'
+        assign scene = 'berry'
+      else
+        assign scene = 'steel'
+    endcase
+  endif
 -%}
-<article class="j14-card">
-  <a href="{{ product.url }}" class="j14-card__link">
-    <div class="j14-card__media">
-      {%- if product.featured_media -%}
+
+<article class="j14-card" data-j14-card>
+  <a class="j14-card__media-link" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+    <div
+      class="j14-card__media j14-card__media--{{ scene }}"
+      data-j14-card-media
+      style="--j14-card-ratio: {{ media_ratio }};"
+    >
+      <span class="j14-card__wash" aria-hidden="true"></span>
+      {%- if featured != blank -%}
         {{
-          product.featured_media
+          featured
           | image_url: width: 900
-          | image_tag: class: 'j14-card__img', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 50vw', widths: '360, 540, 720, 900', alt: product.featured_media.alt
+          | image_tag:
+            loading: 'lazy',
+            widths: '320, 480, 640, 900',
+            sizes: '(min-width: 900px) 30vw, 45vw',
+            class: 'j14-card__img',
+            alt: featured.alt | default: product.title | escape
         }}
-        {%- if product.media[1] -%}
-          {{
-            product.media[1]
-            | image_url: width: 900
-            | image_tag: class: 'j14-card__img j14-card__img--hover', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 50vw', widths: '360, 540, 720, 900', alt: product.media[1].alt
-          }}
-        {%- endif -%}
       {%- else -%}
-        {{ 'product-1' | placeholder_svg_tag: 'j14-card__img j14-placeholder-svg' }}
+        {{ 'product-1' | placeholder_svg_tag: 'j14-card__img j14-card__img--ph' }}
       {%- endif -%}
-      {%- unless product.available -%}
-        <span class="j14-card__badge">{{ 'products.product.sold_out' | t }}</span>
-      {%- endunless -%}
-    </div>
-    <div class="j14-card__info">
-      <{{ hl }} class="j14-card__title">{{ product.title | escape }}</{{ hl }}>
-      <p class="j14-card__price">
-        {%- if product.price_varies -%}
-          {{ 'products.product.from_price_html' | t: price: product.price_min | money }}
-        {%- else -%}
-          {{ product.price | money }}
-        {%- endif -%}
-      </p>
     </div>
   </a>
+
+  <div class="j14-card__body">
+    <h3 class="j14-card__title">
+      <a href="{{ product.url }}">{{ product.title | escape }}</a>
+    </h3>
+
+    <p class="j14-card__price">
+      {%- if product.price_varies -%}
+        From {{ product.price_min | money }}
+      {%- else -%}
+        {{ product.price | money }}
+      {%- endif -%}
+    </p>
+
+    {%- if show_swatches and color_option != blank -%}
+      <ul class="j14-card__swatches" role="list" aria-label="Available colorways">
+        {%- for value in color_option.values -%}
+          {%- assign slug = value | handleize -%}
+          <li>
+            <span
+              class="j14-card__swatch j14-swatch-tone--{{ slug }}"
+              title="{{ value | escape }}"
+              aria-label="{{ value | escape }}"
+            ></span>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if show_quick_add and product.variants.size == 1 and product.available -%}
+      {%- form 'product', product, class: 'j14-card__quick' -%}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        <button type="submit" class="j14-card__quick-btn">Add</button>
+      {%- endform -%}
+    {%- elsif product.variants.size > 1 -%}
+      <a class="j14-card__choose" href="{{ product.url }}">Choose options</a>
+    {%- endif -%}
+  </div>
 </article>

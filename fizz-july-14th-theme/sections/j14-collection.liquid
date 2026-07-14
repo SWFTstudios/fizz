@@ -1,54 +1,158 @@
-<section class="j14-collection">
-  <header class="j14-collection__head">
-    <p class="j14-eyebrow">{{ section.settings.eyebrow | default: 'Shop' | escape }}</p>
-    <h1 class="j14-heading j14-collection__title">
-      {%- if collection.title != blank -%}
-        {{ collection.title | escape }}
-      {%- else -%}
-        {{ 'collections.general.all_products' | t }}
+{%- comment -%}
+  Collection page — hero, editorial benefits, product grid.
+  Surfaces + type inherit active Theme style / colorway tokens.
+{%- endcomment -%}
+
+{%- liquid
+  assign products_per_page = section.settings.products_per_page | default: 12
+  assign hero_mode = section.settings.hero_mode | default: 'surface'
+-%}
+
+<section
+  class="j14-collection"
+  data-j14-collection
+  style="
+    --j14-collection-pad-y: {{ section.settings.padding_y }}px;
+    --j14-collection-gap: {{ section.settings.grid_gap }}px;
+    --j14-collection-hero-min: {{ section.settings.hero_min_height }}vh;
+  "
+>
+  <header class="j14-collection__hero j14-collection__hero--{{ hero_mode }}">
+    <div class="j14-collection__hero-bg" aria-hidden="true">
+      <span class="j14-collection__hero-wash"></span>
+      <span class="j14-collection__hero-grain"></span>
+    </div>
+    <div class="j14-collection__hero-inner j14-container">
+      {%- if section.settings.show_breadcrumb -%}
+        <nav class="j14-collection__crumb" aria-label="Breadcrumb">
+          <a href="{{ routes.root_url }}">{{ 'general.home' | t | default: 'Home' }}</a>
+          <span aria-hidden="true">/</span>
+          <span>{{ collection.title | escape }}</span>
+        </nav>
       {%- endif -%}
-    </h1>
-    {%- if section.settings.show_description and collection.description != blank -%}
-      <div class="j14-collection__description j14-rte">{{ collection.description }}</div>
-    {%- endif -%}
+
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="j14-collection__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+
+      <h1 class="j14-collection__title">{{ collection.title | escape }}</h1>
+
+      {%- if section.settings.show_description and collection.description != blank -%}
+        <div class="j14-collection__desc rte">{{ collection.description }}</div>
+      {%- elsif section.settings.fallback_description != blank -%}
+        <p class="j14-collection__desc">{{ section.settings.fallback_description | escape }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.show_count -%}
+        <p class="j14-collection__count">
+          {{ collection.products_count }}
+          {%- if collection.products_count == 1 -%} product{%- else -%} products{%- endif -%}
+        </p>
+      {%- endif -%}
+    </div>
   </header>
 
-  {%- paginate collection.products by section.settings.products_per_page -%}
-    {%- if collection.products.size > 0 -%}
-      <div class="j14-collection__grid j14-collection__grid--{{ section.settings.desktop_columns }}">
-        {%- for product in collection.products -%}
-          {% render 'j14-product-card', product: product %}
+  {%- if section.blocks.size > 0 -%}
+    <div class="j14-collection__benefits j14-container">
+      <ul class="j14-collection__benefit-list" role="list">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'benefit' -%}
+            <li class="j14-collection__benefit" {{ block.shopify_attributes }}>
+              {%- if block.settings.label != blank -%}
+                <p class="j14-collection__benefit-label">{{ block.settings.label | escape }}</p>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <p class="j14-collection__benefit-text">{{ block.settings.text | escape }}</p>
+              {%- endif -%}
+            </li>
+          {%- endif -%}
         {%- endfor -%}
-      </div>
-    {%- else -%}
-      <p class="j14-collection__empty">{{ 'collections.general.empty' | t }}</p>
-    {%- endif -%}
+      </ul>
+    </div>
+  {%- endif -%}
 
-    {%- if paginate.pages > 1 -%}
-      <nav class="j14-pagination" aria-label="Pagination">
-        {%- if paginate.previous -%}
-          <a class="j14-btn j14-btn--ghost" href="{{ paginate.previous.url }}">{{ 'general.pagination.previous' | t }}</a>
+  <div class="j14-collection__body j14-container">
+    {%- paginate collection.products by products_per_page -%}
+      {%- if collection.products.size > 0 -%}
+        <ul class="j14-collection__grid" role="list">
+          {%- for product in collection.products -%}
+            <li class="j14-collection__item">
+              {% render 'j14-product-card',
+                product: product,
+                show_swatches: section.settings.show_swatches,
+                show_quick_add: section.settings.show_quick_add,
+                media_ratio: section.settings.card_media_ratio
+              %}
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        {%- if paginate.pages > 1 -%}
+          <nav class="j14-collection__pagination" aria-label="Pagination">
+            {%- if paginate.previous -%}
+              <a class="j14-collection__page-link" href="{{ paginate.previous.url }}">Previous</a>
+            {%- endif -%}
+            <span class="j14-collection__page-status">
+              Page {{ paginate.current_page }} of {{ paginate.pages }}
+            </span>
+            {%- if paginate.next -%}
+              <a class="j14-collection__page-link" href="{{ paginate.next.url }}">Next</a>
+            {%- endif -%}
+          </nav>
         {%- endif -%}
-        <span class="j14-pagination__status">{{ paginate.current_page }} / {{ paginate.pages }}</span>
-        {%- if paginate.next -%}
-          <a class="j14-btn j14-btn--ghost" href="{{ paginate.next.url }}">{{ 'general.pagination.next' | t }}</a>
-        {%- endif -%}
-      </nav>
-    {%- endif -%}
-  {%- endpaginate -%}
+      {%- else -%}
+        <div class="j14-collection__empty">
+          <p>{{ section.settings.empty_text | default: 'No products in this collection yet.' | escape }}</p>
+          <a class="j14-btn j14-btn--primary" href="{{ routes.all_products_collection_url }}">Browse all</a>
+        </div>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
 </section>
 
 {% schema %}
 {
   "name": "J14 Collection",
   "tag": "section",
-  "class": "j14-collection-section",
+  "class": "j14-section j14-section--collection",
   "settings": [
+    {
+      "type": "header",
+      "content": "Hero"
+    },
+    {
+      "type": "select",
+      "id": "hero_mode",
+      "label": "Hero stage",
+      "options": [
+        { "value": "surface", "label": "Page surface (theme bg)" },
+        { "value": "accent", "label": "Accent wash (theme tint)" },
+        { "value": "contrast", "label": "High contrast band" }
+      ],
+      "default": "accent",
+      "info": "Uses active Theme style / Colorway tokens."
+    },
+    {
+      "type": "range",
+      "id": "hero_min_height",
+      "min": 20,
+      "max": 70,
+      "step": 2,
+      "unit": "vh",
+      "label": "Hero min height",
+      "default": 36
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "Show breadcrumb",
+      "default": true
+    },
     {
       "type": "text",
       "id": "eyebrow",
       "label": "Eyebrow",
-      "default": "Shop"
+      "default": "Shop the lineup"
     },
     {
       "type": "checkbox",
@@ -57,27 +161,130 @@
       "default": true
     },
     {
+      "type": "textarea",
+      "id": "fallback_description",
+      "label": "Fallback description",
+      "default": "Bottles and flavors built for the ritual — pick a colorway and make it yours."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_count",
+      "label": "Show product count",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Grid"
+    },
+    {
       "type": "range",
       "id": "products_per_page",
-      "label": "Products per page",
       "min": 4,
       "max": 24,
       "step": 2,
+      "label": "Products per page",
       "default": 12
     },
     {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 8,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 20
+    },
+    {
       "type": "select",
-      "id": "desktop_columns",
-      "label": "Columns on desktop",
+      "id": "card_media_ratio",
+      "label": "Card media ratio",
       "options": [
-        { "value": "3", "label": "3" },
-        { "value": "4", "label": "4" }
+        { "value": "3 / 4", "label": "Portrait 3:4" },
+        { "value": "4 / 5", "label": "Portrait 4:5" },
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "auto", "label": "Natural (contain bottles)" }
       ],
-      "default": "3"
+      "default": "auto",
+      "info": "Use Natural for warped bottle PNGs so they are not cropped."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show colorway swatches on cards",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Show quick add when single variant",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Empty collection text",
+      "default": "No products in this collection yet."
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "min": 24,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Body vertical padding",
+      "default": 48
     }
   ],
-  "enabled_on": {
-    "templates": ["collection"]
-  }
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Free shipping"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "On starter kits over $50"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "J14 Collection",
+      "blocks": [
+        {
+          "type": "benefit",
+          "settings": {
+            "label": "Mix free",
+            "text": "Swap flavors anytime"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "label": "Colorways",
+            "text": "Five bottles, one ritual"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "label": "Ships fast",
+            "text": "Most orders in 2–3 days"
+          }
+        }
+      ]
+    }
+  ]
 }
 {% endschema %}

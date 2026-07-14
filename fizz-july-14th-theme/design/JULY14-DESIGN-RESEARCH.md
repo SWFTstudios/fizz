@@ -81,6 +81,29 @@ Verified in the section schema reference
 | No JSON parse in Liquid | Liquid docs / prior colorway research | Palette mirrored in Liquid snippet |
 | CSS scroll-driven animations not cross-browser | caniuse (animation-timeline) | rAF + IntersectionObserver JS engine; `prefers-reduced-motion` gets a static layout |
 
+### 5. Product and collection templates (commerce)
+
+Verified against Online Store 2.0 architecture
+(https://shopify.dev/docs/storefronts/themes/architecture):
+
+- Product/collection templates are JSON templates that compose sections
+  (`templates/product.json`, `templates/collection.json`).
+- Variant selection and carts use the standard `{% form 'product' %}` and
+  `{% form 'product', product %}` (quick add) patterns; money formatting and
+  availability come from Liquid product/variant objects.
+- Colorway-aware PDP stage gradients reuse
+  `snippets/j14-colorway-scene.liquid` (variant/bottle palette). Global
+  Theme style / colorway presets still flow through
+  `snippets/j14-theme-tokens.liquid` (`--j14-paper`, `--j14-ink`,
+  `--j14-accent`, `--j14-surface`, `--j14-dark`, fonts, radii) so switching
+  Theme style restyles product + collection chrome without a separate
+  template per preset.
+- Collection pagination uses `{% paginate collection.products %}`.
+
+Storefront vs editor: swatch → stage gradient sync is client-side JS on
+the product section; Theme style token changes re-render via Liquid on
+save / style switch.
+
 ## Reference implementation notes
 
 - Structure mirrors `/workspace/fizz-claude-theme` (standalone OS 2.0 theme:

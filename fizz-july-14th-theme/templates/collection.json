@@ -2,11 +2,45 @@
   "sections": {
     "main": {
       "type": "j14-collection",
+      "blocks": {
+        "benefit_1": {
+          "type": "benefit",
+          "settings": {
+            "label": "Mix free",
+            "text": "Swap flavors anytime"
+          }
+        },
+        "benefit_2": {
+          "type": "benefit",
+          "settings": {
+            "label": "Colorways",
+            "text": "Five bottles, one ritual"
+          }
+        },
+        "benefit_3": {
+          "type": "benefit",
+          "settings": {
+            "label": "Ships fast",
+            "text": "Most orders in 2–3 days"
+          }
+        }
+      },
+      "block_order": ["benefit_1", "benefit_2", "benefit_3"],
       "settings": {
-        "eyebrow": "Shop",
+        "hero_mode": "accent",
+        "hero_min_height": 36,
+        "show_breadcrumb": true,
+        "eyebrow": "Shop the lineup",
         "show_description": true,
+        "fallback_description": "Bottles and flavors built for the ritual — pick a colorway and make it yours.",
+        "show_count": true,
         "products_per_page": 12,
-        "desktop_columns": "3"
+        "grid_gap": 20,
+        "card_media_ratio": "auto",
+        "show_swatches": true,
+        "show_quick_add": true,
+        "empty_text": "No products in this collection yet.",
+        "padding_y": 48
       }
     },
     "footer": {

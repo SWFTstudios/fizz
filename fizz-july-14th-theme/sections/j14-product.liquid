@@ -1,64 +1,117 @@
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
+  capture color_slug
+    render 'j14-color-slug', variant: current_variant
+  endcapture
+  assign color_slug = color_slug | strip
+  capture scene_raw
+    render 'j14-colorway-scene', slug: color_slug, variant: current_variant
+  endcapture
+  assign scene_parts = scene_raw | strip | split: '|'
+  assign stage_bg = scene_parts[0] | default: settings.color_surface
+  assign stage_bg_end = scene_parts[1] | default: settings.color_dark
+  assign stage_text = scene_parts[3] | default: settings.color_dark_text
 -%}
-<section class="j14-product" data-j14-product>
+<section
+  class="j14-product"
+  data-j14-product
+  data-stage-mode="{{ section.settings.stage_mode }}"
+  style="--pdp-stage-bg: {{ stage_bg }}; --pdp-stage-bg-end: {{ stage_bg_end }}; --pdp-stage-text: {{ stage_text }};"
+>
   <div class="j14-product__layout">
-    <div class="j14-product__gallery" data-j14-gallery>
-      {%- if product.media.size > 0 -%}
+    <div class="j14-product__gallery">
+      <div
+        class="j14-product__stage j14-product__stage--{{ section.settings.stage_mode }}"
+        data-j14-pdp-stage
+      >
         <div class="j14-product__media-rail" data-j14-media-rail>
-          {%- for media in product.media -%}
-            <div
-              class="j14-product__media{% if forloop.first %} is-active{% endif %}"
-              data-media-id="{{ media.id }}"
-            >
-              {%- case media.media_type -%}
-                {%- when 'video' -%}
-                  {{ media | video_tag: image_size: '1080x', controls: true, playsinline: true, class: 'j14-product__media-el' }}
-                {%- when 'external_video' -%}
-                  {{ media | external_video_tag: class: 'j14-product__media-el' }}
-                {%- when 'model' -%}
-                  {{ media | model_viewer_tag: class: 'j14-product__media-el' }}
-                {%- else -%}
-                  {%- liquid
-                    assign media_loading = 'lazy'
-                    if forloop.first
-                      assign media_loading = 'eager'
-                    endif
-                  -%}
-                  {{
-                    media
-                    | image_url: width: 1400
-                    | image_tag: class: 'j14-product__media-el', loading: media_loading, sizes: '(min-width: 750px) 55vw, 100vw', widths: '540, 720, 1080, 1400', alt: media.alt
-                  }}
-              {%- endcase -%}
+          {%- if product.media.size > 0 -%}
+            {%- for media in product.media -%}
+              <div
+                class="j14-product__media{% if forloop.first %} is-active{% endif %}"
+                data-media-id="{{ media.id }}"
+              >
+                {%- case media.media_type -%}
+                  {%- when 'video' -%}
+                    {{ media | video_tag: image_size: '1080x', controls: true, playsinline: true, class: 'j14-product__media-el' }}
+                  {%- when 'external_video' -%}
+                    {{ media | external_video_tag: class: 'j14-product__media-el' }}
+                  {%- when 'model' -%}
+                    {{ media | model_viewer_tag: class: 'j14-product__media-el' }}
+                  {%- else -%}
+                    {%- liquid
+                      assign media_loading = 'lazy'
+                      if forloop.first
+                        assign media_loading = 'eager'
+                      endif
+                    -%}
+                    {{
+                      media
+                      | image_url: width: 1400
+                      | image_tag:
+                        class: 'j14-product__media-el',
+                        loading: media_loading,
+                        sizes: '(min-width: 750px) 55vw, 100vw',
+                        widths: '540, 720, 1080, 1400',
+                        alt: media.alt
+                    }}
+                  {%- endcase -%}
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            <div class="j14-product__media is-active" data-media-id="fallback">
+              <img
+                src="{{ 'fizz-bottle-product-' | append: color_slug | append: '.png' | asset_url }}"
+                class="j14-product__media-el j14-product__media-el--contain"
+                width="504"
+                height="1400"
+                alt="{{ product.title | escape }}"
+                data-j14-fallback-bottle
+              >
             </div>
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- if product.media.size > 1 -%}
+        <div class="j14-product__thumbs">
+          {%- for media in product.media -%}
+            <button
+              type="button"
+              class="j14-product__thumb{% if forloop.first %} is-active{% endif %}"
+              data-j14-thumb
+              data-media-id="{{ media.id }}"
+              aria-label="{{ 'products.product.media_label' | t: index: forloop.index }}"
+            >
+              {{ media.preview_image | image_url: width: 180 | image_tag: loading: 'lazy', alt: '' }}
+            </button>
           {%- endfor -%}
         </div>
-        {%- if product.media.size > 1 -%}
-          <div class="j14-product__thumbs">
-            {%- for media in product.media -%}
-              <button
-                type="button"
-                class="j14-product__thumb{% if forloop.first %} is-active{% endif %}"
-                data-j14-thumb
-                data-media-id="{{ media.id }}"
-                aria-label="{{ 'products.product.media_label' | t: index: forloop.index }}"
-              >
-                {{ media.preview_image | image_url: width: 180 | image_tag: loading: 'lazy', alt: '' }}
-              </button>
-            {%- endfor -%}
-          </div>
-        {%- endif -%}
-      {%- else -%}
-        {{ 'product-1' | placeholder_svg_tag: 'j14-product__media-el j14-placeholder-svg' }}
       {%- endif -%}
     </div>
 
     <div class="j14-product__panel">
-      {%- if section.settings.show_vendor and product.vendor != blank -%}
+      <nav class="j14-product__crumb" aria-label="Breadcrumb">
+        <a href="{{ routes.root_url }}">{{ shop.name }}</a>
+        {%- if collection -%}
+          <span aria-hidden="true">/</span>
+          <a href="{{ collection.url }}">{{ collection.title | escape }}</a>
+        {%- endif -%}
+        <span aria-hidden="true">/</span>
+        <span>{{ product.title | escape }}</span>
+      </nav>
+
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="j14-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- elsif section.settings.show_vendor and product.vendor != blank -%}
         <p class="j14-eyebrow">{{ product.vendor | escape }}</p>
       {%- endif -%}
-      <h1 class="j14-heading j14-product__title">{{ product.title | escape }}</h1>
+
+      <h1 class="j14-heading j14-product__title">{{ section.settings.heading | default: product.title | escape }}</h1>
+
+      {%- if section.settings.tagline != blank -%}
+        <p class="j14-product__tagline">{{ section.settings.tagline | escape }}</p>
+      {%- endif -%}
 
       <p class="j14-product__price" data-j14-price>
         <span data-j14-price-current>{{ current_variant.price | money }}</span>
@@ -72,25 +125,65 @@
       {% form 'product', product, class: 'j14-product__form', novalidate: 'novalidate' %}
         <input type="hidden" name="id" value="{{ current_variant.id }}" data-j14-variant-id>
 
+        {%- if product.variants.size > 1 and section.settings.show_colorway_swatches -%}
+          <div class="j14-product__ways" data-j14-ways>
+            <p class="j14-product__option-name">
+              {{ section.settings.colorway_label | default: 'Colorway' | escape }}
+              — <span data-j14-way-label>{{ current_variant.title | escape }}</span>
+            </p>
+            <div class="j14-product__swatches" role="list">
+              {%- for variant in product.variants -%}
+                {%- capture slug -%}{% render 'j14-color-slug', variant: variant %}{%- endcapture -%}
+                {%- assign slug = slug | strip -%}
+                {%- capture scene -%}{% render 'j14-colorway-scene', slug: slug, variant: variant %}{%- endcapture -%}
+                {%- assign swatch_parts = scene | strip | split: '|' -%}
+                {%- assign swatch_hex = swatch_parts[4] -%}
+                <button
+                  type="button"
+                  class="j14-swatch{% if variant.id == current_variant.id %} is-active{% endif %}"
+                  data-j14-swatch
+                  data-variant-id="{{ variant.id }}"
+                  data-options="{{ variant.options | json | escape }}"
+                  data-name="{{ variant.title | escape }}"
+                  data-bg="{{ swatch_parts[0] }}"
+                  data-bg-end="{{ swatch_parts[1] }}"
+                  data-text="{{ swatch_parts[3] }}"
+                  data-available="{{ variant.available }}"
+                  data-price="{{ variant.price }}"
+                  data-compare="{{ variant.compare_at_price | default: 0 }}"
+                  data-media-id="{{ variant.featured_media.id }}"
+                  data-fallback-src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}"
+                  style="--swatch: {{ swatch_hex }};"
+                  aria-label="{{ variant.title | escape }}"
+                  title="{{ variant.title | escape }}"
+                ></button>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+
         {%- unless product.has_only_default_variant -%}
-          {%- for option in product.options_with_values -%}
-            <fieldset class="j14-product__option" data-j14-option data-option-index="{{ forloop.index0 }}">
-              <legend class="j14-product__option-name">{{ option.name | escape }}</legend>
-              <div class="j14-product__pills">
-                {%- for value in option.values -%}
-                  <label class="j14-pill">
-                    <input
-                      type="radio"
-                      name="option-{{ section.id }}-{{ forloop.parentloop.index0 }}"
-                      value="{{ value | escape }}"
-                      {% if option.selected_value == value %}checked{% endif %}
-                    >
-                    <span>{{ value | escape }}</span>
-                  </label>
-                {%- endfor -%}
-              </div>
-            </fieldset>
-          {%- endfor -%}
+          {%- unless section.settings.show_colorway_swatches and product.options.size == 1 -%}
+            {%- for option in product.options_with_values -%}
+              <fieldset class="j14-product__option" data-j14-option data-option-index="{{ forloop.index0 }}">
+                <legend class="j14-product__option-name">{{ option.name | escape }}</legend>
+                <div class="j14-product__pills">
+                  {%- for value in option.values -%}
+                    <label class="j14-pill">
+                      <input
+                        type="radio"
+                        name="option-{{ section.id }}-{{ forloop.parentloop.index0 }}"
+                        value="{{ value | escape }}"
+                        {% if option.selected_value == value %}checked{% endif %}
+                        data-j14-option-input
+                      >
+                      <span>{{ value | escape }}</span>
+                    </label>
+                  {%- endfor -%}
+                </div>
+              </fieldset>
+            {%- endfor -%}
+          {%- endunless -%}
         {%- endunless -%}
 
         {%- if section.settings.show_quantity -%}
@@ -114,7 +207,7 @@
         >
           <span data-j14-atc-label>
             {%- if current_variant.available -%}
-              {{ 'products.product.add_to_cart' | t }}
+              {{ section.settings.atc_label | default: 'Add to cart' | escape }}
             {%- else -%}
               {{ 'products.product.sold_out' | t }}
             {%- endif -%}
@@ -125,6 +218,20 @@
         {%- endif -%}
       {% endform %}
 
+      {%- assign has_trust = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'trust' -%}{%- assign has_trust = true -%}{%- endif -%}
+      {%- endfor -%}
+      {%- if has_trust -%}
+        <ul class="j14-product__trust">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'trust' -%}
+              <li {{ block.shopify_attributes }}>{{ block.settings.label | escape }}</li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
       {%- if section.settings.show_description and product.description != blank -%}
         <div class="j14-product__description j14-rte">{{ product.description }}</div>
       {%- endif -%}
@@ -132,10 +239,12 @@
       {%- if section.blocks.size > 0 -%}
         <div class="j14-product__accordions">
           {%- for block in section.blocks -%}
-            <details class="j14-accordion" {{ block.shopify_attributes }}>
-              <summary class="j14-accordion__summary">{{ block.settings.title | escape }}</summary>
-              <div class="j14-accordion__body j14-rte">{{ block.settings.body }}</div>
-            </details>
+            {%- if block.type == 'accordion' -%}
+              <details class="j14-accordion" {{ block.shopify_attributes }}>
+                <summary class="j14-accordion__summary">{{ block.settings.title | escape }}</summary>
+                <div class="j14-accordion__body j14-rte">{{ block.settings.body }}</div>
+              </details>
+            {%- endif -%}
           {%- endfor -%}
         </div>
       {%- endif -%}
@@ -157,9 +266,12 @@
     var priceCompare = section.querySelector('[data-j14-price-compare]');
     var atc = section.querySelector('[data-j14-atc]');
     var atcLabel = section.querySelector('[data-j14-atc-label]');
+    var wayLabel = section.querySelector('[data-j14-way-label]');
+    var stage = section.querySelector('[data-j14-pdp-stage]');
+    var fallback = section.querySelector('[data-j14-fallback-bottle]');
     var moneyFormat = {{ shop.money_format | json }};
     var soldOutText = {{ 'products.product.sold_out' | t | json }};
-    var addText = {{ 'products.product.add_to_cart' | t | json }};
+    var addText = {{ section.settings.atc_label | default: 'Add to cart' | json }};
     var unavailableText = {{ 'products.product.unavailable' | t | json }};
 
     function formatMoney(cents) {
@@ -184,6 +296,59 @@
       });
     }
 
+    function stageFromSwatch(id) {
+      var swatch = section.querySelector('[data-j14-swatch][data-variant-id="' + id + '"]');
+      if (!swatch || !stage) return;
+      if (swatch.dataset.bg) stage.style.setProperty('--pdp-stage-bg', swatch.dataset.bg);
+      if (swatch.dataset.bgEnd) stage.style.setProperty('--pdp-stage-bg-end', swatch.dataset.bgEnd);
+      if (swatch.dataset.text) stage.style.setProperty('--pdp-stage-text', swatch.dataset.text);
+      if (fallback && swatch.dataset.fallbackSrc) fallback.src = swatch.dataset.fallbackSrc;
+      if (wayLabel && swatch.dataset.name) wayLabel.textContent = swatch.dataset.name;
+      section.querySelectorAll('[data-j14-swatch]').forEach(function (btn) {
+        btn.classList.toggle('is-active', btn.dataset.variantId === String(id));
+      });
+    }
+
+    function applyVariant(match, meta) {
+      if (!match && !meta) return;
+      var id = match ? match.id : meta.variantId;
+      var price = match ? match.price : meta.price;
+      var compare = match ? match.compare_at_price : meta.compare;
+      var available = match ? match.available : meta.available === true || meta.available === 'true';
+      var mediaId = match && match.featured_media ? match.featured_media.id : meta && meta.mediaId;
+
+      if (idInput) idInput.value = id;
+      if (priceCurrent) priceCurrent.textContent = formatMoney(price);
+      if (priceCompare) {
+        if (compare && compare > price) {
+          priceCompare.textContent = formatMoney(compare);
+          priceCompare.hidden = false;
+        } else {
+          priceCompare.hidden = true;
+        }
+      }
+      if (atc) atc.disabled = !available;
+      if (atcLabel) atcLabel.textContent = available ? addText : soldOutText;
+      if (mediaId) showMedia(mediaId);
+      if (meta) {
+        if (wayLabel && meta.name) wayLabel.textContent = meta.name;
+        if (stage) {
+          if (meta.bg) stage.style.setProperty('--pdp-stage-bg', meta.bg);
+          if (meta.bgEnd) stage.style.setProperty('--pdp-stage-bg-end', meta.bgEnd);
+          if (meta.text) stage.style.setProperty('--pdp-stage-text', meta.text);
+        }
+        if (fallback && meta.fallbackSrc) fallback.src = meta.fallbackSrc;
+        section.querySelectorAll('[data-j14-swatch]').forEach(function (btn) {
+          btn.classList.toggle('is-active', btn.dataset.variantId === String(id));
+        });
+      } else {
+        stageFromSwatch(id);
+      }
+      var url = new URL(window.location.href);
+      url.searchParams.set('variant', id);
+      window.history.replaceState({}, '', url);
+    }
+
     function onOptionChange() {
       var opts = selectedOptions();
       if (!opts.length) return;
@@ -197,30 +362,41 @@
         if (atcLabel) atcLabel.textContent = unavailableText;
         return;
       }
-      if (idInput) idInput.value = match.id;
-      if (priceCurrent) priceCurrent.textContent = formatMoney(match.price);
-      if (priceCompare) {
-        if (match.compare_at_price && match.compare_at_price > match.price) {
-          priceCompare.textContent = formatMoney(match.compare_at_price);
-          priceCompare.hidden = false;
-        } else {
-          priceCompare.hidden = true;
-        }
-      }
-      if (atc) atc.disabled = !match.available;
-      if (atcLabel) atcLabel.textContent = match.available ? addText : soldOutText;
-      if (match.featured_media) showMedia(match.featured_media.id);
-      var url = new URL(window.location.href);
-      url.searchParams.set('variant', match.id);
-      window.history.replaceState({}, '', url);
+      applyVariant(match, null);
     }
 
-    section.querySelectorAll('[data-j14-option] input').forEach(function (input) {
+    section.querySelectorAll('[data-j14-option-input]').forEach(function (input) {
       input.addEventListener('change', onOptionChange);
     });
     section.querySelectorAll('[data-j14-thumb]').forEach(function (thumb) {
       thumb.addEventListener('click', function () {
         showMedia(thumb.dataset.mediaId);
+      });
+    });
+    section.querySelectorAll('[data-j14-swatch]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var options;
+        try {
+          options = JSON.parse(btn.dataset.options || '[]');
+        } catch (err) {
+          options = [];
+        }
+        section.querySelectorAll('[data-j14-option]').forEach(function (fieldset, i) {
+          var input = fieldset.querySelector('input[value="' + CSS.escape(options[i] || '') + '"]');
+          if (input) input.checked = true;
+        });
+        applyVariant(null, {
+          variantId: btn.dataset.variantId,
+          price: parseInt(btn.dataset.price, 10),
+          compare: parseInt(btn.dataset.compare, 10),
+          available: btn.dataset.available,
+          mediaId: btn.dataset.mediaId,
+          name: btn.dataset.name,
+          bg: btn.dataset.bg,
+          bgEnd: btn.dataset.bgEnd,
+          text: btn.dataset.text,
+          fallbackSrc: btn.dataset.fallbackSrc
+        });
       });
     });
   })();
@@ -233,9 +409,49 @@
   "class": "j14-product-section",
   "settings": [
     {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading override"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Sparkling water, anywhere."
+    },
+    {
+      "type": "select",
+      "id": "stage_mode",
+      "label": "Media stage style",
+      "options": [
+        { "value": "surface", "label": "Theme surface" },
+        { "value": "colorway", "label": "Colorway scene gradient" },
+        { "value": "dark", "label": "Theme dark" }
+      ],
+      "default": "colorway",
+      "info": "Colorway scene syncs with the selected bottle variant and every theme colorway preset."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_colorway_swatches",
+      "label": "Show colorway swatches",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "colorway_label",
+      "label": "Colorway label",
+      "default": "Colorway"
+    },
+    {
       "type": "checkbox",
       "id": "show_vendor",
-      "label": "Show vendor",
+      "label": "Show vendor when eyebrow empty",
       "default": false
     },
     {
@@ -243,6 +459,12 @@
       "id": "show_quantity",
       "label": "Show quantity selector",
       "default": true
+    },
+    {
+      "type": "text",
+      "id": "atc_label",
+      "label": "Add to cart label",
+      "default": "Add to cart"
     },
     {
       "type": "checkbox",
@@ -275,9 +497,21 @@
           "default": "<p>Add product details here.</p>"
         }
       ]
+    },
+    {
+      "type": "trust",
+      "name": "Trust point",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Free shipping over $50"
+        }
+      ]
     }
   ],
-  "max_blocks": 8,
+  "max_blocks": 12,
   "enabled_on": {
     "templates": ["product"]
   }
