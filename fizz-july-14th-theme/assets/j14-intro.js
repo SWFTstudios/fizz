@@ -2,6 +2,9 @@
   July 14th intro — GSAP ScrollTrigger.
   Media is always full-bleed / object-fit: cover. We animate clip-path from an
   uppercase I stem to the full viewport so imagery is not scale-zoomed.
+
+  On load (when enabled), the page auto-scrolls through the intro track so the
+  expand plays without a manual scroll. Touch / wheel / menu open cancel it.
 */
 (function () {
   'use strict';
@@ -38,6 +41,21 @@
     );
   }
 
+  function afterPageTransition(cb) {
+    var tries = 0;
+    function tick() {
+      var tx = document.getElementById('j14-tx');
+      var busy = tx && tx.classList.contains('is-active');
+      if (busy && tries < 50) {
+        tries += 1;
+        window.setTimeout(tick, 60);
+        return;
+      }
+      cb();
+    }
+    tick();
+  }
+
   function Intro(section) {
     this.section = section;
     this.track = section.querySelector('[data-j14-intro-track]');
@@ -56,6 +74,9 @@
     this.timer = null;
     this.tl = null;
     this.st = null;
+    this.autoScrollTween = null;
+    this.autoScrolling = false;
+    this._cancelAutoScroll = this.cancelAutoScroll.bind(this);
 
     var self = this;
     this.thumbs.forEach(function (thumb) {
@@ -73,10 +94,10 @@
     }
 
     /* Measure after fonts/layout; slight delay avoids wrong stem clip. */
-    var selfBuild = this;
     requestAnimationFrame(function () {
-      selfBuild.buildTimeline();
+      self.buildTimeline();
       ScrollTrigger.refresh();
+      self.maybeAutoScroll();
     });
   }
 
@@ -119,6 +140,82 @@
     this.timer = setInterval(function () {
       self.setSlide(self.active + 1);
     }, interval * 1000);
+  };
+
+  Intro.prototype.bindAutoScrollCancel = function () {
+    window.addEventListener('wheel', this._cancelAutoScroll, { passive: true });
+    window.addEventListener('touchstart', this._cancelAutoScroll, { passive: true });
+    window.addEventListener('keydown', this._cancelAutoScroll, { passive: true });
+  };
+
+  Intro.prototype.unbindAutoScrollCancel = function () {
+    window.removeEventListener('wheel', this._cancelAutoScroll);
+    window.removeEventListener('touchstart', this._cancelAutoScroll);
+    window.removeEventListener('keydown', this._cancelAutoScroll);
+  };
+
+  Intro.prototype.cancelAutoScroll = function () {
+    if (!this.autoScrolling) return;
+    this.autoScrolling = false;
+    this.section.classList.remove('is-auto-scrolling');
+    if (this.autoScrollTween) {
+      this.autoScrollTween.kill();
+      this.autoScrollTween = null;
+    }
+    this.unbindAutoScrollCancel();
+  };
+
+  Intro.prototype.maybeAutoScroll = function () {
+    var self = this;
+    if (this.section.dataset.autoScroll !== 'true') return;
+    if (!this.st || !this.track) return;
+    /* Deep-linked further down the page — don't yank shoppers back */
+    if (window.scrollY > 48) return;
+    if (window.location.hash && window.location.hash !== '#') return;
+
+    var delay = parseFloat(this.section.dataset.autoScrollDelay, 10);
+    if (isNaN(delay)) delay = 0.5;
+    var duration = parseFloat(this.section.dataset.autoScrollDuration, 10);
+    if (isNaN(duration) || duration < 0.4) duration = 2.8;
+
+    afterPageTransition(function () {
+      gsap.delayedCall(delay, function () {
+        if (document.documentElement.classList.contains('j14-menu-open')) return;
+        if (window.scrollY > 48) return;
+        self.playAutoScroll(duration);
+      });
+    });
+  };
+
+  Intro.prototype.playAutoScroll = function (duration) {
+    var self = this;
+    if (!this.st) return;
+
+    ScrollTrigger.refresh();
+    var endY = this.st.end;
+    var startY = window.scrollY || 0;
+    if (endY <= startY + 8) return;
+
+    this.autoScrolling = true;
+    this.section.classList.add('is-auto-scrolling');
+    this.bindAutoScrollCancel();
+
+    var proxy = { y: startY };
+    this.autoScrollTween = gsap.to(proxy, {
+      y: endY,
+      duration: duration,
+      ease: 'power1.inOut',
+      onUpdate: function () {
+        if (!self.autoScrolling) return;
+        window.scrollTo(0, proxy.y);
+      },
+      onComplete: function () {
+        self.cancelAutoScroll();
+        /* Land precisely at the intro end so scrub settles */
+        window.scrollTo(0, endY);
+        if (typeof ScrollTrigger.update === 'function') ScrollTrigger.update();
+      }
+    });
   };
 
   Intro.prototype.buildTimeline = function () {
@@ -208,6 +305,7 @@
   };
 
   Intro.prototype.destroy = function () {
+    this.cancelAutoScroll();
     if (this.timer) clearInterval(this.timer);
     if (this.tl) this.tl.kill();
     if (this.st) this.st.kill();
@@ -255,4 +353,13 @@
       if (slide) inst.setSlide(parseInt(slide.dataset.index, 10) || 0);
     });
   });
+
+  /* Pause/cancel when the mobile menu opens */
+  var menuObserver = new MutationObserver(function () {
+    if (!document.documentElement.classList.contains('j14-menu-open')) return;
+    instances.forEach(function (inst) {
+      inst.cancelAutoScroll();
+    });
+  });
+  menuObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 })();

@@ -697,6 +697,10 @@ html.j14-menu-open .j14-header__nav {
 .j14-intro.is-zoomed .j14-intro__hint {
   color: #f7f6f1;
 }
+.j14-intro.is-auto-scrolling .j14-intro__hint {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
 .j14-intro__hint-line {
   width: 1px;
   height: 34px;

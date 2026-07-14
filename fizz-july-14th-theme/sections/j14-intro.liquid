@@ -6,6 +6,9 @@
   class="j14-intro"
   data-j14-intro
   data-autoplay-interval="{{ section.settings.autoplay_interval }}"
+  data-auto-scroll="{% if section.settings.auto_scroll %}true{% else %}false{% endif %}"
+  data-auto-scroll-duration="{{ section.settings.auto_scroll_duration }}"
+  data-auto-scroll-delay="{{ section.settings.auto_scroll_delay }}"
   style="--j14-intro-len: {{ section.settings.scroll_length }}vh;"
 >
   <h1 class="j14-visually-hidden">{{ section.settings.seo_heading | default: shop.name }}</h1>
@@ -198,6 +201,34 @@
       "step": 1,
       "unit": "s",
       "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_scroll",
+      "label": "Auto-play scroll expand on load",
+      "default": true,
+      "info": "Starts the I-mask expand without the shopper scrolling. Manual scroll still takes over."
+    },
+    {
+      "type": "range",
+      "id": "auto_scroll_duration",
+      "label": "Auto-scroll duration",
+      "min": 1.5,
+      "max": 6,
+      "step": 0.1,
+      "unit": "s",
+      "default": 2.8
+    },
+    {
+      "type": "range",
+      "id": "auto_scroll_delay",
+      "label": "Auto-scroll delay",
+      "info": "Wait before starting so the first frame can settle.",
+      "min": 0,
+      "max": 2,
+      "step": 0.1,
+      "unit": "s",
+      "default": 0.5
     },
     {
       "type": "header",
