@@ -1,0 +1,36 @@
+{% comment %}
+  Global CSS design tokens driven by theme settings.
+  Rendered once in layout/theme.liquid <head>.
+{% endcomment %}
+{%- liquid
+  assign heading_font = settings.font_heading
+  assign body_font = settings.font_body
+  assign body_font_bold = body_font | font_modify: 'weight', 'bolder'
+-%}
+<style>
+  {{ heading_font | font_face: font_display: 'swap' }}
+  {{ body_font | font_face: font_display: 'swap' }}
+  {% if body_font_bold %}{{ body_font_bold | font_face: font_display: 'swap' }}{% endif %}
+
+  :root {
+    --j14-paper: {{ settings.color_paper }};
+    --j14-ink: {{ settings.color_ink }};
+    --j14-accent: {{ settings.color_accent }};
+    --j14-surface: {{ settings.color_surface }};
+    --j14-dark: {{ settings.color_dark }};
+    --j14-dark-text: {{ settings.color_dark_text }};
+    --j14-ink-rgb: {{ settings.color_ink | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+    --j14-paper-rgb: {{ settings.color_paper | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+
+    --j14-font-heading: {{ heading_font.family }}, {{ heading_font.fallback_families }};
+    --j14-font-heading-weight: {{ heading_font.weight }};
+    --j14-font-body: {{ body_font.family }}, {{ body_font.fallback_families }};
+    --j14-font-body-weight: {{ body_font.weight }};
+    --j14-heading-scale: {{ settings.heading_scale | divided_by: 100.0 }};
+    --j14-heading-transform: {% if settings.heading_uppercase %}uppercase{% else %}none{% endif %};
+
+    --j14-page-width: {{ settings.page_width }}px;
+    --j14-gutter: {{ settings.gutter }}px;
+    --j14-btn-radius: {{ settings.button_radius }}px;
+  }
+</style>

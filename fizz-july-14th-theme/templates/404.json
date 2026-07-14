@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "main": {
+      "type": "j14-404",
+      "settings": {}
+    },
+    "footer": {
+      "type": "j14-footer",
+      "settings": {
+        "show_newsletter": false
+      }
+    }
+  },
+  "order": ["main", "footer"]
+}

@@ -1,0 +1,28 @@
+{% comment %}
+  Maps a bottle product variant to a colorway slug.
+  Merchants can override per variant with the custom.color_slug metafield.
+  Usage: {% capture slug %}{% render 'j14-color-slug', variant: variant %}{% endcapture %}
+{% endcomment %}
+{% if variant.metafields.custom.color_slug != blank %}
+  {{- variant.metafields.custom.color_slug -}}
+{% else %}
+  {% liquid
+    assign title_key = variant.title | downcase | strip
+    case title_key
+      when 'black', 'onyx', 'charcoal'
+        echo 'charcoal-black'
+      when 'white', 'cloud', 'arctic'
+        echo 'arctic-white'
+      when 'orange', 'citrus', 'coral'
+        echo 'coral-orange'
+      when 'sage', 'fern', 'green'
+        echo 'sage-green'
+      when 'blue', 'ocean', 'electric'
+        echo 'electric-blue'
+      when 'navy', 'steel'
+        echo 'steel-navy'
+      else
+        echo title_key | replace: ' ', '-'
+    endcase
+  %}
+{% endif %}

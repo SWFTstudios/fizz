@@ -1,0 +1,225 @@
+{
+  "sections": {
+    "intro": {
+      "type": "j14-intro",
+      "blocks": {
+        "slide_1": {
+          "type": "media",
+          "settings": {
+            "label": "Trail",
+            "asset": "stitch-hero-slideshow-1.jpg"
+          }
+        },
+        "slide_2": {
+          "type": "media",
+          "settings": {
+            "label": "Studio",
+            "asset": "stitch-hero-slideshow-2.jpg"
+          }
+        },
+        "slide_3": {
+          "type": "media",
+          "settings": {
+            "label": "Sunrise",
+            "asset": "stitch-hero-slideshow-3.jpg"
+          }
+        }
+      },
+      "block_order": ["slide_1", "slide_2", "slide_3"],
+      "settings": {
+        "word_left": "FI",
+        "word_right": "ZZ",
+        "scroll_length": 260,
+        "autoplay_interval": 5,
+        "show_hint": true,
+        "hint_text": "Scroll"
+      }
+    },
+    "mosaic": {
+      "type": "j14-mosaic",
+      "blocks": {
+        "tile_1": {
+          "type": "tile",
+          "settings": { "asset": "stitch-bottle-steel-navy-desk.jpg", "span": 4 }
+        },
+        "tile_2": {
+          "type": "tile",
+          "settings": { "asset": "stitch-bottle-coral-orange-pool.jpg", "span": 4 }
+        },
+        "tile_3": {
+          "type": "tile",
+          "settings": { "asset": "stitch-bottle-electric-blue-water.jpg", "span": 4 }
+        },
+        "tile_4": {
+          "type": "tile",
+          "settings": { "asset": "stitch-beach-arctic-white.jpg", "span": 8, "wide_mobile": true }
+        },
+        "tile_5": {
+          "type": "tile",
+          "settings": { "asset": "stitch-bottle-sage-green-kitchen.jpg", "span": 4, "tall": true }
+        },
+        "tile_6": {
+          "type": "tile",
+          "settings": { "asset": "stitch-bottle-charcoal-black-dinner.jpg", "span": 6 }
+        },
+        "tile_7": {
+          "type": "tile",
+          "settings": { "asset": "stitch-flavor-packs-lifestyle.jpg", "span": 6 }
+        }
+      },
+      "block_order": ["tile_1", "tile_2", "tile_3", "tile_4", "tile_5", "tile_6", "tile_7"],
+      "settings": {
+        "heading": "Lifestyle gallery",
+        "anchor_id": "gallery",
+        "mobile_columns": "2",
+        "desktop_columns": "12",
+        "gap": 8,
+        "radius": 0
+      }
+    },
+    "colorways": {
+      "type": "j14-colorways",
+      "settings": {
+        "eyebrow": "The bottle",
+        "heading": "Pick your color",
+        "anchor_id": "colors",
+        "cta_label": "Shop this color",
+        "sync_scene": true
+      }
+    },
+    "how": {
+      "type": "j14-how-sticky",
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "title": "Fill with cold water",
+            "body": "<p>Cold water carbonates best. Fill to the line, no further.</p>",
+            "asset": "stitch-bottle-arctic-white-studio.jpg"
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "title": "Twist the pod",
+            "body": "<p>Lock a CO2 pod into the base and give it a quarter turn.</p>",
+            "asset": "stitch-science-carbonation.jpg"
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "title": "Sip the sparkle",
+            "body": "<p>Add a flavor pack if you like. Bubbles in under ten seconds.</p>",
+            "asset": "stitch-bottle-coral-orange-studio.jpg"
+          }
+        }
+      },
+      "block_order": ["step_1", "step_2", "step_3"],
+      "settings": {
+        "eyebrow": "How it works",
+        "heading": "Fizz in three moves",
+        "anchor_id": "how"
+      }
+    },
+    "flavors": {
+      "type": "j14-flavors",
+      "blocks": {
+        "flavor_1": {
+          "type": "flavor",
+          "settings": {
+            "title": "Zesty Lime",
+            "body": "<p>Bright, sharp, and cold-pressed.</p>",
+            "asset": "stitch-flavor-zesty-lime.jpg",
+            "tint": "#dce8c8"
+          }
+        },
+        "flavor_2": {
+          "type": "flavor",
+          "settings": {
+            "title": "Orange Tangerine",
+            "body": "<p>Sunny citrus with a soft finish.</p>",
+            "asset": "stitch-flavor-orange-tangerine.jpg",
+            "tint": "#f4ddc4"
+          }
+        },
+        "flavor_3": {
+          "type": "flavor",
+          "settings": {
+            "title": "Blood Orange",
+            "body": "<p>Deep citrus with a berry edge.</p>",
+            "asset": "stitch-flavor-blood-orange.jpg",
+            "tint": "#f0cfc4"
+          }
+        }
+      },
+      "block_order": ["flavor_1", "flavor_2", "flavor_3"],
+      "settings": {
+        "eyebrow": "Flavors",
+        "heading": "Three packs. Zero sugar.",
+        "subheading": "Real fruit flavor drops made for sparkling water.",
+        "anchor_id": "flavors"
+      }
+    },
+    "about": {
+      "type": "j14-about",
+      "blocks": {
+        "claim_1": {
+          "type": "claim",
+          "settings": {
+            "stat": "500+",
+            "title": "Cans replaced per bottle",
+            "body": "<p>One reusable bottle keeps hundreds of single-use cans out of circulation.</p>"
+          }
+        },
+        "claim_2": {
+          "type": "claim",
+          "settings": {
+            "stat": "100%",
+            "title": "Recyclable CO2 pods",
+            "body": "<p>Send pods back with the prepaid label and we refill them.</p>"
+          }
+        },
+        "claim_3": {
+          "type": "claim",
+          "settings": {
+            "stat": "0",
+            "title": "Plastic shipped in water",
+            "body": "<p>We ship flavor, not water. Your tap does the heavy lifting.</p>"
+          }
+        }
+      },
+      "block_order": ["claim_1", "claim_2", "claim_3"],
+      "settings": {
+        "eyebrow": "About us",
+        "heading": "Bubbles without the baggage",
+        "body": "<p>We started Fizz because sparkling water should not need a truck, a fridge, or a mountain of cans. One bottle, one pod, endless sparkle.</p>",
+        "asset": "fizz-bottle-hero.jpg",
+        "anchor_id": "about",
+        "sustain_eyebrow": "Sustainability",
+        "sustain_heading": "Better for the planet, by design",
+        "sustain_body": "<p>Every part of the system is designed to be refilled, returned, or recycled.</p>"
+      }
+    },
+    "footer": {
+      "type": "j14-footer",
+      "blocks": {
+        "link_shop": {
+          "type": "link",
+          "settings": { "label": "Shop all", "url": "/collections/all" }
+        },
+        "link_search": {
+          "type": "link",
+          "settings": { "label": "Search", "url": "/search" }
+        }
+      },
+      "block_order": ["link_shop", "link_search"],
+      "settings": {
+        "headline": "Sparkling water, anywhere.",
+        "cta_label": "Shop bottles",
+        "show_newsletter": true
+      }
+    }
+  },
+  "order": ["intro", "mosaic", "colorways", "how", "flavors", "about", "footer"]
+}

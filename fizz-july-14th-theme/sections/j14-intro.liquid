@@ -1,0 +1,218 @@
+{%- liquid
+  assign slide_count = section.blocks.size
+-%}
+<section
+  class="j14-intro"
+  data-j14-intro
+  data-autoplay-interval="{{ section.settings.autoplay_interval }}"
+  style="--j14-intro-len: {{ section.settings.scroll_length }}vh;"
+>
+  <h1 class="j14-visually-hidden">{{ section.settings.seo_heading | default: shop.name }}</h1>
+
+  <div class="j14-intro__track" data-j14-intro-track>
+    <div class="j14-intro__sticky">
+      <div class="j14-intro__word" aria-hidden="true">
+        <span class="j14-intro__half j14-intro__half--left" data-j14-intro-left>
+          {{- section.settings.word_left | default: 'FIZZ' | escape -}}
+        </span>
+
+        <div class="j14-intro__window" data-j14-intro-window>
+          <div class="j14-intro__slides" data-j14-intro-slides>
+            {%- if slide_count > 0 -%}
+              {%- for block in section.blocks -%}
+                <div
+                  class="j14-intro__slide{% if forloop.first %} is-active{% endif %}"
+                  data-j14-intro-slide
+                  data-index="{{ forloop.index0 }}"
+                  {{ block.shopify_attributes }}
+                >
+                  {%- render 'j14-media',
+                    video: block.settings.video,
+                    video_url: block.settings.video_url,
+                    image: block.settings.image,
+                    asset: block.settings.asset,
+                    alt: block.settings.label,
+                    class: 'j14-intro__media',
+                    sizes: '100vw',
+                    loading: 'eager'
+                  -%}
+                </div>
+              {%- endfor -%}
+            {%- else -%}
+              <div class="j14-intro__slide is-active" data-j14-intro-slide data-index="0">
+                {%- render 'j14-media', asset: 'stitch-hero-slideshow-1.jpg', class: 'j14-intro__media', loading: 'eager' -%}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+
+        <span class="j14-intro__half j14-intro__half--right" data-j14-intro-right>
+          {{- section.settings.word_right | default: 'FIZZ' | escape -}}
+        </span>
+      </div>
+
+      {%- if slide_count > 1 -%}
+        <div class="j14-intro__thumbs" data-j14-intro-thumbs role="tablist" aria-label="Intro media">
+          {%- for block in section.blocks -%}
+            <button
+              type="button"
+              class="j14-intro__thumb{% if forloop.first %} is-active{% endif %}"
+              data-j14-intro-thumb
+              data-index="{{ forloop.index0 }}"
+              aria-label="{{ block.settings.label | default: forloop.index | escape }}"
+            >
+              {%- liquid
+                assign thumb_image = block.settings.image
+                if thumb_image == blank and block.settings.video != blank
+                  assign thumb_image = block.settings.video.preview_image
+                endif
+              -%}
+              {%- if thumb_image != blank -%}
+                {{ thumb_image | image_url: width: 180 | image_tag: class: 'j14-intro__thumb-img', loading: 'lazy', alt: '' }}
+              {%- elsif block.settings.asset != blank -%}
+                <img src="{{ block.settings.asset | asset_url }}" class="j14-intro__thumb-img" loading="lazy" alt="">
+              {%- else -%}
+                <span class="j14-intro__thumb-fallback">{{ forloop.index }}</span>
+              {%- endif -%}
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.show_hint -%}
+        <p class="j14-intro__hint" data-j14-intro-hint>
+          <span class="j14-intro__hint-line" aria-hidden="true"></span>
+          {{ section.settings.hint_text | default: 'Scroll' | escape }}
+        </p>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "J14 Intro",
+  "tag": "section",
+  "class": "j14-intro-section",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Wordmark"
+    },
+    {
+      "type": "text",
+      "id": "word_left",
+      "label": "Word — left half",
+      "default": "FI"
+    },
+    {
+      "type": "text",
+      "id": "word_right",
+      "label": "Word — right half",
+      "default": "ZZ"
+    },
+    {
+      "type": "text",
+      "id": "seo_heading",
+      "label": "Accessible page heading",
+      "info": "Read by screen readers and search engines. Defaults to the store name."
+    },
+    {
+      "type": "header",
+      "content": "Scroll behavior"
+    },
+    {
+      "type": "range",
+      "id": "scroll_length",
+      "label": "Scroll length",
+      "info": "How much scrolling it takes for the media window to expand to full screen.",
+      "min": 150,
+      "max": 400,
+      "step": 10,
+      "unit": "vh",
+      "default": 260
+    },
+    {
+      "type": "range",
+      "id": "autoplay_interval",
+      "label": "Slide autoplay interval",
+      "info": "0 disables autoplay.",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Scroll hint"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hint",
+      "label": "Show scroll hint",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "hint_text",
+      "label": "Hint text",
+      "default": "Scroll"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "media",
+      "name": "Media slide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "Used for the thumbnail button and alt text.",
+          "default": "Slide"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Overrides the image. Autoplays muted."
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": "External video",
+          "accept": ["youtube", "vimeo"],
+          "info": "Used when no Shopify-hosted video is set."
+        },
+        {
+          "type": "text",
+          "id": "asset",
+          "label": "Theme asset fallback",
+          "info": "Advanced: filename of a theme asset, e.g. stitch-hero-slideshow-1.jpg"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [
+    {
+      "name": "J14 Intro",
+      "blocks": [
+        { "type": "media", "settings": { "label": "Trail", "asset": "stitch-hero-slideshow-1.jpg" } },
+        { "type": "media", "settings": { "label": "Studio", "asset": "stitch-hero-slideshow-2.jpg" } },
+        { "type": "media", "settings": { "label": "Sunrise", "asset": "stitch-hero-slideshow-3.jpg" } }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  }
+}
+{% endschema %}

@@ -1,0 +1,46 @@
+{
+  "sections": {
+    "main": {
+      "type": "j14-product",
+      "blocks": {
+        "acc_1": {
+          "type": "accordion",
+          "settings": {
+            "title": "Details",
+            "body": "<p>Add product details here.</p>"
+          }
+        },
+        "acc_2": {
+          "type": "accordion",
+          "settings": {
+            "title": "Shipping and returns",
+            "body": "<p>Free shipping over $50. 30-day returns.</p>"
+          }
+        }
+      },
+      "block_order": ["acc_1", "acc_2"],
+      "settings": {
+        "show_vendor": false,
+        "show_quantity": true,
+        "show_description": true,
+        "show_dynamic_checkout": false
+      }
+    },
+    "related": {
+      "type": "j14-related",
+      "settings": {
+        "heading": "Pairs well with",
+        "limit": 4
+      }
+    },
+    "footer": {
+      "type": "j14-footer",
+      "settings": {
+        "headline": "Sparkling water, anywhere.",
+        "cta_label": "Shop bottles",
+        "show_newsletter": false
+      }
+    }
+  },
+  "order": ["main", "related", "footer"]
+}

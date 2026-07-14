@@ -1,0 +1,70 @@
+<section class="j14-cart">
+  <h1 class="j14-heading j14-cart__title">{{ 'cart.general.title' | t }}</h1>
+
+  {%- if cart.item_count > 0 -%}
+    {% form 'cart', cart, class: 'j14-cart__form' %}
+      <ul class="j14-cart__items">
+        {%- for item in cart.items -%}
+          <li class="j14-cart__item">
+            <a href="{{ item.url }}" class="j14-cart__item-media">
+              {%- if item.image -%}
+                {{ item.image | image_url: width: 240 | image_tag: loading: 'lazy', widths: '120, 240', sizes: '96px', alt: item.title }}
+              {%- endif -%}
+            </a>
+            <div class="j14-cart__item-info">
+              <a class="j14-cart__item-title" href="{{ item.url }}">{{ item.product.title | escape }}</a>
+              {%- unless item.product.has_only_default_variant -%}
+                <p class="j14-cart__item-variant">{{ item.variant.title | escape }}</p>
+              {%- endunless -%}
+              <p class="j14-cart__item-price">{{ item.final_price | money }}</p>
+              <div class="j14-cart__item-controls">
+                <label class="j14-visually-hidden" for="Qty-{{ item.index | plus: 1 }}">
+                  {{ 'cart.general.quantity_label' | t: title: item.product.title }}
+                </label>
+                <input
+                  id="Qty-{{ item.index | plus: 1 }}"
+                  class="j14-input j14-cart__qty"
+                  type="number"
+                  name="updates[]"
+                  value="{{ item.quantity }}"
+                  min="0"
+                >
+                <a class="j14-cart__remove" href="{{ item.url_to_remove }}">{{ 'cart.general.remove' | t }}</a>
+              </div>
+            </div>
+            <p class="j14-cart__item-total">{{ item.final_line_price | money }}</p>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      <div class="j14-cart__summary">
+        <p class="j14-cart__subtotal">
+          <span>{{ 'cart.general.subtotal' | t }}</span>
+          <span>{{ cart.total_price | money }}</span>
+        </p>
+        <p class="j14-cart__note">{{ 'cart.general.taxes_and_shipping_at_checkout' | t }}</p>
+        <div class="j14-cart__actions">
+          <button type="submit" name="update" class="j14-btn j14-btn--ghost">{{ 'cart.general.update' | t }}</button>
+          <button type="submit" name="checkout" class="j14-btn j14-btn--accent">{{ 'cart.general.checkout' | t }}</button>
+        </div>
+      </div>
+    {% endform %}
+  {%- else -%}
+    <div class="j14-cart__empty">
+      <p>{{ 'cart.general.empty' | t }}</p>
+      <a class="j14-btn" href="{{ routes.all_products_collection_url }}">{{ 'cart.general.continue_shopping' | t }}</a>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "J14 Cart",
+  "tag": "section",
+  "class": "j14-cart-section",
+  "settings": [],
+  "enabled_on": {
+    "templates": ["cart"]
+  }
+}
+{% endschema %}

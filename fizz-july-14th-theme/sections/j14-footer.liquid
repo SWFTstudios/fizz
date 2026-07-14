@@ -1,0 +1,139 @@
+<footer class="j14-footer" id="footer">
+  <div class="j14-footer__inner">
+    {%- if section.settings.headline != blank -%}
+      <p class="j14-footer__headline">{{ section.settings.headline | escape }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.cta_label != blank -%}
+      <a class="j14-btn j14-btn--accent j14-footer__cta" href="{{ section.settings.cta_url | default: routes.all_products_collection_url }}">
+        {{- section.settings.cta_label | escape -}}
+      </a>
+    {%- endif -%}
+
+    {%- if section.settings.show_newsletter -%}
+      <div class="j14-footer__newsletter">
+        {% form 'customer', class: 'j14-newsletter-form' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          {%- if form.posted_successfully? -%}
+            <p class="j14-footer__success">{{ 'footer.newsletter.success' | t }}</p>
+          {%- else -%}
+            <label class="j14-visually-hidden" for="J14NewsletterEmail">{{ 'footer.newsletter.label' | t }}</label>
+            <input
+              id="J14NewsletterEmail"
+              type="email"
+              name="contact[email]"
+              class="j14-input"
+              placeholder="{{ section.settings.newsletter_placeholder | default: 'Your email' | escape }}"
+              required
+            >
+            <button type="submit" class="j14-btn">{{ 'footer.newsletter.submit' | t }}</button>
+          {%- endif -%}
+        {% endform %}
+      </div>
+    {%- endif -%}
+
+    <div class="j14-footer__grid">
+      <nav class="j14-footer__links" aria-label="Footer">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'link' -%}
+            <a href="{{ block.settings.url }}" {{ block.shopify_attributes }}>{{ block.settings.label | escape }}</a>
+          {%- endif -%}
+        {%- endfor -%}
+      </nav>
+      <div class="j14-footer__social">
+        {%- if settings.social_instagram != blank -%}
+          <a href="{{ settings.social_instagram }}" target="_blank" rel="noopener">Instagram</a>
+        {%- endif -%}
+        {%- if settings.social_tiktok != blank -%}
+          <a href="{{ settings.social_tiktok }}" target="_blank" rel="noopener">TikTok</a>
+        {%- endif -%}
+        {%- if settings.social_youtube != blank -%}
+          <a href="{{ settings.social_youtube }}" target="_blank" rel="noopener">YouTube</a>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <p class="j14-footer__meta">
+      {{ section.settings.copyright_note | default: 'All rights reserved' | escape }}
+      &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
+    </p>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "J14 Footer",
+  "tag": "footer",
+  "class": "j14-footer-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Sparkling water, anywhere."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Shop bottles"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Show newsletter signup",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Newsletter placeholder",
+      "default": "Your email"
+    },
+    {
+      "type": "text",
+      "id": "copyright_note",
+      "label": "Copyright note",
+      "default": "All rights reserved"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link",
+      "name": "Footer link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Shop all"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "J14 Footer",
+      "blocks": [
+        { "type": "link", "settings": { "label": "Shop all", "url": "/collections/all" } },
+        { "type": "link", "settings": { "label": "Search", "url": "/search" } }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["*"],
+    "groups": ["footer"]
+  }
+}
+{% endschema %}

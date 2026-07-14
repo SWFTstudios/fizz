@@ -1,0 +1,63 @@
+{%- if recommendations.performed? -%}
+  {%- assign related_products = recommendations.products -%}
+{%- else -%}
+  {%- assign related_products = collections.all.products | slice: 0, section.settings.limit -%}
+{%- endif -%}
+
+<section class="j14-related">
+  <h2 class="j14-heading j14-related__heading">{{ section.settings.heading | escape }}</h2>
+  <div
+    class="j14-related__rail"
+    data-recommendations
+    data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ section.settings.limit }}"
+  >
+    {%- for related in related_products limit: section.settings.limit -%}
+      {%- unless related.id == product.id -%}
+        {% render 'j14-product-card', product: related %}
+      {%- endunless -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+<script>
+  (function () {
+    var wrap = document.querySelector('[data-recommendations]');
+    if (!wrap || !wrap.dataset.url) return;
+    fetch(wrap.dataset.url)
+      .then(function (res) { return res.text(); })
+      .then(function (html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var fresh = doc.querySelector('[data-recommendations]');
+        if (fresh && fresh.children.length) wrap.innerHTML = fresh.innerHTML;
+      })
+      .catch(function () {});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "J14 Related Products",
+  "tag": "section",
+  "class": "j14-related-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Pairs well with"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Products",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  }
+}
+{% endschema %}

@@ -1,0 +1,52 @@
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "j14_header": {
+      "type": "j14-header",
+      "blocks": {
+        "colors": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Colors",
+            "anchor_id": "colors"
+          }
+        },
+        "how": {
+          "type": "nav_link",
+          "settings": {
+            "label": "How it works",
+            "anchor_id": "how"
+          }
+        },
+        "flavors": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Flavors",
+            "anchor_id": "flavors"
+          }
+        },
+        "about": {
+          "type": "nav_link",
+          "settings": {
+            "label": "About",
+            "anchor_id": "about"
+          }
+        },
+        "shop": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Shop",
+            "url": "/collections/all"
+          }
+        }
+      },
+      "block_order": ["colors", "how", "flavors", "about", "shop"],
+      "settings": {
+        "menu_label": "Menu",
+        "transparent_home": true
+      }
+    }
+  },
+  "order": ["j14_header"]
+}

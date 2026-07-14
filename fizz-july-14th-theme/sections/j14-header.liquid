@@ -1,0 +1,147 @@
+{%- liquid
+  assign cart_count = cart.item_count
+-%}
+<header
+  class="j14-header{% if section.settings.transparent_home and template.name == 'index' %} j14-header--transparent{% endif %}"
+  data-j14-header
+>
+  <div class="j14-header__inner">
+    <a href="{{ routes.root_url }}" class="j14-header__logo" aria-label="{{ shop.name | escape }}">
+      {%- if section.settings.logo != blank -%}
+        {{
+          section.settings.logo
+          | image_url: width: 360
+          | image_tag: class: 'j14-header__logo-img', widths: '120, 240, 360', sizes: '120px', alt: shop.name
+        }}
+      {%- else -%}
+        <span class="j14-header__logo-text">{{ section.settings.logo_text | default: shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    <nav class="j14-header__nav" id="j14-nav" aria-label="Main">
+      <ul class="j14-header__list">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign href = block.settings.url
+            if block.settings.anchor_id != blank
+              assign href = routes.root_url | append: '#' | append: block.settings.anchor_id
+            endif
+          -%}
+          <li {{ block.shopify_attributes }}>
+            <a class="j14-header__link" href="{{ href | default: routes.root_url }}">{{ block.settings.label | escape }}</a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="j14-header__actions">
+      <a class="j14-header__cart" href="{{ routes.cart_url }}" aria-label="{{ 'cart.general.title' | t }}">
+        <svg class="j14-header__cart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M6 7h12l-1.2 12.2a1.5 1.5 0 0 1-1.5 1.3H8.7a1.5 1.5 0 0 1-1.5-1.3L6 7Z"/>
+          <path d="M9 9V6a3 3 0 1 1 6 0v3"/>
+        </svg>
+        <span class="j14-header__cart-count" data-j14-cart-count>{{ cart_count }}</span>
+      </a>
+      <button
+        class="j14-header__toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="j14-nav"
+        data-j14-menu-toggle
+      >
+        <span class="j14-header__toggle-bar"></span>
+        <span class="j14-header__toggle-bar"></span>
+        <span class="j14-visually-hidden">{{ section.settings.menu_label | default: 'Menu' }}</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  (function () {
+    var header = document.querySelector('[data-j14-header]');
+    if (!header) return;
+    var toggle = header.querySelector('[data-j14-menu-toggle]');
+    if (toggle) {
+      toggle.addEventListener('click', function () {
+        var open = header.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.documentElement.classList.toggle('j14-menu-open', open);
+      });
+      header.querySelectorAll('.j14-header__link').forEach(function (link) {
+        link.addEventListener('click', function () {
+          header.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+          document.documentElement.classList.remove('j14-menu-open');
+        });
+      });
+    }
+    var onScroll = function () {
+      header.classList.toggle('is-scrolled', window.scrollY > 24);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "J14 Header",
+  "tag": "header",
+  "class": "j14-header-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo image"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo text",
+      "info": "Used when no logo image is set. Defaults to the store name."
+    },
+    {
+      "type": "text",
+      "id": "menu_label",
+      "label": "Mobile menu label",
+      "default": "Menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "transparent_home",
+      "label": "Transparent over homepage intro",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_link",
+      "name": "Nav link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Shop"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "anchor_id",
+          "label": "Homepage anchor ID",
+          "info": "Overrides the link. E.g. colors, how, flavors, about."
+        }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "enabled_on": {
+    "groups": ["header"]
+  }
+}
+{% endschema %}
