@@ -55,7 +55,11 @@
           endif
         -%}
         <li {{ block.shopify_attributes }}>
-          <a class="j14-header__link" href="{{ href | default: routes.root_url }}">{{ block.settings.label | escape }}</a>
+          <a
+            class="j14-header__link"
+            href="{{ href | default: routes.root_url }}"
+            {% if block.settings.anchor_id != blank %}data-no-transition{% endif %}
+          >{{ block.settings.label | escape }}</a>
         </li>
       {%- endfor -%}
     </ul>
@@ -67,21 +71,54 @@
     var header = document.querySelector('[data-j14-header]');
     if (!header) return;
     var toggle = header.querySelector('[data-j14-menu-toggle]');
+    var scrollY = 0;
+
+    function setMenuOpen(open) {
+      header.classList.toggle('is-open', open);
+      if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.documentElement.classList.toggle('j14-menu-open', open);
+
+      /* Lock scroll without fighting the homepage intro scrub */
+      if (open) {
+        scrollY = window.scrollY || window.pageYOffset || 0;
+        document.body.style.position = 'fixed';
+        document.body.style.top = '-' + scrollY + 'px';
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
+        if (window.ScrollTrigger && typeof ScrollTrigger.getAll === 'function') {
+          ScrollTrigger.getAll().forEach(function (st) {
+            if (st.disable) st.disable(false);
+          });
+        }
+      } else {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+        if (window.ScrollTrigger && typeof ScrollTrigger.getAll === 'function') {
+          ScrollTrigger.getAll().forEach(function (st) {
+            if (st.enable) st.enable();
+          });
+          if (typeof ScrollTrigger.refresh === 'function') ScrollTrigger.refresh();
+        }
+      }
+    }
+
     if (toggle) {
       toggle.addEventListener('click', function () {
-        var open = header.classList.toggle('is-open');
-        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        document.documentElement.classList.toggle('j14-menu-open', open);
+        setMenuOpen(!header.classList.contains('is-open'));
       });
       header.querySelectorAll('.j14-header__link').forEach(function (link) {
         link.addEventListener('click', function () {
-          header.classList.remove('is-open');
-          toggle.setAttribute('aria-expanded', 'false');
-          document.documentElement.classList.remove('j14-menu-open');
+          setMenuOpen(false);
         });
       });
     }
     var onScroll = function () {
+      if (document.documentElement.classList.contains('j14-menu-open')) return;
       header.classList.toggle('is-scrolled', window.scrollY > 24);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
