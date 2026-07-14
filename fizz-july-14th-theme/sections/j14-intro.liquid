@@ -12,44 +12,45 @@
 
   <div class="j14-intro__track" data-j14-intro-track>
     <div class="j14-intro__sticky">
+      {%- comment -%}
+        Media is always full-bleed / cover-fit. GSAP animates clip-path from an
+        uppercase “I” stem to the full viewport so images never get scale-zoomed.
+      {%- endcomment -%}
+      <div class="j14-intro__stage" data-j14-intro-stage aria-hidden="true">
+        <div class="j14-intro__slides" data-j14-intro-slides>
+          {%- if slide_count > 0 -%}
+            {%- for block in section.blocks -%}
+              <div
+                class="j14-intro__slide{% if forloop.first %} is-active{% endif %}"
+                data-j14-intro-slide
+                data-index="{{ forloop.index0 }}"
+                {{ block.shopify_attributes }}
+              >
+                {%- render 'j14-media',
+                  video: block.settings.video,
+                  video_url: block.settings.video_url,
+                  image: block.settings.image,
+                  asset: block.settings.asset,
+                  alt: block.settings.label,
+                  class: 'j14-intro__media',
+                  sizes: '100vw',
+                  loading: 'eager'
+                -%}
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            <div class="j14-intro__slide is-active" data-j14-intro-slide data-index="0">
+              {%- render 'j14-media', asset: 'stitch-hero-slideshow-1.jpg', class: 'j14-intro__media', loading: 'eager' -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+
       <div class="j14-intro__word" aria-hidden="true">
         <span class="j14-intro__half j14-intro__half--left" data-j14-intro-left>
           {{- section.settings.word_left | default: 'F' | escape -}}
         </span>
-
-        <div class="j14-intro__i" data-j14-intro-i>
-          <span class="j14-intro__idot" data-j14-intro-idot></span>
-          <div class="j14-intro__window" data-j14-intro-window>
-            <div class="j14-intro__slides" data-j14-intro-slides>
-              {%- if slide_count > 0 -%}
-                {%- for block in section.blocks -%}
-                  <div
-                    class="j14-intro__slide{% if forloop.first %} is-active{% endif %}"
-                    data-j14-intro-slide
-                    data-index="{{ forloop.index0 }}"
-                    {{ block.shopify_attributes }}
-                  >
-                    {%- render 'j14-media',
-                      video: block.settings.video,
-                      video_url: block.settings.video_url,
-                      image: block.settings.image,
-                      asset: block.settings.asset,
-                      alt: block.settings.label,
-                      class: 'j14-intro__media',
-                      sizes: '100vw',
-                      loading: 'eager'
-                    -%}
-                  </div>
-                {%- endfor -%}
-              {%- else -%}
-                <div class="j14-intro__slide is-active" data-j14-intro-slide data-index="0">
-                  {%- render 'j14-media', asset: 'stitch-hero-slideshow-1.jpg', class: 'j14-intro__media', loading: 'eager' -%}
-                </div>
-              {%- endif -%}
-            </div>
-          </div>
-        </div>
-
+        <span class="j14-intro__gap" data-j14-intro-gap aria-hidden="true"></span>
         <span class="j14-intro__half j14-intro__half--right" data-j14-intro-right>
           {{- section.settings.word_right | default: 'ZZ' | escape -}}
         </span>
@@ -124,13 +125,13 @@
     {
       "type": "text",
       "id": "word_left",
-      "label": "Word — left of the i mask",
+      "label": "Word — left of the I mask",
       "default": "F"
     },
     {
       "type": "text",
       "id": "word_right",
-      "label": "Word — right of the i mask",
+      "label": "Word — right of the I mask",
       "default": "ZZ"
     },
     {
@@ -180,7 +181,7 @@
       "type": "range",
       "id": "scroll_length",
       "label": "Scroll length",
-      "info": "How much scrolling it takes for the media window to expand to full screen.",
+      "info": "How much scrolling it takes for the I mask to expand to full screen.",
       "min": 150,
       "max": 400,
       "step": 10,
