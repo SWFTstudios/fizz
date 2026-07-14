@@ -1782,3 +1782,45 @@ html:not(.j14-js) .j14-how__step {
     font-size: 6.4rem;
   }
 }
+
+/* =============================================================
+   Bubble page transitions (j14-transition.js)
+   ============================================================= */
+#j14-tx {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  visibility: hidden;
+  overflow: hidden;
+}
+#j14-tx.is-active {
+  visibility: visible;
+}
+.j14-tx__swipe {
+  position: absolute;
+  inset: 0;
+  transform: translateX(-105%);
+  background: linear-gradient(115deg, var(--j14-dark) 0%, #142018 52%, #3d4a18 100%);
+  transition: transform 0.58s cubic-bezier(0.65, 0, 0.25, 1);
+  will-change: transform;
+}
+.j14-tx__swipe.is-cover {
+  transform: translateX(0);
+}
+.j14-tx__swipe.is-exit {
+  transform: translateX(105%);
+  transition-duration: 0.62s;
+}
+.j14-tx__bubbles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+.j14-no-motion #j14-tx {
+  display: none !important;
+}

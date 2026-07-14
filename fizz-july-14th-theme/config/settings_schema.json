@@ -130,6 +130,13 @@
         "label": "Enable scroll animations",
         "info": "Automatically disabled for visitors who prefer reduced motion.",
         "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "page_transitions",
+        "label": "Bubble page transitions",
+        "info": "On link click, fizz bubbles play fully, then a swipe covers the screen and reveals the next page. The destination is preloaded during the bubble burst.",
+        "default": true
       }
     ]
   },

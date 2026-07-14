@@ -1,5 +1,9 @@
 <!doctype html>
-<html lang="{{ request.locale.iso_code }}" class="j14-html{% unless settings.motion_enabled %} j14-no-motion{% endunless %}">
+<html
+  lang="{{ request.locale.iso_code }}"
+  class="j14-html{% unless settings.motion_enabled %} j14-no-motion{% endunless %}"
+  data-j14-transitions="{% if settings.page_transitions %}true{% else %}false{% endif %}"
+>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,5 +40,6 @@
     <script src="{{ 'j14-intro.js' | asset_url }}" defer></script>
     <script src="{{ 'j14-scroll.js' | asset_url }}" defer></script>
     <script src="{{ 'j14-carousel.js' | asset_url }}" defer></script>
+    <script src="{{ 'j14-transition.js' | asset_url }}" defer></script>
   </body>
 </html>
