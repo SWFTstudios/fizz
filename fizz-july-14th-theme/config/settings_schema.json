@@ -1,0 +1,167 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "July 14th Custom Design",
+    "theme_version": "1.0.0",
+    "theme_author": "Fizz",
+    "theme_documentation_url": "https://github.com/",
+    "theme_support_url": "https://github.com/"
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_paper",
+        "label": "Background (paper)",
+        "default": "#f4f3ee"
+      },
+      {
+        "type": "color",
+        "id": "color_ink",
+        "label": "Text (ink)",
+        "default": "#111214"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Accent",
+        "default": "#c6f24e"
+      },
+      {
+        "type": "color",
+        "id": "color_surface",
+        "label": "Cards and panels",
+        "default": "#e9e7df"
+      },
+      {
+        "type": "color",
+        "id": "color_dark",
+        "label": "Dark sections background",
+        "default": "#0b0c0e"
+      },
+      {
+        "type": "color",
+        "id": "color_dark_text",
+        "label": "Dark sections text",
+        "default": "#f2f1ea"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "font_heading",
+        "label": "Headings",
+        "default": "anton_n4"
+      },
+      {
+        "type": "font_picker",
+        "id": "font_body",
+        "label": "Body",
+        "default": "work_sans_n4"
+      },
+      {
+        "type": "range",
+        "id": "heading_scale",
+        "label": "Heading size scale",
+        "min": 80,
+        "max": 130,
+        "step": 5,
+        "unit": "%",
+        "default": 100
+      },
+      {
+        "type": "checkbox",
+        "id": "heading_uppercase",
+        "label": "Uppercase headings",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "label": "Maximum page width",
+        "min": 1200,
+        "max": 1920,
+        "step": 40,
+        "unit": "px",
+        "default": 1600
+      },
+      {
+        "type": "range",
+        "id": "gutter",
+        "label": "Page gutter (mobile)",
+        "min": 12,
+        "max": 32,
+        "step": 2,
+        "unit": "px",
+        "default": 16
+      }
+    ]
+  },
+  {
+    "name": "Buttons",
+    "settings": [
+      {
+        "type": "range",
+        "id": "button_radius",
+        "label": "Button corner radius",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "default": 4
+      }
+    ]
+  },
+  {
+    "name": "Motion",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "motion_enabled",
+        "label": "Enable scroll animations",
+        "info": "Automatically disabled for visitors who prefer reduced motion.",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Products",
+    "settings": [
+      {
+        "type": "product",
+        "id": "bottle_product",
+        "label": "Default bottle product",
+        "info": "Used by the colorways carousel and pairing links when a section does not set its own product."
+      }
+    ]
+  },
+  {
+    "name": "Social",
+    "settings": [
+      {
+        "type": "url",
+        "id": "social_instagram",
+        "label": "Instagram URL"
+      },
+      {
+        "type": "url",
+        "id": "social_tiktok",
+        "label": "TikTok URL"
+      },
+      {
+        "type": "url",
+        "id": "social_youtube",
+        "label": "YouTube URL"
+      }
+    ]
+  }
+]

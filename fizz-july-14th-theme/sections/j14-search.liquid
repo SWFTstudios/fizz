@@ -1,0 +1,67 @@
+<section class="j14-search">
+  <h1 class="j14-heading j14-search__title">{{ 'general.search.search' | t }}</h1>
+
+  <form action="{{ routes.search_url }}" method="get" role="search" class="j14-search__form">
+    <label class="j14-visually-hidden" for="J14SearchInput">{{ 'general.search.search' | t }}</label>
+    <input
+      id="J14SearchInput"
+      class="j14-input j14-search__input"
+      type="search"
+      name="q"
+      value="{{ search.terms | escape }}"
+      placeholder="{{ 'general.search.placeholder' | t }}"
+    >
+    <input type="hidden" name="options[prefix]" value="last">
+    <button type="submit" class="j14-btn">{{ 'general.search.search' | t }}</button>
+  </form>
+
+  {%- if search.performed -%}
+    {%- if search.results_count > 0 -%}
+      <p class="j14-search__count">
+        {{ 'general.search.results_with_count' | t: count: search.results_count, terms: search.terms }}
+      </p>
+      {%- paginate search.results by 12 -%}
+        <div class="j14-collection__grid j14-collection__grid--3">
+          {%- for result in search.results -%}
+            {%- if result.object_type == 'product' -%}
+              {% render 'j14-product-card', product: result %}
+            {%- else -%}
+              <article class="j14-card j14-card--text">
+                <a href="{{ result.url }}" class="j14-card__link">
+                  <div class="j14-card__info">
+                    <h3 class="j14-card__title">{{ result.title | escape }}</h3>
+                  </div>
+                </a>
+              </article>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+        {%- if paginate.pages > 1 -%}
+          <nav class="j14-pagination" aria-label="Pagination">
+            {%- if paginate.previous -%}
+              <a class="j14-btn j14-btn--ghost" href="{{ paginate.previous.url }}">{{ 'general.pagination.previous' | t }}</a>
+            {%- endif -%}
+            <span class="j14-pagination__status">{{ paginate.current_page }} / {{ paginate.pages }}</span>
+            {%- if paginate.next -%}
+              <a class="j14-btn j14-btn--ghost" href="{{ paginate.next.url }}">{{ 'general.pagination.next' | t }}</a>
+            {%- endif -%}
+          </nav>
+        {%- endif -%}
+      {%- endpaginate -%}
+    {%- else -%}
+      <p class="j14-search__none">{{ 'general.search.no_results' | t: terms: search.terms }}</p>
+    {%- endif -%}
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "J14 Search",
+  "tag": "section",
+  "class": "j14-search-section",
+  "settings": [],
+  "enabled_on": {
+    "templates": ["search"]
+  }
+}
+{% endschema %}

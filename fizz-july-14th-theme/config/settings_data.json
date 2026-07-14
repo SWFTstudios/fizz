@@ -1,0 +1,36 @@
+{
+  "current": {
+    "color_paper": "#f4f3ee",
+    "color_ink": "#111214",
+    "color_accent": "#c6f24e",
+    "color_surface": "#e9e7df",
+    "color_dark": "#0b0c0e",
+    "color_dark_text": "#f2f1ea",
+    "font_heading": "anton_n4",
+    "font_body": "work_sans_n4",
+    "heading_scale": 100,
+    "heading_uppercase": true,
+    "page_width": 1600,
+    "gutter": 16,
+    "button_radius": 4,
+    "motion_enabled": true
+  },
+  "presets": {
+    "July 14th": {
+      "color_paper": "#f4f3ee",
+      "color_ink": "#111214",
+      "color_accent": "#c6f24e",
+      "color_surface": "#e9e7df",
+      "color_dark": "#0b0c0e",
+      "color_dark_text": "#f2f1ea",
+      "font_heading": "anton_n4",
+      "font_body": "work_sans_n4",
+      "heading_scale": 100,
+      "heading_uppercase": true,
+      "page_width": 1600,
+      "gutter": 16,
+      "button_radius": 4,
+      "motion_enabled": true
+    }
+  }
+}

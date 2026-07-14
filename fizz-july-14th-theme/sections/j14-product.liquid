@@ -1,0 +1,285 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+-%}
+<section class="j14-product" data-j14-product>
+  <div class="j14-product__layout">
+    <div class="j14-product__gallery" data-j14-gallery>
+      {%- if product.media.size > 0 -%}
+        <div class="j14-product__media-rail" data-j14-media-rail>
+          {%- for media in product.media -%}
+            <div
+              class="j14-product__media{% if forloop.first %} is-active{% endif %}"
+              data-media-id="{{ media.id }}"
+            >
+              {%- case media.media_type -%}
+                {%- when 'video' -%}
+                  {{ media | video_tag: image_size: '1080x', controls: true, playsinline: true, class: 'j14-product__media-el' }}
+                {%- when 'external_video' -%}
+                  {{ media | external_video_tag: class: 'j14-product__media-el' }}
+                {%- when 'model' -%}
+                  {{ media | model_viewer_tag: class: 'j14-product__media-el' }}
+                {%- else -%}
+                  {%- liquid
+                    assign media_loading = 'lazy'
+                    if forloop.first
+                      assign media_loading = 'eager'
+                    endif
+                  -%}
+                  {{
+                    media
+                    | image_url: width: 1400
+                    | image_tag: class: 'j14-product__media-el', loading: media_loading, sizes: '(min-width: 750px) 55vw, 100vw', widths: '540, 720, 1080, 1400', alt: media.alt
+                  }}
+              {%- endcase -%}
+            </div>
+          {%- endfor -%}
+        </div>
+        {%- if product.media.size > 1 -%}
+          <div class="j14-product__thumbs">
+            {%- for media in product.media -%}
+              <button
+                type="button"
+                class="j14-product__thumb{% if forloop.first %} is-active{% endif %}"
+                data-j14-thumb
+                data-media-id="{{ media.id }}"
+                aria-label="{{ 'products.product.media_label' | t: index: forloop.index }}"
+              >
+                {{ media.preview_image | image_url: width: 180 | image_tag: loading: 'lazy', alt: '' }}
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'j14-product__media-el j14-placeholder-svg' }}
+      {%- endif -%}
+    </div>
+
+    <div class="j14-product__panel">
+      {%- if section.settings.show_vendor and product.vendor != blank -%}
+        <p class="j14-eyebrow">{{ product.vendor | escape }}</p>
+      {%- endif -%}
+      <h1 class="j14-heading j14-product__title">{{ product.title | escape }}</h1>
+
+      <p class="j14-product__price" data-j14-price>
+        <span data-j14-price-current>{{ current_variant.price | money }}</span>
+        {%- if current_variant.compare_at_price > current_variant.price -%}
+          <s data-j14-price-compare>{{ current_variant.compare_at_price | money }}</s>
+        {%- else -%}
+          <s data-j14-price-compare hidden></s>
+        {%- endif -%}
+      </p>
+
+      {% form 'product', product, class: 'j14-product__form', novalidate: 'novalidate' %}
+        <input type="hidden" name="id" value="{{ current_variant.id }}" data-j14-variant-id>
+
+        {%- unless product.has_only_default_variant -%}
+          {%- for option in product.options_with_values -%}
+            <fieldset class="j14-product__option" data-j14-option data-option-index="{{ forloop.index0 }}">
+              <legend class="j14-product__option-name">{{ option.name | escape }}</legend>
+              <div class="j14-product__pills">
+                {%- for value in option.values -%}
+                  <label class="j14-pill">
+                    <input
+                      type="radio"
+                      name="option-{{ section.id }}-{{ forloop.parentloop.index0 }}"
+                      value="{{ value | escape }}"
+                      {% if option.selected_value == value %}checked{% endif %}
+                    >
+                    <span>{{ value | escape }}</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </fieldset>
+          {%- endfor -%}
+        {%- endunless -%}
+
+        {%- if section.settings.show_quantity -%}
+          <label class="j14-product__qty-label" for="Quantity-{{ section.id }}">{{ 'products.product.quantity' | t }}</label>
+          <input
+            id="Quantity-{{ section.id }}"
+            class="j14-input j14-product__qty"
+            type="number"
+            name="quantity"
+            value="1"
+            min="1"
+          >
+        {%- endif -%}
+
+        <button
+          type="submit"
+          name="add"
+          class="j14-btn j14-btn--accent j14-product__atc"
+          data-j14-atc
+          {% unless current_variant.available %}disabled{% endunless %}
+        >
+          <span data-j14-atc-label>
+            {%- if current_variant.available -%}
+              {{ 'products.product.add_to_cart' | t }}
+            {%- else -%}
+              {{ 'products.product.sold_out' | t }}
+            {%- endif -%}
+          </span>
+        </button>
+        {%- if section.settings.show_dynamic_checkout -%}
+          {{ form | payment_button }}
+        {%- endif -%}
+      {% endform %}
+
+      {%- if section.settings.show_description and product.description != blank -%}
+        <div class="j14-product__description j14-rte">{{ product.description }}</div>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <div class="j14-product__accordions">
+          {%- for block in section.blocks -%}
+            <details class="j14-accordion" {{ block.shopify_attributes }}>
+              <summary class="j14-accordion__summary">{{ block.settings.title | escape }}</summary>
+              <div class="j14-accordion__body j14-rte">{{ block.settings.body }}</div>
+            </details>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script type="application/json" data-j14-product-json>
+  {{ product.variants | json }}
+</script>
+<script>
+  (function () {
+    var section = document.querySelector('[data-j14-product]');
+    if (!section) return;
+    var jsonEl = document.querySelector('[data-j14-product-json]');
+    var variants = jsonEl ? JSON.parse(jsonEl.textContent) : [];
+    var idInput = section.querySelector('[data-j14-variant-id]');
+    var priceCurrent = section.querySelector('[data-j14-price-current]');
+    var priceCompare = section.querySelector('[data-j14-price-compare]');
+    var atc = section.querySelector('[data-j14-atc]');
+    var atcLabel = section.querySelector('[data-j14-atc-label]');
+    var moneyFormat = {{ shop.money_format | json }};
+    var soldOutText = {{ 'products.product.sold_out' | t | json }};
+    var addText = {{ 'products.product.add_to_cart' | t | json }};
+    var unavailableText = {{ 'products.product.unavailable' | t | json }};
+
+    function formatMoney(cents) {
+      var value = (cents / 100).toFixed(2);
+      return moneyFormat.replace(/\{\{\s*amount[^}]*\}\}/, value);
+    }
+
+    function selectedOptions() {
+      return Array.prototype.map.call(section.querySelectorAll('[data-j14-option]'), function (fieldset) {
+        var checked = fieldset.querySelector('input:checked');
+        return checked ? checked.value : null;
+      });
+    }
+
+    function showMedia(mediaId) {
+      if (!mediaId) return;
+      section.querySelectorAll('.j14-product__media').forEach(function (media) {
+        media.classList.toggle('is-active', media.dataset.mediaId === String(mediaId));
+      });
+      section.querySelectorAll('[data-j14-thumb]').forEach(function (thumb) {
+        thumb.classList.toggle('is-active', thumb.dataset.mediaId === String(mediaId));
+      });
+    }
+
+    function onOptionChange() {
+      var opts = selectedOptions();
+      if (!opts.length) return;
+      var match = variants.find(function (variant) {
+        return variant.options.every(function (value, i) {
+          return value === opts[i];
+        });
+      });
+      if (!match) {
+        if (atc) atc.disabled = true;
+        if (atcLabel) atcLabel.textContent = unavailableText;
+        return;
+      }
+      if (idInput) idInput.value = match.id;
+      if (priceCurrent) priceCurrent.textContent = formatMoney(match.price);
+      if (priceCompare) {
+        if (match.compare_at_price && match.compare_at_price > match.price) {
+          priceCompare.textContent = formatMoney(match.compare_at_price);
+          priceCompare.hidden = false;
+        } else {
+          priceCompare.hidden = true;
+        }
+      }
+      if (atc) atc.disabled = !match.available;
+      if (atcLabel) atcLabel.textContent = match.available ? addText : soldOutText;
+      if (match.featured_media) showMedia(match.featured_media.id);
+      var url = new URL(window.location.href);
+      url.searchParams.set('variant', match.id);
+      window.history.replaceState({}, '', url);
+    }
+
+    section.querySelectorAll('[data-j14-option] input').forEach(function (input) {
+      input.addEventListener('change', onOptionChange);
+    });
+    section.querySelectorAll('[data-j14-thumb]').forEach(function (thumb) {
+      thumb.addEventListener('click', function () {
+        showMedia(thumb.dataset.mediaId);
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "J14 Product",
+  "tag": "section",
+  "class": "j14-product-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quantity",
+      "label": "Show quantity selector",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "Show dynamic checkout button",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "accordion",
+      "name": "Accordion",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Details"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Body",
+          "default": "<p>Add product details here.</p>"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "enabled_on": {
+    "templates": ["product"]
+  }
+}
+{% endschema %}

@@ -1,0 +1,16 @@
+<section class="j14-page">
+  <h1 class="j14-heading j14-page__title">{{ page.title | escape }}</h1>
+  <div class="j14-page__content j14-rte">{{ page.content }}</div>
+</section>
+
+{% schema %}
+{
+  "name": "J14 Page",
+  "tag": "section",
+  "class": "j14-page-section",
+  "settings": [],
+  "enabled_on": {
+    "templates": ["page"]
+  }
+}
+{% endschema %}

@@ -1,0 +1,207 @@
+{%- liquid
+  assign bottle = section.settings.product | default: settings.bottle_product
+  assign cta_label = section.settings.cta_label | default: 'Shop this color'
+  assign demo_slugs = 'steel-navy,electric-blue,coral-orange,sage-green,charcoal-black,arctic-white' | split: ','
+-%}
+<section
+  class="j14-ways{% unless section.settings.sync_scene %} j14-ways--static{% endunless %}"
+  id="{{ section.settings.anchor_id | default: 'colors' }}"
+  data-j14-carousel
+  data-sync-scene="{{ section.settings.sync_scene }}"
+>
+  <div class="j14-ways__head">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="j14-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.heading != blank -%}
+      <h2 class="j14-heading j14-ways__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+  </div>
+
+  <div class="j14-ways__viewport">
+    <ul class="j14-ways__rail" data-j14-rail tabindex="0" aria-label="{{ section.settings.heading | default: 'Bottle colors' | escape }}">
+      {%- if bottle != blank -%}
+        {%- for variant in bottle.variants -%}
+          {%- capture slug -%}{% render 'j14-color-slug', variant: variant %}{%- endcapture -%}
+          {%- assign slug = slug | strip -%}
+          {%- capture scene -%}{% render 'j14-colorway-scene', slug: slug, variant: variant %}{%- endcapture -%}
+          {%- assign scene_parts = scene | strip | split: '|' -%}
+          {%- assign bg = scene_parts[0] -%}
+          {%- assign bg_end = scene_parts[1] -%}
+          {%- assign btn = scene_parts[2] -%}
+          {%- assign text_color = scene_parts[3] -%}
+          {%- assign swatch = scene_parts[4] -%}
+          {%- assign btn_text = scene_parts[5] -%}
+          {%- assign override_image = blank -%}
+          {%- for block in section.blocks -%}
+            {%- if block.settings.slug == slug -%}
+              {%- if block.settings.bg != blank %}{% assign bg = block.settings.bg %}{% endif -%}
+              {%- if block.settings.bg_end != blank %}{% assign bg_end = block.settings.bg_end %}{% endif -%}
+              {%- if block.settings.btn != blank %}{% assign btn = block.settings.btn %}{% endif -%}
+              {%- if block.settings.text != blank %}{% assign text_color = block.settings.text %}{% endif -%}
+              {%- if block.settings.image != blank %}{% assign override_image = block.settings.image %}{% endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+          <li
+            class="j14-way{% if forloop.first %} is-active{% endif %}"
+            data-j14-slide
+            data-bg="{{ bg }}"
+            data-bg-end="{{ bg_end }}"
+            data-btn="{{ btn }}"
+            data-btn-text="{{ btn_text }}"
+            data-text="{{ text_color }}"
+            data-swatch="{{ swatch }}"
+          >
+            <div class="j14-way__media">
+              {%- if override_image != blank -%}
+                {{ override_image | image_url: width: 900 | image_tag: class: 'j14-way__img', loading: 'lazy', sizes: '(min-width: 750px) 34vw, 72vw', widths: '360, 540, 720, 900', alt: variant.title }}
+              {%- elsif variant.featured_image -%}
+                {{ variant.featured_image | image_url: width: 900 | image_tag: class: 'j14-way__img', loading: 'lazy', sizes: '(min-width: 750px) 34vw, 72vw', widths: '360, 540, 720, 900', alt: variant.title }}
+              {%- else -%}
+                <img src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}" class="j14-way__img" loading="lazy" width="675" height="900" alt="{{ variant.title | escape }}">
+              {%- endif -%}
+            </div>
+            <div class="j14-way__info">
+              <h3 class="j14-way__name">{{ variant.title | escape }}</h3>
+              <p class="j14-way__price">{{ variant.price | money }}</p>
+              <a class="j14-btn j14-way__cta" href="{{ bottle.url }}?variant={{ variant.id }}">
+                {{- cta_label | escape -}}
+              </a>
+            </div>
+          </li>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for slug in demo_slugs -%}
+          {%- capture scene -%}{% render 'j14-colorway-scene', slug: slug %}{%- endcapture -%}
+          {%- assign scene_parts = scene | strip | split: '|' -%}
+          <li
+            class="j14-way{% if forloop.first %} is-active{% endif %}"
+            data-j14-slide
+            data-bg="{{ scene_parts[0] }}"
+            data-bg-end="{{ scene_parts[1] }}"
+            data-btn="{{ scene_parts[2] }}"
+            data-btn-text="{{ scene_parts[5] }}"
+            data-text="{{ scene_parts[3] }}"
+            data-swatch="{{ scene_parts[4] }}"
+          >
+            <div class="j14-way__media">
+              <img src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}" class="j14-way__img" loading="lazy" width="675" height="900" alt="{{ slug | replace: '-', ' ' | capitalize | escape }}">
+            </div>
+            <div class="j14-way__info">
+              <h3 class="j14-way__name">{{ slug | replace: '-', ' ' | capitalize }}</h3>
+              <a class="j14-btn j14-way__cta" href="{{ routes.all_products_collection_url }}">{{ cta_label | escape }}</a>
+            </div>
+          </li>
+        {%- endfor -%}
+      {%- endif -%}
+    </ul>
+  </div>
+
+  <div class="j14-ways__controls">
+    <button type="button" class="j14-ways__arrow" data-j14-prev aria-label="{{ 'general.accessibility.previous' | t }}">&larr;</button>
+    <div class="j14-ways__dots" data-j14-dots role="tablist"></div>
+    <button type="button" class="j14-ways__arrow" data-j14-next aria-label="{{ 'general.accessibility.next' | t }}">&rarr;</button>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "J14 Colorways Carousel",
+  "tag": "section",
+  "class": "j14-ways-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "The bottle"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Pick your color"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "colors"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Bottle product",
+      "info": "One slide is created per variant. Falls back to the theme's default bottle product, then to demo colorways."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Shop this color"
+    },
+    {
+      "type": "checkbox",
+      "id": "sync_scene",
+      "label": "Sync background with active color",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "colorway",
+      "name": "Colorway override",
+      "settings": [
+        {
+          "type": "select",
+          "id": "slug",
+          "label": "Colorway",
+          "options": [
+            { "value": "steel-navy", "label": "Steel Navy" },
+            { "value": "electric-blue", "label": "Electric Blue" },
+            { "value": "coral-orange", "label": "Coral Orange" },
+            { "value": "sage-green", "label": "Sage Green" },
+            { "value": "charcoal-black", "label": "Charcoal Black" },
+            { "value": "arctic-white", "label": "Arctic White" }
+          ],
+          "default": "steel-navy"
+        },
+        {
+          "type": "color",
+          "id": "bg",
+          "label": "Background start"
+        },
+        {
+          "type": "color",
+          "id": "bg_end",
+          "label": "Background end"
+        },
+        {
+          "type": "color",
+          "id": "btn",
+          "label": "Button color"
+        },
+        {
+          "type": "color",
+          "id": "text",
+          "label": "Text color"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Bottle image override"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "J14 Colorways Carousel"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index", "page", "product", "collection"]
+  }
+}
+{% endschema %}

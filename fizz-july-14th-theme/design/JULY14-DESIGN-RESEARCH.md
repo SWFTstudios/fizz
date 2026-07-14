@@ -1,0 +1,87 @@
+# July 14th Custom Design — Shopify research report
+
+Research performed against shopify.dev before building the theme, per the
+workspace rule on research-backed Shopify planning. This theme has its own
+`design/` folder because the other themes in this repository must not be
+modified.
+
+## Questions answered
+
+### 1. Can merchants add photos AND videos to homepage sections from the theme editor?
+
+Yes. Verified in the input settings reference
+(https://shopify.dev/docs/storefronts/themes/architecture/settings/input-settings):
+
+- `image_picker` — image from Files, supports focal point.
+- `video` — picker for Shopify-hosted videos uploaded to Files; returns a
+  `video` object usable with `video_tag`. **Does not support a `default`
+  value**, so sections must render a fallback (this theme falls back to a
+  theme-asset filename, then a `placeholder_svg_tag`).
+- `video_url` — YouTube/Vimeo URL field with an `accept` array; returns
+  `.id` and `.type` for building an embed.
+
+Consequence adopted in this theme: every media block (`j14-intro`,
+`j14-mosaic`, `j14-how-sticky`, `j14-flavors`, `j14-about`) exposes all three
+inputs plus a theme-asset fallback text field, with priority
+video → external video → image → asset → placeholder
+(implemented in `snippets/j14-media.liquid`).
+
+### 2. Section/block limits
+
+Verified in the section schema reference
+(https://shopify.dev/docs/storefronts/themes/architecture/sections/section-schema):
+
+- Max **50 blocks per section**; `max_blocks` can lower this. The mosaic is
+  capped at 24 tiles, intro at 8 slides, how-to at 6 steps.
+- `presets` make sections addable from the editor's "Add section" picker;
+  every non-main-template section in this theme ships a preset with sensible
+  default blocks.
+- `enabled_on` / `disabled_on` restrict where sections can be added; used so
+  e.g. `j14-intro` only appears on the home template and `j14-product` only
+  on product templates.
+- `limit: 1` is applied to the intro and how-to sections (only one scroll
+  narrative per page).
+
+### 3. Theme presets and JSON parsing (carried over from prior research)
+
+- `settings_data.json` supports at most **5 theme presets** (source:
+  `fizz-claude-theme/design/colorway-presets/SHOPIFY-COLORWAY-RESEARCH.md`,
+  verified against shopify.dev during that project). This theme ships **1**
+  preset ("July 14th").
+- **Liquid cannot parse JSON files at runtime**, so colorway palette data is
+  mirrored as Liquid case statements in `snippets/j14-colorway-scene.liquid`
+  (same approach proven in `fizz-claude-theme`), with per-variant metafield
+  overrides (`custom.color_slug`, `custom.swatch_hex`, `custom.scene_bg`,
+  `custom.scene_bg_end`, `custom.scene_btn`, `custom.scene_text`).
+
+### 4. Storefront runtime vs theme editor behavior
+
+- Scroll-driven effects (intro expansion, mosaic slide-up, sticky how-to)
+  are storefront runtime JS (`assets/j14-scroll.js`). The theme editor does
+  not scroll-drive the preview, so the engine also listens for
+  `shopify:section:load`, `shopify:section:unload`, and
+  `shopify:block:select` to re-initialize and to jump to the selected
+  slide/step when a merchant clicks a block in the editor sidebar.
+- Section settings are read at render time in Liquid; visual color syncing
+  of the colorways carousel happens client-side from data attributes
+  produced by Liquid.
+
+## Limitations (documented, with sources)
+
+| Limitation | Source | Mitigation in this theme |
+| --- | --- | --- |
+| `video` setting has no `default` | input-settings reference (see URL above) | Theme-asset fallback + `placeholder_svg_tag` |
+| Autoplay requires muted video | Browser autoplay policies (Chrome/Safari) | `video_tag` rendered with `muted`, `playsinline`, `loop` |
+| Max 50 blocks/section | section-schema reference | `max_blocks` set per section |
+| Max 5 theme presets | settings_data docs / prior colorway research | 1 preset shipped |
+| No JSON parse in Liquid | Liquid docs / prior colorway research | Palette mirrored in Liquid snippet |
+| CSS scroll-driven animations not cross-browser | caniuse (animation-timeline) | rAF + IntersectionObserver JS engine; `prefers-reduced-motion` gets a static layout |
+
+## Reference implementation notes
+
+- Structure mirrors `/workspace/fizz-claude-theme` (standalone OS 2.0 theme:
+  `layout/`, `config/`, `locales/`, `sections/`, `snippets/`, `templates/`,
+  `assets/`, `design/`).
+- Colorway slug/scene logic was adapted (copied and renamed with the `j14-`
+  prefix) from `fizz-claude-theme` snippets; no files outside
+  `fizz-july-14th-theme/` were modified.

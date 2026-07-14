@@ -1,0 +1,83 @@
+<section class="j14-collection">
+  <header class="j14-collection__head">
+    <p class="j14-eyebrow">{{ section.settings.eyebrow | default: 'Shop' | escape }}</p>
+    <h1 class="j14-heading j14-collection__title">
+      {%- if collection.title != blank -%}
+        {{ collection.title | escape }}
+      {%- else -%}
+        {{ 'collections.general.all_products' | t }}
+      {%- endif -%}
+    </h1>
+    {%- if section.settings.show_description and collection.description != blank -%}
+      <div class="j14-collection__description j14-rte">{{ collection.description }}</div>
+    {%- endif -%}
+  </header>
+
+  {%- paginate collection.products by section.settings.products_per_page -%}
+    {%- if collection.products.size > 0 -%}
+      <div class="j14-collection__grid j14-collection__grid--{{ section.settings.desktop_columns }}">
+        {%- for product in collection.products -%}
+          {% render 'j14-product-card', product: product %}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <p class="j14-collection__empty">{{ 'collections.general.empty' | t }}</p>
+    {%- endif -%}
+
+    {%- if paginate.pages > 1 -%}
+      <nav class="j14-pagination" aria-label="Pagination">
+        {%- if paginate.previous -%}
+          <a class="j14-btn j14-btn--ghost" href="{{ paginate.previous.url }}">{{ 'general.pagination.previous' | t }}</a>
+        {%- endif -%}
+        <span class="j14-pagination__status">{{ paginate.current_page }} / {{ paginate.pages }}</span>
+        {%- if paginate.next -%}
+          <a class="j14-btn j14-btn--ghost" href="{{ paginate.next.url }}">{{ 'general.pagination.next' | t }}</a>
+        {%- endif -%}
+      </nav>
+    {%- endif -%}
+  {%- endpaginate -%}
+</section>
+
+{% schema %}
+{
+  "name": "J14 Collection",
+  "tag": "section",
+  "class": "j14-collection-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Shop"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show collection description",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per page",
+      "min": 4,
+      "max": 24,
+      "step": 2,
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "desktop_columns",
+      "label": "Columns on desktop",
+      "options": [
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "default": "3"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["collection"]
+  }
+}
+{% endschema %}

@@ -1,0 +1,74 @@
+{% comment %}
+  Renders block/section media with a consistent priority:
+    1. video        (Shopify-hosted video object)
+    2. video_url    (YouTube / Vimeo embed)
+    3. image        (image_picker)
+    4. asset        (theme asset filename fallback)
+    5. placeholder  (SVG placeholder so empty sections still render in the editor)
+
+  Params:
+    video, video_url, image, asset (string), alt (string),
+    sizes (string), widths (string), class (string),
+    loading ('lazy' default), autoplay (bool, default true for videos), controls (bool)
+{% endcomment %}
+{%- liquid
+  assign media_class = class | default: 'j14-media'
+  assign media_loading = loading | default: 'lazy'
+  assign media_sizes = sizes | default: '100vw'
+  assign media_widths = widths | default: '360, 540, 720, 900, 1080, 1440, 1920'
+  assign media_autoplay = true
+  if autoplay == false
+    assign media_autoplay = false
+  endif
+-%}
+{%- if video != blank -%}
+  {%- if media_autoplay -%}
+    {{ video | video_tag: image_size: '1080x', autoplay: true, loop: true, muted: true, controls: false, playsinline: true, class: media_class, preload: 'metadata' }}
+  {%- else -%}
+    {{ video | video_tag: image_size: '1080x', controls: true, playsinline: true, class: media_class, preload: 'metadata' }}
+  {%- endif -%}
+{%- elsif video_url != blank -%}
+  <div class="{{ media_class }} j14-media--embed">
+    {%- if video_url.type == 'youtube' -%}
+      <iframe
+        src="https://www.youtube.com/embed/{{ video_url.id }}?playsinline=1{% if media_autoplay %}&autoplay=1&mute=1&loop=1&playlist={{ video_url.id }}&controls=0{% endif %}"
+        title="{{ alt | default: 'Video' | escape }}"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen
+        loading="lazy"
+      ></iframe>
+    {%- elsif video_url.type == 'vimeo' -%}
+      <iframe
+        src="https://player.vimeo.com/video/{{ video_url.id }}?playsinline=1{% if media_autoplay %}&autoplay=1&muted=1&loop=1&background=1{% endif %}"
+        title="{{ alt | default: 'Video' | escape }}"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen
+        loading="lazy"
+      ></iframe>
+    {%- endif -%}
+  </div>
+{%- elsif image != blank -%}
+  {{
+    image
+    | image_url: width: 1920
+    | image_tag:
+      class: media_class,
+      loading: media_loading,
+      sizes: media_sizes,
+      widths: media_widths,
+      alt: alt
+  }}
+{%- elsif asset != blank -%}
+  <img
+    src="{{ asset | asset_url }}"
+    alt="{{ alt | default: '' | escape }}"
+    class="{{ media_class }}"
+    loading="{{ media_loading }}"
+    width="1440"
+    height="1080"
+  >
+{%- else -%}
+  <div class="{{ media_class }} j14-media--placeholder">
+    {{ 'lifestyle-1' | placeholder_svg_tag: 'j14-placeholder-svg' }}
+  </div>
+{%- endif -%}

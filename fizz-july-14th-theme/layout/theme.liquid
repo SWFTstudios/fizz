@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}" class="j14-html{% unless settings.motion_enabled %} j14-no-motion{% endunless %}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+    <link rel="canonical" href="{{ canonical_url }}">
+    {{ content_for_header }}
+
+    {{ 'j14-base.css' | asset_url | stylesheet_tag }}
+    {% render 'j14-theme-tokens' %}
+    <script>
+      document.documentElement.classList.add('j14-js');
+    </script>
+  </head>
+
+  <body class="j14 template-{{ template.name | handle }}">
+    <a class="j14-skip-link" href="#main-content">{{ 'general.accessibility.skip_to_content' | t }}</a>
+
+    {% sections 'header-group' %}
+
+    <main id="main-content" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    <script src="{{ 'j14-scroll.js' | asset_url }}" defer></script>
+    <script src="{{ 'j14-carousel.js' | asset_url }}" defer></script>
+  </body>
+</html>

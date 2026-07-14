@@ -1,0 +1,37 @@
+<section class="j14-404">
+  <p class="j14-eyebrow">404</p>
+  <h1 class="j14-heading j14-404__title">{{ section.settings.heading | default: 'Page not found' | escape }}</h1>
+  <p class="j14-404__text">{{ section.settings.subtext | default: 'The page you were looking for has fizzed away.' | escape }}</p>
+  <a class="j14-btn j14-btn--accent" href="{{ routes.root_url }}">{{ section.settings.link_label | default: 'Back to home' | escape }}</a>
+</section>
+
+{% schema %}
+{
+  "name": "J14 404",
+  "tag": "section",
+  "class": "j14-404-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Page not found"
+    },
+    {
+      "type": "text",
+      "id": "subtext",
+      "label": "Subtext",
+      "default": "The page you were looking for has fizzed away."
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Link label",
+      "default": "Back to home"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["404"]
+  }
+}
+{% endschema %}

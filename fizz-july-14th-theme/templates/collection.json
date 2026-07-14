@@ -1,0 +1,22 @@
+{
+  "sections": {
+    "main": {
+      "type": "j14-collection",
+      "settings": {
+        "eyebrow": "Shop",
+        "show_description": true,
+        "products_per_page": 12,
+        "desktop_columns": "3"
+      }
+    },
+    "footer": {
+      "type": "j14-footer",
+      "settings": {
+        "headline": "Sparkling water, anywhere.",
+        "cta_label": "Shop bottles",
+        "show_newsletter": false
+      }
+    }
+  },
+  "order": ["main", "footer"]
+}

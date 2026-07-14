@@ -1,0 +1,42 @@
+{% comment %}
+  Product card for collection grids, search results and related products.
+  Params: product (required), heading_level (string, default 'h3')
+{% endcomment %}
+{%- liquid
+  assign hl = heading_level | default: 'h3'
+-%}
+<article class="j14-card">
+  <a href="{{ product.url }}" class="j14-card__link">
+    <div class="j14-card__media">
+      {%- if product.featured_media -%}
+        {{
+          product.featured_media
+          | image_url: width: 900
+          | image_tag: class: 'j14-card__img', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 50vw', widths: '360, 540, 720, 900', alt: product.featured_media.alt
+        }}
+        {%- if product.media[1] -%}
+          {{
+            product.media[1]
+            | image_url: width: 900
+            | image_tag: class: 'j14-card__img j14-card__img--hover', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 50vw', widths: '360, 540, 720, 900', alt: product.media[1].alt
+          }}
+        {%- endif -%}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'j14-card__img j14-placeholder-svg' }}
+      {%- endif -%}
+      {%- unless product.available -%}
+        <span class="j14-card__badge">{{ 'products.product.sold_out' | t }}</span>
+      {%- endunless -%}
+    </div>
+    <div class="j14-card__info">
+      <{{ hl }} class="j14-card__title">{{ product.title | escape }}</{{ hl }}>
+      <p class="j14-card__price">
+        {%- if product.price_varies -%}
+          {{ 'products.product.from_price_html' | t: price: product.price_min | money }}
+        {%- else -%}
+          {{ product.price | money }}
+        {%- endif -%}
+      </p>
+    </div>
+  </a>
+</article>
