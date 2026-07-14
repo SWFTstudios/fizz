@@ -2412,7 +2412,12 @@ html:not(.j14-js) .j14-how__step {
   position: absolute;
   inset: 0;
   transform: translateX(-105%);
-  background: linear-gradient(115deg, var(--j14-dark) 0%, #142018 52%, #3d4a18 100%);
+  background: linear-gradient(
+    115deg,
+    var(--j14-dark) 0%,
+    color-mix(in srgb, var(--j14-dark) 70%, var(--j14-accent)) 55%,
+    color-mix(in srgb, var(--j14-accent) 55%, var(--j14-dark)) 100%
+  );
   transition: transform 0.58s cubic-bezier(0.65, 0, 0.25, 1);
   will-change: transform;
   z-index: 1;
@@ -2432,12 +2437,21 @@ html:not(.j14-js) .j14-how__step {
   z-index: 2;
   pointer-events: none;
   mix-blend-mode: screen;
+  transform: translateX(0);
   transition: transform 0.58s cubic-bezier(0.65, 0, 0.25, 1);
   will-change: transform;
 }
-/* Keep the fizz layer pinned to the covering panel edge as it sweeps */
+/*
+  While covering, the canvas stays at 0 (full viewport) so bubbles that
+  already burst stay visible and ride via JS lateral push. On exit, the
+  fizz layer exits with the swipe panel.
+*/
 #j14-tx.is-covering .j14-tx__bubbles {
   transform: translateX(0);
+}
+.j14-tx__swipe.is-exit ~ .j14-tx__bubbles {
+  transform: translateX(105%);
+  transition-duration: 0.62s;
 }
 .j14-no-motion #j14-tx {
   display: none !important;

@@ -58,6 +58,16 @@ Verified in the section schema reference
   overrides (`custom.color_slug`, `custom.swatch_hex`, `custom.scene_bg`,
   `custom.scene_bg_end`, `custom.scene_btn`, `custom.scene_text`).
 
+### 3b. Bubble page transitions (shipped)
+
+- Leave sequence (Theme settings → Motion → Bubble page transitions):
+  prefetch destination + burst bubbles immediately, start swipe cover at
+  ~150ms while bubbles are still alive, add a lateral “ride” push to
+  particles while `#j14-tx.is-covering`, navigate after swipe
+  `transitionend` + prefetch settle/timeout. Enter uses reverse swipe
+  with a lighter burst. Reduced-motion / setting off = instant navigation
+  (`assets/j14-transition.js`, styles in `assets/j14-base.css`).
+
 ### 4. Storefront runtime vs theme editor behavior
 
 - Scroll-driven effects (intro expansion, mosaic slide-up, sticky how-to)

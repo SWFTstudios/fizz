@@ -289,7 +289,7 @@
       burst(16, origin);
     }, 180);
 
-    /* Swipe starts while bubbles are still alive — they ride with it */
+    /* Swipe starts ~150ms in (plan: 120–180ms) while bubbles still rise/ride */
     var swipeDelay = new Promise(function (resolve) {
       setTimeout(resolve, 150);
     });
