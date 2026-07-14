@@ -28,6 +28,7 @@ video,
 iframe,
 svg {
   max-width: 100%;
+  height: auto;
   display: block;
 }
 a {
@@ -742,6 +743,8 @@ a.j14-tile:hover .j14-tile__media {
 
 /* =============================================================
    Colorways carousel
+   Bottle assets are tall (≈504×1400). Use contain + height-based
+   media box so they never stretch to a 3:4 frame.
    ============================================================= */
 .j14-ways {
   --ways-bg: var(--j14-dark);
@@ -749,8 +752,10 @@ a.j14-tile:hover .j14-tile__media {
   --ways-btn: var(--j14-accent);
   --ways-btn-text: #0b0c0e;
   --ways-text: var(--j14-dark-text);
-  padding: 72px 0 48px;
-  min-height: 100vh;
+  --ways-section-height: 100vh;
+  --ways-media-height: min(52vh, 560px);
+  padding: 56px 0 40px;
+  min-height: var(--ways-section-height);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -760,17 +765,22 @@ a.j14-tile:hover .j14-tile__media {
 }
 .j14-ways__head {
   text-align: center;
-  padding: 0 var(--j14-gutter) 28px;
+  padding: 0 var(--j14-gutter) 20px;
+  flex: 0 0 auto;
 }
 .j14-ways__heading {
   font-size: clamp(2rem, 8vw, 4.4rem);
+}
+.j14-ways__viewport {
+  flex: 0 0 auto;
+  min-height: 0;
 }
 .j14-ways__rail {
   display: flex;
   gap: 16px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  padding: 8px max(calc((100vw - 74vw) / 2), var(--j14-gutter)) 16px;
+  padding: 8px max(calc((100vw - 74vw) / 2), var(--j14-gutter)) 12px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -788,10 +798,10 @@ a.j14-tile:hover .j14-tile__media {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   text-align: center;
   opacity: 0.45;
-  transform: scale(0.92);
+  transform: scale(0.96);
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
 .j14-way.is-active,
@@ -800,16 +810,28 @@ html:not(.j14-js) .j14-way {
   transform: none;
 }
 .j14-way__media {
-  width: min(58vw, 300px);
-  aspect-ratio: 3 / 4;
+  width: min(42vw, 220px);
+  height: var(--ways-media-height);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
+  overflow: visible;
 }
 .j14-way__img {
-  max-height: 100%;
   width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
   filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.35));
+}
+.j14-way__info {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  width: 100%;
+  padding: 0 8px;
 }
 .j14-way__name {
   font-family: var(--j14-font-heading);
@@ -831,7 +853,8 @@ html:not(.j14-js) .j14-way {
   align-items: center;
   justify-content: center;
   gap: 18px;
-  padding: 24px var(--j14-gutter) 0;
+  padding: 20px var(--j14-gutter) 0;
+  flex: 0 0 auto;
 }
 .j14-ways__arrow {
   width: 44px;
@@ -866,7 +889,7 @@ html:not(.j14-js) .j14-way {
     flex-basis: 34vw;
   }
   .j14-way__media {
-    width: min(24vw, 360px);
+    width: min(18vw, 260px);
   }
   .j14-ways__rail {
     gap: 28px;
@@ -878,6 +901,9 @@ html:not(.j14-js) .j14-way {
 @media (min-width: 1440px) {
   .j14-way {
     flex-basis: 26vw;
+  }
+  .j14-way__media {
+    width: min(14vw, 280px);
   }
 }
 
