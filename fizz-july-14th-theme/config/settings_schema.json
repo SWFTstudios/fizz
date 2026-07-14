@@ -8,43 +8,70 @@
     "theme_support_url": "https://github.com/"
   },
   {
-    "name": "Colors",
+    "name": "Colorway",
     "settings": [
+      {
+        "type": "select",
+        "id": "colorway_preset",
+        "label": "Colorway preset",
+        "options": [
+          { "value": "lime_fizz", "label": "Lime Fizz" },
+          { "value": "steel_navy", "label": "Steel Navy" },
+          { "value": "citrus_burst", "label": "Citrus Burst" },
+          { "value": "berry_night", "label": "Berry Night" },
+          { "value": "electric_pool", "label": "Electric Pool" }
+        ],
+        "default": "lime_fizz",
+        "info": "Storefront colors apply from this preset on save. For matching color pickers below, also switch Theme style (top of the theme editor) to the same name. Shopify allows up to 5 Theme styles."
+      },
+      {
+        "type": "checkbox",
+        "id": "colorway_custom_enabled",
+        "label": "Use custom colors",
+        "default": false,
+        "info": "Overrides the preset with the pickers below."
+      },
       {
         "type": "color",
         "id": "color_paper",
         "label": "Background (paper)",
-        "default": "#f4f3ee"
+        "default": "#f4f3ee",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "color_ink",
         "label": "Text (ink)",
-        "default": "#111214"
+        "default": "#111214",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "color_accent",
         "label": "Accent",
-        "default": "#c6f24e"
+        "default": "#c6f24e",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "color_surface",
         "label": "Cards and panels",
-        "default": "#e9e7df"
+        "default": "#e9e7df",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "color_dark",
         "label": "Dark sections background",
-        "default": "#0b0c0e"
+        "default": "#0b0c0e",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       },
       {
         "type": "color",
         "id": "color_dark_text",
         "label": "Dark sections text",
-        "default": "#f2f1ea"
+        "default": "#f2f1ea",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
       }
     ]
   },
@@ -129,6 +156,13 @@
         "id": "motion_enabled",
         "label": "Enable scroll animations",
         "info": "Automatically disabled for visitors who prefer reduced motion.",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "page_transitions",
+        "label": "Bubble page transitions",
+        "info": "On link click, fizz bubbles burst and ride with a swipe cover before the next page reveals. The destination is preloaded during the transition.",
         "default": true
       }
     ]

@@ -13,7 +13,12 @@
   >
     {%- for related in related_products limit: section.settings.limit -%}
       {%- unless related.id == product.id -%}
-        {% render 'j14-product-card', product: related %}
+        {% render 'j14-product-card',
+          product: related,
+          show_swatches: true,
+          show_quick_add: false,
+          media_ratio: 'auto'
+        %}
       {%- endunless -%}
     {%- endfor -%}
   </div>

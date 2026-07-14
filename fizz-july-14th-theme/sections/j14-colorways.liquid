@@ -2,12 +2,15 @@
   assign bottle = section.settings.product | default: settings.bottle_product
   assign cta_label = section.settings.cta_label | default: 'Shop this color'
   assign demo_slugs = 'steel-navy,electric-blue,coral-orange,sage-green,charcoal-black,arctic-white' | split: ','
+  assign section_height = section.settings.section_height | default: 100
+  assign media_height = section.settings.media_height | default: 52
 -%}
 <section
   class="j14-ways{% unless section.settings.sync_scene %} j14-ways--static{% endunless %}"
   id="{{ section.settings.anchor_id | default: 'colors' }}"
   data-j14-carousel
   data-sync-scene="{{ section.settings.sync_scene }}"
+  style="--ways-section-height: {{ section_height }}vh; --ways-media-height: min({{ media_height }}vh, 640px);"
 >
   <div class="j14-ways__head">
     {%- if section.settings.eyebrow != blank -%}
@@ -58,7 +61,7 @@
               {%- elsif variant.featured_image -%}
                 {{ variant.featured_image | image_url: width: 900 | image_tag: class: 'j14-way__img', loading: 'lazy', sizes: '(min-width: 750px) 34vw, 72vw', widths: '360, 540, 720, 900', alt: variant.title }}
               {%- else -%}
-                <img src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}" class="j14-way__img" loading="lazy" width="675" height="900" alt="{{ variant.title | escape }}">
+                <img src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}" class="j14-way__img" loading="lazy" width="504" height="1400" alt="{{ variant.title | escape }}">
               {%- endif -%}
             </div>
             <div class="j14-way__info">
@@ -85,7 +88,7 @@
             data-swatch="{{ scene_parts[4] }}"
           >
             <div class="j14-way__media">
-              <img src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}" class="j14-way__img" loading="lazy" width="675" height="900" alt="{{ slug | replace: '-', ' ' | capitalize | escape }}">
+              <img src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}" class="j14-way__img" loading="lazy" width="504" height="1400" alt="{{ slug | replace: '-', ' ' | capitalize | escape }}">
             </div>
             <div class="j14-way__info">
               <h3 class="j14-way__name">{{ slug | replace: '-', ' ' | capitalize }}</h3>
@@ -145,6 +148,32 @@
       "id": "sync_scene",
       "label": "Sync background with active color",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "section_height",
+      "label": "Section height",
+      "info": "Minimum height of the colorways section as a percentage of the viewport.",
+      "min": 70,
+      "max": 120,
+      "step": 5,
+      "unit": "vh",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "media_height",
+      "label": "Bottle image height",
+      "info": "How tall bottle images render inside the carousel. Images keep their natural proportions.",
+      "min": 30,
+      "max": 70,
+      "step": 2,
+      "unit": "vh",
+      "default": 52
     }
   ],
   "blocks": [

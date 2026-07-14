@@ -27,9 +27,13 @@
       },
       "block_order": ["slide_1", "slide_2", "slide_3"],
       "settings": {
-        "word_left": "FI",
+        "word_left": "F",
         "word_right": "ZZ",
-        "scroll_length": 260,
+        "hero_eyebrow": "The portable sparkling water bottle",
+        "hero_heading": "Sparkling water, anywhere.",
+        "hero_subheading": "Fill. Twist. Fizz. Cold bubbles in under ten seconds — no machine, no cans.",
+        "cta_label": "Shop bottles",
+        "scroll_length": 280,
         "autoplay_interval": 5,
         "show_hint": true,
         "hint_text": "Scroll"

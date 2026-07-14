@@ -1,4 +1,4 @@
-<section class="j14-collection">
+<section class="j14-list-collections">
   <header class="j14-collection__head">
     <p class="j14-eyebrow">{{ section.settings.eyebrow | default: 'Browse' | escape }}</p>
     <h1 class="j14-heading j14-collection__title">{{ section.settings.heading | default: 'Collections' | escape }}</h1>
@@ -8,11 +8,12 @@
     {%- for collection in collections -%}
       <article class="j14-card">
         <a href="{{ collection.url }}" class="j14-card__link">
-          <div class="j14-card__media">
+          <div class="j14-card__media j14-card__media--lime">
+            <span class="j14-card__wash" aria-hidden="true"></span>
             {%- if collection.featured_image -%}
-              {{ collection.featured_image | image_url: width: 900 | image_tag: class: 'j14-card__img', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 50vw', widths: '360, 540, 720, 900', alt: collection.title }}
+              {{ collection.featured_image | image_url: width: 900 | image_tag: class: 'j14-card__img j14-card__img--ph', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 50vw', widths: '360, 540, 720, 900', alt: collection.title }}
             {%- else -%}
-              {{ 'collection-1' | placeholder_svg_tag: 'j14-card__img j14-placeholder-svg' }}
+              {{ 'collection-1' | placeholder_svg_tag: 'j14-card__img j14-card__img--ph' }}
             {%- endif -%}
           </div>
           <div class="j14-card__info">

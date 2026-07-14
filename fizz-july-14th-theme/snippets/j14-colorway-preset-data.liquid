@@ -1,0 +1,20 @@
+{% comment %}
+  Pipe-delimited theme colorway tokens for a preset id.
+  Order: paper|ink|accent|surface|dark|dark_text
+  Keep in sync with config/settings_data.json Theme styles.
+{% endcomment %}
+{%- liquid
+  assign key = preset | default: 'lime_fizz' | strip
+  case key
+    when 'steel_navy'
+      echo '#e8edf5|#0f1a2e|#6b9fd4|#d5deeb|#0a1220|#e8edf5'
+    when 'citrus_burst'
+      echo '#fff6eb|#1a1208|#f07a2e|#f3e4d2|#1a0f08|#fff6eb'
+    when 'berry_night'
+      echo '#f6eef5|#1a0f1c|#c47bb0|#e8d9e6|#120a14|#f6eef5'
+    when 'electric_pool'
+      echo '#eaf7fb|#061820|#2f9fd6|#d4ebf2|#041018|#eaf7fb'
+    else
+      echo '#f4f3ee|#111214|#c6f24e|#e9e7df|#0b0c0e|#f2f1ea'
+  endcase
+-%}
