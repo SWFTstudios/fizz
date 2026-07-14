@@ -537,8 +537,9 @@
         "label": "Bubble style",
         "options": [
           { "value": "ring", "label": "Ring — canvas outline only (lightweight)" },
-          { "value": "glass", "label": "Glass — canvas bubbles with highlight (recommended)" },
-          { "value": "bold", "label": "Bold — canvas bubbles, stronger fill" }
+          { "value": "glass", "label": "Glass — modern specular bubbles (recommended)" },
+          { "value": "foam", "label": "Foam — dense micro-fizz" },
+          { "value": "bold", "label": "Bold — larger bubbles, stronger fill" }
         ],
         "default": "glass"
       },
@@ -611,6 +612,45 @@
         "id": "bubble_wobble",
         "label": "Subtle horizontal wobble",
         "default": false
+      },
+      {
+        "type": "header",
+        "content": "Page transitions"
+      },
+      {
+        "type": "paragraph",
+        "content": "Brand overlay on internal navigation. Melt uses merging micro-bubbles; Classic keeps the original liquid-wave slabs."
+      },
+      {
+        "type": "select",
+        "id": "page_transition_style",
+        "label": "Transition style",
+        "options": [
+          { "value": "melt", "label": "Melt — carbonation metaball (recommended)" },
+          { "value": "classic", "label": "Classic — liquid wave slabs" }
+        ],
+        "default": "melt"
+      },
+      {
+        "type": "range",
+        "id": "page_transition_intensity",
+        "min": 50,
+        "max": 150,
+        "step": 5,
+        "unit": "%",
+        "label": "Transition intensity",
+        "default": 100,
+        "info": "Blob count and size during melt transitions."
+      },
+      {
+        "type": "range",
+        "id": "page_transition_duration_scale",
+        "min": 50,
+        "max": 150,
+        "step": 5,
+        "unit": "%",
+        "label": "Transition duration",
+        "default": 100
       }
     ]
   }
