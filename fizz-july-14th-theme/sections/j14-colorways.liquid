@@ -58,7 +58,7 @@
               {%- elsif variant.featured_image -%}
                 {{ variant.featured_image | image_url: width: 900 | image_tag: class: 'j14-way__img', loading: 'lazy', sizes: '(min-width: 750px) 34vw, 72vw', widths: '360, 540, 720, 900', alt: variant.title }}
               {%- else -%}
-                <img src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}" class="j14-way__img" loading="lazy" alt="{{ variant.title | escape }}">
+                <img src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}" class="j14-way__img" loading="lazy" width="675" height="900" alt="{{ variant.title | escape }}">
               {%- endif -%}
             </div>
             <div class="j14-way__info">
@@ -85,7 +85,7 @@
             data-swatch="{{ scene_parts[4] }}"
           >
             <div class="j14-way__media">
-              <img src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}" class="j14-way__img" loading="lazy" alt="{{ slug | replace: '-', ' ' | capitalize | escape }}">
+              <img src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}" class="j14-way__img" loading="lazy" width="675" height="900" alt="{{ slug | replace: '-', ' ' | capitalize | escape }}">
             </div>
             <div class="j14-way__info">
               <h3 class="j14-way__name">{{ slug | replace: '-', ' ' | capitalize }}</h3>

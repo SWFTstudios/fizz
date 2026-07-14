@@ -17,6 +17,9 @@
 
     {{ 'j14-base.css' | asset_url | stylesheet_tag }}
     {% render 'j14-theme-tokens' %}
+    <script>
+      document.documentElement.classList.add('j14-js');
+    </script>
   </head>
 
   <body class="j14 template-{{ template.name | handle }}">

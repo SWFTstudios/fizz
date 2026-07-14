@@ -499,27 +499,33 @@ fieldset {
   }
 }
 
-/* Reduced motion / motion off: static hero */
-.j14-no-motion .j14-intro__track {
+/* Reduced motion / motion off / no JS: static hero */
+.j14-no-motion .j14-intro__track,
+html:not(.j14-js) .j14-intro__track {
   height: auto;
 }
-.j14-no-motion .j14-intro__sticky {
+.j14-no-motion .j14-intro__sticky,
+html:not(.j14-js) .j14-intro__sticky {
   position: relative;
 }
-.j14-no-motion .j14-intro__window {
+.j14-no-motion .j14-intro__window,
+html:not(.j14-js) .j14-intro__window {
   width: min(84vw, 700px);
   transform: none !important;
 }
-.j14-no-motion .j14-intro__half {
+.j14-no-motion .j14-intro__half,
+html:not(.j14-js) .j14-intro__half {
   transform: none !important;
   opacity: 1 !important;
 }
-.j14-no-motion .j14-intro__thumbs {
+.j14-no-motion .j14-intro__thumbs,
+html:not(.j14-js) .j14-intro__thumbs {
   opacity: 1;
   transform: none;
   pointer-events: auto;
 }
-.j14-no-motion .j14-intro__hint {
+.j14-no-motion .j14-intro__hint,
+html:not(.j14-js) .j14-intro__hint {
   display: none;
 }
 
@@ -568,7 +574,8 @@ fieldset {
   transition-delay: calc(var(--tile-index, 0) * 45ms);
 }
 .j14-tile.is-in,
-.j14-no-motion .j14-tile {
+.j14-no-motion .j14-tile,
+html:not(.j14-js) .j14-tile {
   opacity: 1;
   transform: none;
 }
@@ -683,7 +690,8 @@ a.j14-tile:hover .j14-tile__media {
   transform: scale(0.92);
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
-.j14-way.is-active {
+.j14-way.is-active,
+html:not(.j14-js) .j14-way {
   opacity: 1;
   transform: none;
 }
@@ -882,29 +890,35 @@ a.j14-tile:hover .j14-tile__media {
   margin: 4px 0 0;
 }
 
-/* Reduced motion: stacked steps, no sticky scene */
-.j14-no-motion .j14-how__track {
+/* Reduced motion / no JS: stacked steps, no sticky scene */
+.j14-no-motion .j14-how__track,
+html:not(.j14-js) .j14-how__track {
   height: auto;
 }
-.j14-no-motion .j14-how__sticky {
+.j14-no-motion .j14-how__sticky,
+html:not(.j14-js) .j14-how__sticky {
   position: relative;
   height: auto;
   display: block;
 }
-.j14-no-motion .j14-how__stage {
+.j14-no-motion .j14-how__stage,
+html:not(.j14-js) .j14-how__stage {
   height: 48vh;
 }
-.j14-no-motion .j14-how__layer {
+.j14-no-motion .j14-how__layer,
+html:not(.j14-js) .j14-how__layer {
   position: relative;
   opacity: 1;
   clip-path: none;
   height: 100%;
   display: none;
 }
-.j14-no-motion .j14-how__layer.is-active {
+.j14-no-motion .j14-how__layer.is-active,
+html:not(.j14-js) .j14-how__layer.is-active {
   display: block;
 }
-.j14-no-motion .j14-how__step {
+.j14-no-motion .j14-how__step,
+html:not(.j14-js) .j14-how__step {
   opacity: 1;
 }
 

@@ -70,7 +70,7 @@
               {%- if thumb_image != blank -%}
                 {{ thumb_image | image_url: width: 180 | image_tag: class: 'j14-intro__thumb-img', loading: 'lazy', alt: '' }}
               {%- elsif block.settings.asset != blank -%}
-                <img src="{{ block.settings.asset | asset_url }}" class="j14-intro__thumb-img" loading="lazy" alt="">
+                <img src="{{ block.settings.asset | asset_url }}" class="j14-intro__thumb-img" loading="lazy" width="128" height="96" alt="">
               {%- else -%}
                 <span class="j14-intro__thumb-fallback">{{ forloop.index }}</span>
               {%- endif -%}
