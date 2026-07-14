@@ -37,7 +37,7 @@
         "autoplay_interval": 5,
         "auto_scroll": true,
         "auto_scroll_duration": 2.8,
-        "auto_scroll_delay": 0.5,
+        "auto_scroll_delay": 0.4,
         "show_hint": true,
         "hint_text": "Scroll"
       }
