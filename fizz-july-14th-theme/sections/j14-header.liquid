@@ -1,9 +1,10 @@
 {%- liquid
   assign cart_count = cart.item_count
 -%}
-<header
+<div
   class="j14-header{% if section.settings.transparent_home and template.name == 'index' %} j14-header--transparent{% endif %}"
   data-j14-header
+  role="banner"
 >
   <div class="j14-header__inner">
     <a href="{{ routes.root_url }}" class="j14-header__logo" aria-label="{{ shop.name | escape }}">
