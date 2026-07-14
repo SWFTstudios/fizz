@@ -6,9 +6,9 @@
   class="j14-intro"
   data-j14-intro
   data-autoplay-interval="{{ section.settings.autoplay_interval }}"
-  data-auto-scroll="{% if section.settings.auto_scroll %}true{% else %}false{% endif %}"
-  data-auto-scroll-duration="{{ section.settings.auto_scroll_duration }}"
-  data-auto-scroll-delay="{{ section.settings.auto_scroll_delay }}"
+  data-auto-scroll="{% if section.settings.auto_scroll == false %}false{% else %}true{% endif %}"
+  data-auto-scroll-duration="{{ section.settings.auto_scroll_duration | default: 2.8 }}"
+  data-auto-scroll-delay="{{ section.settings.auto_scroll_delay | default: 0.35 }}"
   style="--j14-intro-len: {{ section.settings.scroll_length }}vh;"
 >
   <h1 class="j14-visually-hidden">{{ section.settings.seo_heading | default: shop.name }}</h1>

@@ -3,8 +3,10 @@
   Media is always full-bleed / object-fit: cover. We animate clip-path from an
   uppercase I stem to the full viewport so imagery is not scale-zoomed.
 
-  On load (when enabled), the page auto-scrolls through the intro track so the
-  expand plays without a manual scroll. Touch / wheel / menu open cancel it.
+  On load the expand plays automatically as a timed timeline (not dependent on
+  the shopper scrolling). After it finishes, scroll position is synced so the
+  scrubbed ScrubTrigger stays correct. Wheel / touch / menu cancel and hand
+  control back mid-flight.
 */
 (function () {
   'use strict';
@@ -74,9 +76,9 @@
     this.timer = null;
     this.tl = null;
     this.st = null;
-    this.autoScrollTween = null;
-    this.autoScrolling = false;
-    this._cancelAutoScroll = this.cancelAutoScroll.bind(this);
+    this.autoTween = null;
+    this.autoPlaying = false;
+    this._cancelAuto = this.cancelAutoPlay.bind(this);
 
     var self = this;
     this.thumbs.forEach(function (thumb) {
@@ -93,11 +95,10 @@
       return;
     }
 
-    /* Measure after fonts/layout; slight delay avoids wrong stem clip. */
     requestAnimationFrame(function () {
       self.buildTimeline();
       ScrollTrigger.refresh();
-      self.maybeAutoScroll();
+      self.maybeAutoPlay();
     });
   }
 
@@ -109,6 +110,22 @@
     if (this.copyParts.length) gsap.set(this.copyParts, { opacity: 1, y: 0 });
     if (this.hint) gsap.set(this.hint, { opacity: 0 });
     this.section.classList.add('is-zoomed', 'is-copy-in', 'is-done');
+  };
+
+  Intro.prototype.syncProgress = function (p) {
+    this.section.classList.toggle('is-zoomed', p > 0.62);
+    this.section.classList.toggle('is-copy-in', p > 0.82);
+    this.section.classList.toggle('is-done', p >= 0.98);
+    if (this.copy) {
+      this.copy.style.pointerEvents = p > 0.82 ? 'auto' : 'none';
+    }
+  };
+
+  Intro.prototype.trackEndY = function () {
+    if (!this.track) return 0;
+    if (this.st && typeof this.st.end === 'number') return this.st.end;
+    var top = this.track.getBoundingClientRect().top + (window.scrollY || 0);
+    return Math.max(0, top + this.track.offsetHeight - window.innerHeight);
   };
 
   Intro.prototype.setSlide = function (index) {
@@ -142,39 +159,47 @@
     }, interval * 1000);
   };
 
-  Intro.prototype.bindAutoScrollCancel = function () {
-    window.addEventListener('wheel', this._cancelAutoScroll, { passive: true });
-    window.addEventListener('touchstart', this._cancelAutoScroll, { passive: true });
-    window.addEventListener('keydown', this._cancelAutoScroll, { passive: true });
+  Intro.prototype.bindAutoCancel = function () {
+    window.addEventListener('wheel', this._cancelAuto, { passive: true });
+    window.addEventListener('touchstart', this._cancelAuto, { passive: true });
+    window.addEventListener('keydown', this._cancelAuto, { passive: true });
   };
 
-  Intro.prototype.unbindAutoScrollCancel = function () {
-    window.removeEventListener('wheel', this._cancelAutoScroll);
-    window.removeEventListener('touchstart', this._cancelAutoScroll);
-    window.removeEventListener('keydown', this._cancelAutoScroll);
+  Intro.prototype.unbindAutoCancel = function () {
+    window.removeEventListener('wheel', this._cancelAuto);
+    window.removeEventListener('touchstart', this._cancelAuto);
+    window.removeEventListener('keydown', this._cancelAuto);
   };
 
-  Intro.prototype.cancelAutoScroll = function () {
-    if (!this.autoScrolling) return;
-    this.autoScrolling = false;
+  Intro.prototype.cancelAutoPlay = function () {
+    if (!this.autoPlaying) return;
+    var progress = this.tl ? this.tl.progress() : 0;
+    this.autoPlaying = false;
     this.section.classList.remove('is-auto-scrolling');
-    if (this.autoScrollTween) {
-      this.autoScrollTween.kill();
-      this.autoScrollTween = null;
+    if (this.autoTween) {
+      this.autoTween.kill();
+      this.autoTween = null;
     }
-    this.unbindAutoScrollCancel();
+    this.unbindAutoCancel();
+
+    /* Match scroll to current visual progress, then re-enable scrub */
+    var endY = this.trackEndY();
+    window.scrollTo(0, endY * progress);
+    if (this.st && this.st.enable) this.st.enable();
+    if (typeof ScrollTrigger.update === 'function') ScrollTrigger.update();
+    this.syncProgress(progress);
   };
 
-  Intro.prototype.maybeAutoScroll = function () {
+  Intro.prototype.maybeAutoPlay = function () {
     var self = this;
-    if (this.section.dataset.autoScroll !== 'true') return;
-    if (!this.st || !this.track) return;
-    /* Deep-linked further down the page — don't yank shoppers back */
+    /* On unless explicitly disabled — schema/default / editor checkbox */
+    if (this.section.dataset.autoScroll === 'false') return;
+    if (!this.tl || !this.track) return;
     if (window.scrollY > 48) return;
     if (window.location.hash && window.location.hash !== '#') return;
 
     var delay = parseFloat(this.section.dataset.autoScrollDelay, 10);
-    if (isNaN(delay)) delay = 0.5;
+    if (isNaN(delay)) delay = 0.35;
     var duration = parseFloat(this.section.dataset.autoScrollDuration, 10);
     if (isNaN(duration) || duration < 0.4) duration = 2.8;
 
@@ -182,38 +207,45 @@
       gsap.delayedCall(delay, function () {
         if (document.documentElement.classList.contains('j14-menu-open')) return;
         if (window.scrollY > 48) return;
-        self.playAutoScroll(duration);
+        self.playAutoExpand(duration);
       });
     });
   };
 
-  Intro.prototype.playAutoScroll = function (duration) {
+  Intro.prototype.playAutoExpand = function (duration) {
     var self = this;
-    if (!this.st) return;
+    if (!this.tl) return;
 
     ScrollTrigger.refresh();
-    var endY = this.st.end;
-    var startY = window.scrollY || 0;
-    if (endY <= startY + 8) return;
 
-    this.autoScrolling = true;
+    /* Drive the timeline directly — no depending on the browser scroll position */
+    if (this.st && this.st.disable) this.st.disable(false);
+    this.tl.pause(0);
+    this.syncProgress(0);
+
+    this.autoPlaying = true;
     this.section.classList.add('is-auto-scrolling');
-    this.bindAutoScrollCancel();
+    this.bindAutoCancel();
 
-    var proxy = { y: startY };
-    this.autoScrollTween = gsap.to(proxy, {
-      y: endY,
+    this.autoTween = gsap.to(this.tl, {
+      progress: 1,
       duration: duration,
       ease: 'power1.inOut',
       onUpdate: function () {
-        if (!self.autoScrolling) return;
-        window.scrollTo(0, proxy.y);
+        if (!self.autoPlaying) return;
+        self.syncProgress(self.tl.progress());
       },
       onComplete: function () {
-        self.cancelAutoScroll();
-        /* Land precisely at the intro end so scrub settles */
+        self.autoPlaying = false;
+        self.section.classList.remove('is-auto-scrolling');
+        self.unbindAutoCancel();
+        self.autoTween = null;
+
+        var endY = self.trackEndY();
         window.scrollTo(0, endY);
+        if (self.st && self.st.enable) self.st.enable();
         if (typeof ScrollTrigger.update === 'function') ScrollTrigger.update();
+        self.syncProgress(1);
       }
     });
   };
@@ -231,6 +263,7 @@
 
     this.tl = gsap.timeline({
       defaults: { ease: 'none' },
+      paused: true,
       scrollTrigger: {
         trigger: this.track,
         start: 'top top',
@@ -238,16 +271,11 @@
         scrub: 0.65,
         invalidateOnRefresh: true,
         onUpdate: function (selfSt) {
-          var p = selfSt.progress;
-          self.section.classList.toggle('is-zoomed', p > 0.62);
-          self.section.classList.toggle('is-copy-in', p > 0.82);
-          self.section.classList.toggle('is-done', p >= 0.98);
-          if (self.copy) {
-            self.copy.style.pointerEvents = p > 0.82 ? 'auto' : 'none';
-          }
+          if (self.autoPlaying) return;
+          self.syncProgress(selfSt.progress);
         },
         onRefresh: function () {
-          /* Recalculate I stem from the gap after layout. */
+          if (self.autoPlaying) return;
           if (self.tl && self.tl.progress() < 0.05) {
             var clip = stemClip(self.stage, self.gap);
             gsap.set(self.stage, { clipPath: clip, webkitClipPath: clip });
@@ -288,7 +316,7 @@
       this.tl.to(this.hint, { opacity: 0, duration: 0.08 }, 0);
     }
 
-    /* Phase 2 — slow fade of hero copy (0.72 → 1) */
+    /* Phase 2 — hero copy (0.72 → 1) */
     if (this.copyParts.length) {
       this.tl.to(
         this.copyParts,
@@ -305,7 +333,7 @@
   };
 
   Intro.prototype.destroy = function () {
-    this.cancelAutoScroll();
+    this.cancelAutoPlay();
     if (this.timer) clearInterval(this.timer);
     if (this.tl) this.tl.kill();
     if (this.st) this.st.kill();
@@ -354,11 +382,10 @@
     });
   });
 
-  /* Pause/cancel when the mobile menu opens */
   var menuObserver = new MutationObserver(function () {
     if (!document.documentElement.classList.contains('j14-menu-open')) return;
     instances.forEach(function (inst) {
-      inst.cancelAutoScroll();
+      inst.cancelAutoPlay();
     });
   });
   menuObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
