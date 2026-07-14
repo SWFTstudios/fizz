@@ -32,8 +32,10 @@
     this.section = section;
     this.track = section.querySelector('[data-j14-intro-track]');
     this.windowEl = section.querySelector('[data-j14-intro-window]');
+    this.idot = section.querySelector('[data-j14-intro-idot]');
     this.left = section.querySelector('[data-j14-intro-left]');
     this.right = section.querySelector('[data-j14-intro-right]');
+    this.copy = section.querySelector('[data-j14-intro-copy]');
     this.hint = section.querySelector('[data-j14-intro-hint]');
     this.slides = Array.prototype.slice.call(section.querySelectorAll('[data-j14-intro-slide]'));
     this.thumbs = Array.prototype.slice.call(section.querySelectorAll('[data-j14-intro-thumb]'));
@@ -48,6 +50,10 @@
       });
     });
     this.restartAutoplay();
+    if (motionOff) {
+      section.style.setProperty('--intro-copy-opacity', '1');
+      section.classList.add('is-zoomed', 'is-copy-in', 'is-done');
+    }
   }
 
   IntroController.prototype.setSlide = function (index) {
@@ -85,30 +91,39 @@
     if (!this.track || !this.windowEl || motionOff) return;
     var p = trackProgress(this.track);
 
-    /* Window expansion: base size -> cover viewport. */
-    var zoomP = easeOutCubic(clamp(p / 0.85, 0, 1));
+    /* Phase 1 (0 → 0.82): i-stem expands to cover viewport; letters + dot leave.
+       offsetWidth/Height ignore CSS transforms, so they stay at the stem size. */
+    var zoomP = easeOutCubic(clamp(p / 0.82, 0, 1));
     var baseW = this.windowEl.offsetWidth || 1;
     var baseH = this.windowEl.offsetHeight || 1;
-    var targetScale = Math.max(window.innerWidth / baseW, window.innerHeight / baseH) * 1.02;
+    var targetScale = Math.max(window.innerWidth / baseW, window.innerHeight / baseH) * 1.04;
     var scale = 1 + (targetScale - 1) * zoomP;
     this.windowEl.style.transform = 'scale(' + scale.toFixed(4) + ')';
 
-    /* Letters slide outward and fade. */
-    var shift = zoomP * window.innerWidth * 0.6;
-    var fade = 1 - clamp((p - 0.25) / 0.35, 0, 1);
+    var shift = zoomP * window.innerWidth * 0.55;
+    var letterFade = 1 - clamp((p - 0.18) / 0.4, 0, 1);
     if (this.left) {
       this.left.style.transform = 'translateX(' + (-shift).toFixed(1) + 'px)';
-      this.left.style.opacity = fade;
+      this.left.style.opacity = letterFade;
     }
     if (this.right) {
       this.right.style.transform = 'translateX(' + shift.toFixed(1) + 'px)';
-      this.right.style.opacity = fade;
+      this.right.style.opacity = letterFade;
+    }
+    if (this.idot) {
+      this.idot.style.transform = 'translateY(' + (-zoomP * 48).toFixed(1) + 'px) scale(' + (1 - zoomP * 0.4).toFixed(3) + ')';
+      this.idot.style.opacity = letterFade;
     }
     if (this.hint) {
       this.hint.style.opacity = 1 - clamp(p / 0.08, 0, 1);
     }
 
-    this.section.classList.toggle('is-zoomed', p > 0.7);
+    /* Phase 2 (≥ 0.82): slow fade-in of hero heading / sub / CTA. */
+    var copyP = easeOutCubic(clamp((p - 0.82) / 0.18, 0, 1));
+    this.section.style.setProperty('--intro-copy-opacity', copyP.toFixed(4));
+
+    this.section.classList.toggle('is-zoomed', p > 0.72);
+    this.section.classList.toggle('is-copy-in', copyP > 0.08);
     this.section.classList.toggle('is-done', p >= 0.995);
   };
 

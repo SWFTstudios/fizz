@@ -1,5 +1,6 @@
 {%- liquid
   assign slide_count = section.blocks.size
+  assign cta_url = section.settings.cta_url | default: routes.all_products_collection_url
 -%}
 <section
   class="j14-intro"
@@ -13,42 +14,62 @@
     <div class="j14-intro__sticky">
       <div class="j14-intro__word" aria-hidden="true">
         <span class="j14-intro__half j14-intro__half--left" data-j14-intro-left>
-          {{- section.settings.word_left | default: 'FIZZ' | escape -}}
+          {{- section.settings.word_left | default: 'F' | escape -}}
         </span>
 
-        <div class="j14-intro__window" data-j14-intro-window>
-          <div class="j14-intro__slides" data-j14-intro-slides>
-            {%- if slide_count > 0 -%}
-              {%- for block in section.blocks -%}
-                <div
-                  class="j14-intro__slide{% if forloop.first %} is-active{% endif %}"
-                  data-j14-intro-slide
-                  data-index="{{ forloop.index0 }}"
-                  {{ block.shopify_attributes }}
-                >
-                  {%- render 'j14-media',
-                    video: block.settings.video,
-                    video_url: block.settings.video_url,
-                    image: block.settings.image,
-                    asset: block.settings.asset,
-                    alt: block.settings.label,
-                    class: 'j14-intro__media',
-                    sizes: '100vw',
-                    loading: 'eager'
-                  -%}
+        <div class="j14-intro__i" data-j14-intro-i>
+          <span class="j14-intro__idot" data-j14-intro-idot></span>
+          <div class="j14-intro__window" data-j14-intro-window>
+            <div class="j14-intro__slides" data-j14-intro-slides>
+              {%- if slide_count > 0 -%}
+                {%- for block in section.blocks -%}
+                  <div
+                    class="j14-intro__slide{% if forloop.first %} is-active{% endif %}"
+                    data-j14-intro-slide
+                    data-index="{{ forloop.index0 }}"
+                    {{ block.shopify_attributes }}
+                  >
+                    {%- render 'j14-media',
+                      video: block.settings.video,
+                      video_url: block.settings.video_url,
+                      image: block.settings.image,
+                      asset: block.settings.asset,
+                      alt: block.settings.label,
+                      class: 'j14-intro__media',
+                      sizes: '100vw',
+                      loading: 'eager'
+                    -%}
+                  </div>
+                {%- endfor -%}
+              {%- else -%}
+                <div class="j14-intro__slide is-active" data-j14-intro-slide data-index="0">
+                  {%- render 'j14-media', asset: 'stitch-hero-slideshow-1.jpg', class: 'j14-intro__media', loading: 'eager' -%}
                 </div>
-              {%- endfor -%}
-            {%- else -%}
-              <div class="j14-intro__slide is-active" data-j14-intro-slide data-index="0">
-                {%- render 'j14-media', asset: 'stitch-hero-slideshow-1.jpg', class: 'j14-intro__media', loading: 'eager' -%}
-              </div>
-            {%- endif -%}
+              {%- endif -%}
+            </div>
           </div>
         </div>
 
         <span class="j14-intro__half j14-intro__half--right" data-j14-intro-right>
-          {{- section.settings.word_right | default: 'FIZZ' | escape -}}
+          {{- section.settings.word_right | default: 'ZZ' | escape -}}
         </span>
+      </div>
+
+      <div class="j14-intro__hero-copy" data-j14-intro-copy>
+        {%- if section.settings.hero_eyebrow != blank -%}
+          <p class="j14-intro__hero-eyebrow">{{ section.settings.hero_eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.hero_heading != blank -%}
+          <h2 class="j14-intro__hero-heading">{{ section.settings.hero_heading | escape }}</h2>
+        {%- endif -%}
+        {%- if section.settings.hero_subheading != blank -%}
+          <p class="j14-intro__hero-sub">{{ section.settings.hero_subheading | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.cta_label != blank -%}
+          <a class="j14-btn j14-btn--accent j14-intro__hero-cta" href="{{ cta_url }}">
+            {{- section.settings.cta_label | escape -}}
+          </a>
+        {%- endif -%}
       </div>
 
       {%- if slide_count > 1 -%}
@@ -103,13 +124,13 @@
     {
       "type": "text",
       "id": "word_left",
-      "label": "Word — left half",
-      "default": "FI"
+      "label": "Word — left of the i mask",
+      "default": "F"
     },
     {
       "type": "text",
       "id": "word_right",
-      "label": "Word — right half",
+      "label": "Word — right of the i mask",
       "default": "ZZ"
     },
     {
@@ -117,6 +138,39 @@
       "id": "seo_heading",
       "label": "Accessible page heading",
       "info": "Read by screen readers and search engines. Defaults to the store name."
+    },
+    {
+      "type": "header",
+      "content": "Expanded hero copy"
+    },
+    {
+      "type": "text",
+      "id": "hero_eyebrow",
+      "label": "Eyebrow",
+      "default": "The portable sparkling water bottle"
+    },
+    {
+      "type": "text",
+      "id": "hero_heading",
+      "label": "Heading",
+      "default": "Sparkling water, anywhere."
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subheading",
+      "label": "Subheading",
+      "default": "Fill. Twist. Fizz. Cold bubbles in under ten seconds — no machine, no cans."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Shop bottles"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button link"
     },
     {
       "type": "header",
@@ -131,7 +185,7 @@
       "max": 400,
       "step": 10,
       "unit": "vh",
-      "default": 260
+      "default": 280
     },
     {
       "type": "range",
@@ -204,6 +258,14 @@
   "presets": [
     {
       "name": "J14 Intro",
+      "settings": {
+        "word_left": "F",
+        "word_right": "ZZ",
+        "hero_eyebrow": "The portable sparkling water bottle",
+        "hero_heading": "Sparkling water, anywhere.",
+        "hero_subheading": "Fill. Twist. Fizz. Cold bubbles in under ten seconds — no machine, no cans.",
+        "cta_label": "Shop bottles"
+      },
       "blocks": [
         { "type": "media", "settings": { "label": "Trail", "asset": "stitch-hero-slideshow-1.jpg" } },
         { "type": "media", "settings": { "label": "Studio", "asset": "stitch-hero-slideshow-2.jpg" } },
