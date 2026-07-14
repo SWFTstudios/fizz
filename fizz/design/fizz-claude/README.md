@@ -48,7 +48,7 @@ Nav is **not** a section — it lives in the layout snippet so `position: fixed`
 
 - `assets/fizz-claude-base.css` — layout, homepage, PDP, wrapper resets, marquee animation
 - `assets/fizz-claude.js` — bubbles, scroll reveals, parallax, cursor, colorway swatches, PDP addons/cart
-- `assets/fizz-claude-transition.js` — bubble page transitions
+- `assets/fizz-claude-page-transition.js` — melt / classic page transitions
 - `assets/fizz-claude-logo.avif`
 
 ## Bubble animation

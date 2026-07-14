@@ -46,7 +46,7 @@ Then **Online Store → Themes → Add theme → Upload zip file**.
 | `templates/product.json` | Bottle PDP |
 | `assets/fizz-base.css` | All styles + PDP + wrapper resets |
 | `assets/fizz.js` | Motion, swatches, PDP addons/cart |
-| `assets/fizz-transition.js` | Bubble page transitions |
+| `assets/fizz-page-transition.js` | Melt / classic page transitions |
 
 ## Bubble animation
 
