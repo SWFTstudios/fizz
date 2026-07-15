@@ -20,7 +20,7 @@
     {{ content_for_header }}
 
     {{ 'j14-base.css' | asset_url | stylesheet_tag }}
-    {% comment %} Intro: fixed rear hero scale expand · overlay sections {% endcomment %}
+    {% comment %} Intro: sticky rear hero + mosaic overlay (Spencer pattern) {% endcomment %}
     {% render 'j14-theme-tokens' %}
     <script>
       document.documentElement.classList.add('j14-js');

@@ -1,6 +1,6 @@
 /*
-  July 14th theme — mosaic + sticky how scroll engine.
-  Intro scale expand (fixed rear hero) is handled by j14-intro.js.
+  July 14th theme — mosaic tile reveal + sticky how scroll engine.
+  Intro sticky rear-hero scale expand is handled by j14-intro.js.
 */
 (function () {
   'use strict';
@@ -11,9 +11,6 @@
 
   var clamp = function (v, min, max) {
     return Math.min(max, Math.max(min, v));
-  };
-  var easeOutCubic = function (t) {
-    return 1 - Math.pow(1 - t, 3);
   };
 
   function trackProgress(track) {
@@ -51,12 +48,8 @@
   }
 
   MosaicController.prototype.update = function () {
-    if (!this.grid || motionOff) return;
-    var rect = this.section.getBoundingClientRect();
-    var vh = window.innerHeight;
-    var enter = clamp((vh - rect.top) / (vh * 0.9), 0, 1);
-    var lift = (1 - easeOutCubic(enter)) * Math.min(vh * 0.22, 260);
-    this.grid.style.transform = 'translateY(' + lift.toFixed(1) + 'px)';
+    /* Grid stays locked to document flow so tiles keep relative positions
+       while the whole mosaic section slides over the sticky intro hero. */
   };
 
   MosaicController.prototype.destroy = function () {
