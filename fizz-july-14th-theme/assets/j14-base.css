@@ -1100,6 +1100,7 @@ html:not(.j14-js) .j14-way {
   bottom: 0;
   margin-bottom: calc(var(--j14-warp-wave-h) * -0.17);
   transform: rotate(180deg);
+  color: var(--ways-bg-end);
 }
 .j14-warp__viewport {
   position: relative;
@@ -1126,50 +1127,61 @@ html:not(.j14-js) .j14-way {
 .j14-warp__slide {
   flex: 0 0 88vw;
   max-width: 440px;
-  opacity: 0.72;
+  opacity: 0.68;
   transition: opacity 0.35s ease;
 }
 .j14-warp__slide.is-active {
   opacity: 1;
 }
-.j14-warp__card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  height: 100%;
-  padding: 12px 0 8px;
-}
-.j14-warp__media {
+/* Full-bleed colorway panel: reaches the wave zone so the SVG waves carve a
+   visible silhouette. Solid color fill by default, optional per-variant photo. */
+.j14-warp__panel {
+  position: relative;
   width: 100%;
   height: var(--ways-media-height);
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--panel-bg-end, #26344f) 0%, var(--panel-bg, #1d2a44) 115%);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
 }
-.j14-warp__img {
-  width: auto;
-  max-width: 100%;
+.j14-warp__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
   height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.j14-warp__img {
+  position: relative;
+  z-index: 1;
+  width: auto;
+  max-width: 92%;
+  height: 90%;
   object-fit: contain;
   object-position: center bottom;
+  filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.32));
 }
-.j14-warp__info {
+.j14-warp__caption {
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 0 12px;
+  gap: 8px;
+  padding: 22px var(--j14-gutter) 0;
+  color: var(--ways-text);
+  transition: color 0.5s ease;
+  flex: 0 0 auto;
 }
 .j14-warp__name {
   font-family: var(--j14-font-heading);
-  font-size: 1.05rem;
+  font-size: 1.35rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .j14-warp__price {
-  font-size: 0.92rem;
+  font-size: 1rem;
   opacity: 0.85;
 }
 .j14-warp__cta {

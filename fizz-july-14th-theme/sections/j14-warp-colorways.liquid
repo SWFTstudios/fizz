@@ -4,6 +4,16 @@
   assign demo_slugs = 'steel-navy,electric-blue,coral-orange,sage-green,charcoal-black,arctic-white' | split: ','
   assign section_height = section.settings.section_height | default: 100
   assign media_height = section.settings.media_height | default: 52
+  if bottle != blank
+    assign init_variant = bottle.variants.first
+    assign init_name = init_variant.title
+    assign init_price = init_variant.price | money
+    assign init_href = bottle.url | append: '?variant=' | append: init_variant.id
+  else
+    assign init_name = 'Steel navy'
+    assign init_price = ''
+    assign init_href = routes.all_products_collection_url
+  endif
 -%}
 {%- capture warp_slides -%}
   {%- if bottle != blank -%}
@@ -38,31 +48,25 @@
         data-btn-text="{{ btn_text }}"
         data-text="{{ text_color }}"
         data-swatch="{{ swatch }}"
+        data-name="{{ variant.title | escape }}"
+        data-price="{{ variant.price | money }}"
+        data-href="{{ bottle.url }}?variant={{ variant.id }}"
       >
-        <div class="j14-warp__card">
-          <div class="j14-warp__media">
-            {%- if override_image != blank -%}
-              {{ override_image | image_url: width: 900 | image_tag: class: 'j14-warp__img', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 88vw', widths: '360, 540, 720, 900', alt: variant.title }}
-            {%- elsif variant.featured_image -%}
-              {{ variant.featured_image | image_url: width: 900 | image_tag: class: 'j14-warp__img', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 88vw', widths: '360, 540, 720, 900', alt: variant.title }}
-            {%- else -%}
-              <img
-                src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}"
-                class="j14-warp__img"
-                loading="lazy"
-                width="504"
-                height="1400"
-                alt="{{ variant.title | escape }}"
-              >
-            {%- endif -%}
-          </div>
-          <div class="j14-warp__info">
-            <h3 class="j14-warp__name">{{ variant.title | escape }}</h3>
-            <p class="j14-warp__price">{{ variant.price | money }}</p>
-            <a class="j14-btn j14-warp__cta" href="{{ bottle.url }}?variant={{ variant.id }}">
-              {{- cta_label | escape -}}
-            </a>
-          </div>
+        <div class="j14-warp__panel" style="--panel-bg: {{ swatch }}; --panel-bg-end: {{ bg_end }};">
+          {%- if override_image != blank -%}
+            {{ override_image | image_url: width: 900 | image_tag: class: 'j14-warp__photo', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 88vw', widths: '360, 540, 720, 900', alt: variant.title }}
+          {%- elsif variant.featured_image -%}
+            {{ variant.featured_image | image_url: width: 900 | image_tag: class: 'j14-warp__photo', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 88vw', widths: '360, 540, 720, 900', alt: variant.title }}
+          {%- else -%}
+            <img
+              src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}"
+              class="j14-warp__img"
+              loading="lazy"
+              width="504"
+              height="1400"
+              alt="{{ variant.title | escape }}"
+            >
+          {%- endif -%}
         </div>
       </li>
     {%- endfor -%}
@@ -80,24 +84,19 @@
         data-btn-text="{{ scene_parts[5] }}"
         data-text="{{ scene_parts[3] }}"
         data-swatch="{{ scene_parts[4] }}"
+        data-name="{{ slug | replace: '-', ' ' | capitalize | escape }}"
+        data-price=""
+        data-href="{{ routes.all_products_collection_url }}"
       >
-        <div class="j14-warp__card">
-          <div class="j14-warp__media">
-            <img
-              src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}"
-              class="j14-warp__img"
-              loading="lazy"
-              width="504"
-              height="1400"
-              alt="{{ slug | replace: '-', ' ' | capitalize | escape }}"
-            >
-          </div>
-          <div class="j14-warp__info">
-            <h3 class="j14-warp__name">{{ slug | replace: '-', ' ' | capitalize }}</h3>
-            <a class="j14-btn j14-warp__cta" href="{{ routes.all_products_collection_url }}">
-              {{- cta_label | escape -}}
-            </a>
-          </div>
+        <div class="j14-warp__panel" style="--panel-bg: {{ scene_parts[4] }}; --panel-bg-end: {{ scene_parts[1] }};">
+          <img
+            src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}"
+            class="j14-warp__img"
+            loading="lazy"
+            width="504"
+            height="1400"
+            alt="{{ slug | replace: '-', ' ' | capitalize | escape }}"
+          >
         </div>
       </li>
     {%- endfor -%}
@@ -167,6 +166,16 @@
     <button type="button" class="j14-warp__arrow" data-j14-warp-next aria-label="{{ 'general.accessibility.next' | t }}">
       &rarr;
     </button>
+  </div>
+
+  <div class="j14-warp__caption" data-j14-warp-caption>
+    <h3 class="j14-warp__name" data-j14-warp-name>{{ init_name | escape }}</h3>
+    {%- if init_price != blank -%}
+      <p class="j14-warp__price" data-j14-warp-price>{{ init_price }}</p>
+    {%- else -%}
+      <p class="j14-warp__price" data-j14-warp-price hidden></p>
+    {%- endif -%}
+    <a class="j14-btn j14-warp__cta" data-j14-warp-cta href="{{ init_href }}">{{ cta_label | escape }}</a>
   </div>
 </section>
 
