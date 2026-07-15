@@ -85,7 +85,7 @@
       }
     },
     "colorways": {
-      "type": "j14-colorways",
+      "type": "j14-warp-colorways",
       "settings": {
         "eyebrow": "The bottle",
         "heading": "Pick your color",

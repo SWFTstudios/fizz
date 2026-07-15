@@ -13,9 +13,10 @@ other libraries).
    grid that **slides up as one unit** over the sticky hero (higher z-index);
    tiles keep their relative grid positions; per-tile span, height, caption,
    and link controls.
-3. **J14 Colorways Carousel** (`j14-colorways.liquid`) — swipe/scroll-snap
-   carousel of bottle colors driven by a product's variants; active slide
-   syncs the section background and CTA (`?variant=` deep link).
+3. **J14 Warp Colorways** (`j14-warp-colorways.liquid`) — product-variant
+   carousel with the Webflow-style **warp silhouette** (SVG wave overlays on a
+   flat drag rail); active slide can sync section background/CTA
+   (`?variant=`). Flat `j14-colorways` remains available in the editor.
 4. **J14 How To Use** (`j14-how-sticky.liquid`) — sticky full-viewport scene;
    each step's photo wipes in as the visitor scrolls through the track.
 5. **J14 Flavors** (`j14-flavors.liquid`) — three flavor packs with product
@@ -33,10 +34,11 @@ button radius live in **Theme settings** (`config/settings_schema.json`).
 ## Motion
 
 `assets/j14-scroll.js` is a single rAF + IntersectionObserver engine for the
-intro, mosaic, and how-to sections; `assets/j14-carousel.js` powers the
-colorways rail. Both respect `prefers-reduced-motion` (and the Theme settings
-"Enable scroll animations" toggle) with static fallbacks, and re-initialize on
-theme editor events (`shopify:section:load`, `shopify:block:select`).
+intro, mosaic, and how-to sections; `assets/j14-carousel.js` powers the flat
+colorways rail; `assets/j14-warp.js` powers the warp colorways slider. All
+respect `prefers-reduced-motion` (and the Theme settings "Enable scroll
+animations" toggle) with static fallbacks, and re-initialize on theme editor
+events (`shopify:section:load`, `shopify:block:select`).
 
 ## Commerce templates
 

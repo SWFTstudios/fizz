@@ -1,0 +1,299 @@
+{%- liquid
+  assign bottle = section.settings.product | default: settings.bottle_product
+  assign cta_label = section.settings.cta_label | default: 'Shop this color'
+  assign demo_slugs = 'steel-navy,electric-blue,coral-orange,sage-green,charcoal-black,arctic-white' | split: ','
+  assign section_height = section.settings.section_height | default: 100
+  assign media_height = section.settings.media_height | default: 52
+-%}
+{%- capture warp_slides -%}
+  {%- if bottle != blank -%}
+    {%- for variant in bottle.variants -%}
+      {%- capture slug -%}{% render 'j14-color-slug', variant: variant %}{%- endcapture -%}
+      {%- assign slug = slug | strip -%}
+      {%- capture scene -%}{% render 'j14-colorway-scene', slug: slug, variant: variant %}{%- endcapture -%}
+      {%- assign scene_parts = scene | strip | split: '|' -%}
+      {%- assign bg = scene_parts[0] -%}
+      {%- assign bg_end = scene_parts[1] -%}
+      {%- assign btn = scene_parts[2] -%}
+      {%- assign text_color = scene_parts[3] -%}
+      {%- assign swatch = scene_parts[4] -%}
+      {%- assign btn_text = scene_parts[5] -%}
+      {%- assign override_image = blank -%}
+      {%- for block in section.blocks -%}
+        {%- if block.settings.slug == slug -%}
+          {%- if block.settings.bg != blank %}{% assign bg = block.settings.bg %}{% endif -%}
+          {%- if block.settings.bg_end != blank %}{% assign bg_end = block.settings.bg_end %}{% endif -%}
+          {%- if block.settings.btn != blank %}{% assign btn = block.settings.btn %}{% endif -%}
+          {%- if block.settings.text != blank %}{% assign text_color = block.settings.text %}{% endif -%}
+          {%- if block.settings.image != blank %}{% assign override_image = block.settings.image %}{% endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+      <li
+        class="j14-warp__slide{% if forloop.first %} is-active{% endif %}"
+        data-j14-warp-slide
+        data-index="{{ forloop.index0 }}"
+        data-bg="{{ bg }}"
+        data-bg-end="{{ bg_end }}"
+        data-btn="{{ btn }}"
+        data-btn-text="{{ btn_text }}"
+        data-text="{{ text_color }}"
+        data-swatch="{{ swatch }}"
+      >
+        <div class="j14-warp__card">
+          <div class="j14-warp__media">
+            {%- if override_image != blank -%}
+              {{ override_image | image_url: width: 900 | image_tag: class: 'j14-warp__img', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 88vw', widths: '360, 540, 720, 900', alt: variant.title }}
+            {%- elsif variant.featured_image -%}
+              {{ variant.featured_image | image_url: width: 900 | image_tag: class: 'j14-warp__img', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 88vw', widths: '360, 540, 720, 900', alt: variant.title }}
+            {%- else -%}
+              <img
+                src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}"
+                class="j14-warp__img"
+                loading="lazy"
+                width="504"
+                height="1400"
+                alt="{{ variant.title | escape }}"
+              >
+            {%- endif -%}
+          </div>
+          <div class="j14-warp__info">
+            <h3 class="j14-warp__name">{{ variant.title | escape }}</h3>
+            <p class="j14-warp__price">{{ variant.price | money }}</p>
+            <a class="j14-btn j14-warp__cta" href="{{ bottle.url }}?variant={{ variant.id }}">
+              {{- cta_label | escape -}}
+            </a>
+          </div>
+        </div>
+      </li>
+    {%- endfor -%}
+  {%- else -%}
+    {%- for slug in demo_slugs -%}
+      {%- capture scene -%}{% render 'j14-colorway-scene', slug: slug %}{%- endcapture -%}
+      {%- assign scene_parts = scene | strip | split: '|' -%}
+      <li
+        class="j14-warp__slide{% if forloop.first %} is-active{% endif %}"
+        data-j14-warp-slide
+        data-index="{{ forloop.index0 }}"
+        data-bg="{{ scene_parts[0] }}"
+        data-bg-end="{{ scene_parts[1] }}"
+        data-btn="{{ scene_parts[2] }}"
+        data-btn-text="{{ scene_parts[5] }}"
+        data-text="{{ scene_parts[3] }}"
+        data-swatch="{{ scene_parts[4] }}"
+      >
+        <div class="j14-warp__card">
+          <div class="j14-warp__media">
+            <img
+              src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}"
+              class="j14-warp__img"
+              loading="lazy"
+              width="504"
+              height="1400"
+              alt="{{ slug | replace: '-', ' ' | capitalize | escape }}"
+            >
+          </div>
+          <div class="j14-warp__info">
+            <h3 class="j14-warp__name">{{ slug | replace: '-', ' ' | capitalize }}</h3>
+            <a class="j14-btn j14-warp__cta" href="{{ routes.all_products_collection_url }}">
+              {{- cta_label | escape -}}
+            </a>
+          </div>
+        </div>
+      </li>
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+<section
+  class="j14-warp{% unless section.settings.sync_scene %} j14-warp--static{% endunless %}"
+  id="{{ section.settings.anchor_id | default: 'colors' }}"
+  data-j14-warp
+  data-sync-scene="{{ section.settings.sync_scene }}"
+  style="--ways-section-height: {{ section_height }}vh; --ways-media-height: min({{ media_height }}vh, 640px);"
+>
+  <div class="j14-warp__head">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="j14-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.heading != blank -%}
+      <h2 class="j14-heading j14-warp__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+  </div>
+
+  <div class="j14-warp__stage">
+    {%- comment -%} Wave overlays recreate the Webflow warp silhouette (clip illusion). {%- endcomment -%}
+    <svg
+      class="j14-warp__wave j14-warp__wave--top"
+      viewBox="0 0 804 50.167"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        fill="currentColor"
+        d="M804,0 v16.671 c0,0 -204.974,33.496 -401.995,33.496 C204.974,50.167 0,16.671 0,16.671 V0 H804z"
+      ></path>
+    </svg>
+    <svg
+      class="j14-warp__wave j14-warp__wave--bottom"
+      viewBox="0 0 804 50.167"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        fill="currentColor"
+        d="M804,0 v16.671 c0,0 -204.974,33.496 -401.995,33.496 C204.974,50.167 0,16.671 0,16.671 V0 H804z"
+      ></path>
+    </svg>
+
+    <div class="j14-warp__viewport">
+      <ul
+        class="j14-warp__track"
+        data-j14-warp-track
+        tabindex="0"
+        aria-label="{{ section.settings.heading | default: 'Bottle colors' | escape }}"
+      >
+        {{ warp_slides }}
+      </ul>
+    </div>
+  </div>
+
+  <div class="j14-warp__controls">
+    <button type="button" class="j14-warp__arrow" data-j14-warp-prev aria-label="{{ 'general.accessibility.previous' | t }}">
+      &larr;
+    </button>
+    <div class="j14-warp__dots" data-j14-warp-dots role="tablist"></div>
+    <button type="button" class="j14-warp__arrow" data-j14-warp-next aria-label="{{ 'general.accessibility.next' | t }}">
+      &rarr;
+    </button>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "J14 Warp Colorways",
+  "tag": "section",
+  "class": "j14-warp-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "The bottle"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Pick your color"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "colors"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Bottle product",
+      "info": "One slide is created per variant. Falls back to the theme's default bottle product, then to demo colorways."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Shop this color"
+    },
+    {
+      "type": "checkbox",
+      "id": "sync_scene",
+      "label": "Sync background with active color",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "section_height",
+      "label": "Section height",
+      "info": "Minimum height of the section as a percentage of the viewport.",
+      "min": 70,
+      "max": 120,
+      "step": 5,
+      "unit": "vh",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "media_height",
+      "label": "Bottle image height",
+      "info": "How tall bottle images render inside cards. Images keep their natural proportions.",
+      "min": 30,
+      "max": 70,
+      "step": 2,
+      "unit": "vh",
+      "default": 52
+    }
+  ],
+  "blocks": [
+    {
+      "type": "colorway",
+      "name": "Colorway override",
+      "settings": [
+        {
+          "type": "select",
+          "id": "slug",
+          "label": "Colorway",
+          "options": [
+            { "value": "steel-navy", "label": "Steel Navy" },
+            { "value": "electric-blue", "label": "Electric Blue" },
+            { "value": "coral-orange", "label": "Coral Orange" },
+            { "value": "sage-green", "label": "Sage Green" },
+            { "value": "charcoal-black", "label": "Charcoal Black" },
+            { "value": "arctic-white", "label": "Arctic White" }
+          ],
+          "default": "steel-navy"
+        },
+        {
+          "type": "color",
+          "id": "bg",
+          "label": "Background start"
+        },
+        {
+          "type": "color",
+          "id": "bg_end",
+          "label": "Background end"
+        },
+        {
+          "type": "color",
+          "id": "btn",
+          "label": "Button color"
+        },
+        {
+          "type": "color",
+          "id": "text",
+          "label": "Text color"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Bottle image override"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "J14 Warp Colorways"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index", "page", "product", "collection"]
+  }
+}
+{% endschema %}
