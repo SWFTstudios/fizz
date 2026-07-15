@@ -7,12 +7,12 @@ other libraries).
 ## Homepage flow (`templates/index.json`)
 
 1. **J14 Intro** (`sections/j14-intro.liquid`) — brand wordmark split around a
-   media window that expands to full screen as the visitor scrolls; editable
-   media slides (image / Shopify video / YouTube / Vimeo) with a thumbnail
-   strip.
+   media window that **scales** from the uppercase I stem to a fixed
+   `100vw × 100vh` rear plane; editable media slides (image / Shopify video /
+   YouTube / Vimeo) with a thumbnail strip.
 2. **J14 Media Mosaic** (`j14-mosaic.liquid`) — admin-editable grid of photo
-   and video tiles that slides up from the bottom on scroll; per-tile span,
-   height, caption, and link controls.
+   and video tiles that **slides up over the fixed hero** (higher z-index);
+   per-tile span, height, caption, and link controls.
 3. **J14 Colorways Carousel** (`j14-colorways.liquid`) — swipe/scroll-snap
    carousel of bottle colors driven by a product's variants; active slide
    syncs the section background and CTA (`?variant=` deep link).

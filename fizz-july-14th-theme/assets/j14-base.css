@@ -458,35 +458,53 @@ html.j14-menu-open main {
 }
 
 /* =============================================================
-   Intro (FIZZ uppercase I mask — GSAP clip-path expand)
-   Media is always full-bleed + object-fit: cover; clip reveals it.
+   Intro (FIZZ uppercase I — scale expand on a fixed rear hero)
+   Stage is position:fixed 100vw×100vh at the back of the intro
+   stacking context. Following .shopify-section siblings sit at a
+   higher z-index so they slide up over the locked hero.
    ============================================================= */
+.j14-intro-section {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
 .j14-intro__track {
   height: var(--j14-intro-len, 280vh);
 }
 .j14-intro__sticky {
   position: sticky;
   top: 0;
+  z-index: 1;
   height: 100vh;
   height: 100svh;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--j14-paper);
+  background: transparent;
+  pointer-events: none;
+}
+.j14-intro__sticky a,
+.j14-intro__sticky button {
+  pointer-events: auto;
 }
 
-/* Full-viewport media stage (clipped to uppercase I stem by JS) */
+/* Fixed rear media plane — GSAP scales from the I-stem to full bleed */
 .j14-intro__stage {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100svh;
+  z-index: 0;
   overflow: hidden;
   background: var(--j14-surface);
-  will-change: clip-path;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  pointer-events: none;
   /* Approx uppercase I stem until GSAP measures the gap and takes over */
-  clip-path: inset(22% 46.5% 22% 46.5%);
-  -webkit-clip-path: inset(22% 46.5% 22% 46.5%);
+  transform: scale(0.07, 0.56);
 }
 .j14-intro__slides {
   position: absolute;
@@ -670,6 +688,13 @@ html.j14-menu-open main {
   }
 }
 
+/* Sections after intro slide up over the fixed rear hero */
+.j14-intro-section ~ .shopify-section {
+  position: relative;
+  z-index: 2;
+  background: var(--j14-paper);
+}
+
 /* Reduced motion / no JS: full hero + copy visible */
 .j14-no-motion .j14-intro__track,
 html:not(.j14-js) .j14-intro__track {
@@ -683,8 +708,11 @@ html:not(.j14-js) .j14-intro__sticky {
 }
 .j14-no-motion .j14-intro__stage,
 html:not(.j14-js) .j14-intro__stage {
-  clip-path: inset(0) !important;
-  -webkit-clip-path: inset(0) !important;
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  transform: none !important;
 }
 .j14-no-motion .j14-intro__word,
 html:not(.j14-js) .j14-intro__word {
@@ -743,6 +771,7 @@ html:not(.j14-js) .j14-intro__hint {
 .j14-mosaic {
   padding: 4px 0 40px;
   overflow: hidden;
+  background: var(--j14-paper);
 }
 .j14-mosaic__grid {
   display: grid;

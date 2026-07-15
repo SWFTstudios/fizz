@@ -1,6 +1,6 @@
 /*
   July 14th theme — mosaic + sticky how scroll engine.
-  Intro expand is handled by j14-intro.js (GSAP ScrollTrigger).
+  Intro scale expand (fixed rear hero) is handled by j14-intro.js.
 */
 (function () {
   'use strict';
