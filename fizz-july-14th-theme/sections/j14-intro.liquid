@@ -9,16 +9,16 @@
   data-auto-scroll="{% if section.settings.auto_scroll == false %}false{% else %}true{% endif %}"
   data-auto-scroll-duration="{{ section.settings.auto_scroll_duration | default: 2.8 }}"
   data-auto-scroll-delay="{{ section.settings.auto_scroll_delay | default: 0.35 }}"
-  style="--j14-intro-len: {{ section.settings.scroll_length }}vh;"
+  style="--j14-intro-len: 100vh;"
 >
   <h1 class="j14-visually-hidden">{{ section.settings.seo_heading | default: shop.name }}</h1>
 
   <div class="j14-intro__track" data-j14-intro-track>
     <div class="j14-intro__sticky">
       {%- comment -%}
-        Sticky 100vw×100vh rear hero (Spencer pattern). GSAP scales from the
-        uppercase “I” stem to full bleed; mosaic + later sections sit at a
-        higher z-index and slide up as one unit over it.
+        Fixed 100vw×100vh rear hero pin (Spencer pattern). GSAP scales from
+        the uppercase “I” stem to full bleed. Mosaic + later sections sit at
+        a higher z-index and slide up as one unit over it.
       {%- endcomment -%}
       <div class="j14-intro__stage" data-j14-intro-stage aria-hidden="true">
         <div class="j14-intro__slides" data-j14-intro-slides>
