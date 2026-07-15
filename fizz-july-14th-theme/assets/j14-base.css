@@ -694,6 +694,10 @@ html.j14-menu-open main {
   z-index: 2;
   background: var(--j14-paper);
 }
+.j14-intro-section ~ .j14-ways-section,
+.j14-intro-section ~ .j14-footer-section {
+  background: transparent;
+}
 
 /* Reduced motion / no JS: full hero + copy visible */
 .j14-no-motion .j14-intro__track,
