@@ -13,10 +13,18 @@ other libraries).
    grid that **slides up as one unit** over the sticky hero (higher z-index);
    tiles keep their relative grid positions; per-tile span, height, caption,
    and link controls.
-3. **J14 Warp Colorways** (`j14-warp-colorways.liquid`) — product-variant
+3. **J14 Warp Colorways** (`j14-warp-colorways.liquid`) — product media
    carousel with the Webflow-style **warp silhouette** (SVG wave overlays on a
-   flat drag rail); active slide can sync section background/CTA
-   (`?variant=`). Flat `j14-colorways` remains available in the editor.
+   flat drag rail). Three slide sources: **product variants** (default),
+   a **collection**, or a **manual product list** (up to 12). Each slide's
+   media panel resolves the `custom.warp_media` metafield (image **or
+   video**, on the variant or product) first, then native product media,
+   then a colorway gradient panel. Videos autoplay muted on the active slide
+   only. Active slide syncs section background/CTA; scene colors for product
+   sources come from `custom.scene_*` metafields. Flat `j14-colorways`
+   remains available in the editor. See
+   `fizz-claude-theme/design/WARP-MEDIA-CAROUSEL-RESEARCH.md` for the
+   metafield keys and platform research.
 4. **J14 How To Use** (`j14-how-sticky.liquid`) — sticky full-viewport scene;
    each step's photo wipes in as the visitor scrolls through the track.
 5. **J14 Flavors** (`j14-flavors.liquid`) — three flavor packs with product

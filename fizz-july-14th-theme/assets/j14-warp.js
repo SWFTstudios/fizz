@@ -188,7 +188,18 @@
     var self = this;
     this.slides().forEach(function (slide) {
       var real = parseInt(slide.getAttribute('data-index'), 10);
-      slide.classList.toggle('is-active', real === index);
+      var active = real === index;
+      slide.classList.toggle('is-active', active);
+      /* Autoplay only the active slide's video (muted loop); pause the rest
+         so cloned/offscreen videos don't burn cycles. Reduced motion: poster only. */
+      slide.querySelectorAll('video').forEach(function (video) {
+        if (active && !motionOff) {
+          var p = video.play();
+          if (p && p.catch) p.catch(function () {});
+        } else {
+          video.pause();
+        }
+      });
     });
     if (this.dots) {
       this.dots.forEach(function (dot, i) {

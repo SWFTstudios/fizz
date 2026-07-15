@@ -1,10 +1,24 @@
 {%- liquid
+  assign source = section.settings.source | default: 'variants'
   assign bottle = section.settings.product | default: settings.bottle_product
   assign cta_label = section.settings.cta_label | default: 'Shop this color'
   assign demo_slugs = 'steel-navy,electric-blue,coral-orange,sage-green,charcoal-black,arctic-white' | split: ','
   assign section_height = section.settings.section_height | default: 100
   assign media_height = section.settings.media_height | default: 52
-  if bottle != blank
+
+  assign product_items = blank
+  if source == 'collection' and section.settings.collection != blank
+    assign product_items = section.settings.collection.products
+  elsif source == 'products' and section.settings.products.count > 0
+    assign product_items = section.settings.products
+  endif
+
+  if product_items != blank
+    assign init_item = product_items | first
+    assign init_name = init_item.title
+    assign init_price = init_item.price | money
+    assign init_href = init_item.url
+  elsif bottle != blank
     assign init_variant = bottle.variants.first
     assign init_name = init_variant.title
     assign init_price = init_variant.price | money
@@ -16,7 +30,56 @@
   endif
 -%}
 {%- capture warp_slides -%}
-  {%- if bottle != blank -%}
+  {%- if product_items != blank -%}
+    {%- comment -%}
+      Product modes (collection / manual list): one slide per product.
+      Scene colors come from product metafields (custom.scene_*) with theme
+      defaults; media resolves warp_media metafield > native media > gradient.
+    {%- endcomment -%}
+    {%- for item in product_items limit: 12 -%}
+      {%- assign bg = item.metafields.custom.scene_bg | default: '#0f1a2e' -%}
+      {%- assign bg_end = item.metafields.custom.scene_bg_end | default: '#26344f' -%}
+      {%- assign btn = item.metafields.custom.scene_btn | default: '#c6f24e' -%}
+      {%- assign text_color = item.metafields.custom.scene_text | default: '#f2efe7' -%}
+      {%- assign swatch = item.metafields.custom.swatch_hex | default: bg_end -%}
+      {%- assign btn_brightness = btn | color_brightness -%}
+      {%- if btn_brightness > 160 -%}
+        {%- assign btn_text = '#080a0d' -%}
+      {%- else -%}
+        {%- assign btn_text = '#f2efe7' -%}
+      {%- endif -%}
+      {%- assign media_field = item.metafields.custom.warp_media -%}
+      <li
+        class="j14-warp__slide{% if forloop.first %} is-active{% endif %}"
+        data-j14-warp-slide
+        data-index="{{ forloop.index0 }}"
+        data-bg="{{ bg }}"
+        data-bg-end="{{ bg_end }}"
+        data-btn="{{ btn }}"
+        data-btn-text="{{ btn_text }}"
+        data-text="{{ text_color }}"
+        data-swatch="{{ swatch }}"
+        data-name="{{ item.title | escape }}"
+        data-price="{{ item.price | money }}"
+        data-href="{{ item.url }}"
+      >
+        <div class="j14-warp__panel" style="--panel-bg: {{ swatch }}; --panel-bg-end: {{ bg_end }};">
+          {%- if media_field != blank and media_field.value.media_type == 'video' -%}
+            {{ media_field.value | video_tag: class: 'j14-warp__video', loop: true, muted: true, controls: false, preload: 'metadata' }}
+          {%- elsif media_field != blank -%}
+            {{ media_field.value | image_url: width: 900 | image_tag: class: 'j14-warp__photo', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 88vw', widths: '360, 540, 720, 900', alt: item.title }}
+          {%- elsif item.featured_media.media_type == 'video' -%}
+            {{ item.featured_media | video_tag: class: 'j14-warp__video', loop: true, muted: true, controls: false, preload: 'metadata' }}
+          {%- elsif item.featured_image -%}
+            {{ item.featured_image | image_url: width: 900 | image_tag: class: 'j14-warp__photo', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 88vw', widths: '360, 540, 720, 900', alt: item.title }}
+          {%- endif -%}
+        </div>
+      </li>
+    {%- endfor -%}
+  {%- elsif bottle != blank -%}
+    {%- comment -%}
+      Variants mode (default): one slide per variant of the bottle product.
+    {%- endcomment -%}
     {%- for variant in bottle.variants -%}
       {%- capture slug -%}{% render 'j14-color-slug', variant: variant %}{%- endcapture -%}
       {%- assign slug = slug | strip -%}
@@ -38,6 +101,7 @@
           {%- if block.settings.image != blank %}{% assign override_image = block.settings.image %}{% endif -%}
         {%- endif -%}
       {%- endfor -%}
+      {%- assign media_field = variant.metafields.custom.warp_media -%}
       <li
         class="j14-warp__slide{% if forloop.first %} is-active{% endif %}"
         data-j14-warp-slide
@@ -53,7 +117,11 @@
         data-href="{{ bottle.url }}?variant={{ variant.id }}"
       >
         <div class="j14-warp__panel" style="--panel-bg: {{ swatch }}; --panel-bg-end: {{ bg_end }};">
-          {%- if override_image != blank -%}
+          {%- if media_field != blank and media_field.value.media_type == 'video' -%}
+            {{ media_field.value | video_tag: class: 'j14-warp__video', loop: true, muted: true, controls: false, preload: 'metadata' }}
+          {%- elsif media_field != blank -%}
+            {{ media_field.value | image_url: width: 900 | image_tag: class: 'j14-warp__photo', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 88vw', widths: '360, 540, 720, 900', alt: variant.title }}
+          {%- elsif override_image != blank -%}
             {{ override_image | image_url: width: 900 | image_tag: class: 'j14-warp__photo', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 88vw', widths: '360, 540, 720, 900', alt: variant.title }}
           {%- elsif variant.featured_image -%}
             {{ variant.featured_image | image_url: width: 900 | image_tag: class: 'j14-warp__photo', loading: 'lazy', sizes: '(min-width: 750px) 33vw, 88vw', widths: '360, 540, 720, 900', alt: variant.title }}
@@ -204,10 +272,39 @@
       "default": "colors"
     },
     {
+      "type": "header",
+      "content": "Slides source"
+    },
+    {
+      "type": "select",
+      "id": "source",
+      "label": "Show slides from",
+      "options": [
+        { "value": "variants", "label": "Product variants" },
+        { "value": "collection", "label": "Collection" },
+        { "value": "products", "label": "Manual product list" }
+      ],
+      "default": "variants",
+      "info": "Product variants: one slide per variant of the bottle product. Collection or manual list: one slide per product (up to 12). Slide media resolves the custom.warp_media metafield (image or video) first, then native product media."
+    },
+    {
       "type": "product",
       "id": "product",
       "label": "Bottle product",
-      "info": "One slide is created per variant. Falls back to the theme's default bottle product, then to demo colorways."
+      "info": "Used by the Product variants source. Falls back to the theme's default bottle product, then to demo colorways."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Used by the Collection source."
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Products",
+      "limit": 12,
+      "info": "Used by the Manual product list source."
     },
     {
       "type": "text",
@@ -239,8 +336,8 @@
     {
       "type": "range",
       "id": "media_height",
-      "label": "Bottle image height",
-      "info": "How tall bottle images render inside cards. Images keep their natural proportions.",
+      "label": "Media panel height",
+      "info": "How tall slide media panels render inside the carousel.",
       "min": 30,
       "max": 70,
       "step": 2,

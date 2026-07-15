@@ -1145,7 +1145,8 @@ html:not(.j14-js) .j14-way {
   align-items: flex-end;
   justify-content: center;
 }
-.j14-warp__photo {
+.j14-warp__photo,
+.j14-warp__video {
   position: absolute;
   inset: 0;
   width: 100%;
