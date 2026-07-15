@@ -458,25 +458,31 @@ html.j14-menu-open main {
 }
 
 /* =============================================================
-   Intro (FIZZ uppercase I — scale expand on a fixed rear hero)
-   Stage is position:fixed 100vw×100vh at the back of the intro
-   stacking context. Following .shopify-section siblings sit at a
-   higher z-index so they slide up over the locked hero.
+   Intro — Spencer-style sticky rear hero + overlay sections
+   .j14-intro-section sticks at 100vh / low z-index while main
+   scrolls. Media scales from the FIZZ I-stem to full viewport
+   inside that sticky plane. Mosaic and later sections sit at a
+   higher z-index and slide up as one unit over the hero.
    ============================================================= */
 .j14-intro-section {
-  position: relative;
-  z-index: 1;
-  isolation: isolate;
-}
-.j14-intro__track {
-  height: var(--j14-intro-len, 280vh);
-}
-.j14-intro__sticky {
   position: sticky;
   top: 0;
   z-index: 1;
   height: 100vh;
   height: 100svh;
+  overflow: hidden;
+  background: var(--j14-paper);
+}
+.j14-intro {
+  height: 100%;
+}
+.j14-intro__track {
+  height: 100%;
+}
+.j14-intro__sticky {
+  position: relative;
+  z-index: 1;
+  height: 100%;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -489,14 +495,15 @@ html.j14-menu-open main {
   pointer-events: auto;
 }
 
-/* Fixed rear media plane — GSAP scales from the I-stem to full bleed */
+/* Full-bleed media inside the sticky hero — GSAP scales I → cover */
 .j14-intro__stage {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   height: 100svh;
+  max-width: none;
   z-index: 0;
   overflow: hidden;
   background: var(--j14-surface);
@@ -688,10 +695,10 @@ html.j14-menu-open main {
   }
 }
 
-/* Sections after intro slide up over the fixed rear hero */
+/* Sections after intro slide up over the sticky rear hero (Spencer pattern) */
 .j14-intro-section ~ .shopify-section {
   position: relative;
-  z-index: 2;
+  z-index: 6;
   background: var(--j14-paper);
 }
 .j14-intro-section ~ .j14-ways-section,
@@ -700,6 +707,13 @@ html.j14-menu-open main {
 }
 
 /* Reduced motion / no JS: full hero + copy visible */
+.j14-no-motion .j14-intro-section,
+html:not(.j14-js) .j14-intro-section {
+  position: relative;
+  height: auto;
+  min-height: 100vh;
+  min-height: 100svh;
+}
 .j14-no-motion .j14-intro__track,
 html:not(.j14-js) .j14-intro__track {
   height: auto;
@@ -770,8 +784,12 @@ html:not(.j14-js) .j14-intro__hint {
 }
 
 /* =============================================================
-   Mosaic
+   Mosaic — cohesive overlay grid (slides as one unit over hero)
    ============================================================= */
+.j14-mosaic-section {
+  /* Ensure the whole section paints above sticky intro */
+  isolation: isolate;
+}
 .j14-mosaic {
   padding: 4px 0 40px;
   overflow: hidden;
@@ -781,7 +799,6 @@ html:not(.j14-js) .j14-intro__hint {
   display: grid;
   gap: var(--mosaic-gap, 8px);
   padding: 0 var(--mosaic-gap, 8px);
-  will-change: transform;
 }
 .j14-mosaic__grid--m1 {
   grid-template-columns: 1fr;
@@ -797,10 +814,8 @@ html:not(.j14-js) .j14-intro__hint {
   border-radius: var(--mosaic-radius, 0);
   background: var(--j14-surface);
   text-decoration: none;
-  opacity: 0;
-  transform: translateY(36px);
-  transition: opacity 0.55s ease, transform 0.55s ease;
-  transition-delay: calc(var(--tile-index, 0) * 45ms);
+  opacity: 1;
+  transform: none;
 }
 .j14-tile.is-in,
 .j14-no-motion .j14-tile,

@@ -1,20 +1,19 @@
 /*
-  July 14th intro — GSAP ScrollTrigger.
-  Hero media is fixed (100vw × 100vh) at the rear of the intro stacking
-  context. We scale it from the uppercase I stem to full bleed; sections
-  after the intro sit at a higher z-index and slide up over it.
+  July 14th intro — Spencer-style sticky rear hero.
+  The intro section sticks at 100vh. Media scales from the uppercase I stem
+  to full viewport inside that plane. Mosaic / later sections sit at a higher
+  z-index and slide up as one unit over the hero (no per-grid parallax lift).
 
-  On load the expand plays automatically as a timed timeline (not dependent on
-  the shopper scrolling). After it finishes, scroll position is synced so the
-  scrubbed ScrubTrigger stays correct. Wheel / touch / menu cancel and hand
-  control back mid-flight.
+  Expand plays as a timed timeline on load (optional). Wheel / touch / menu
+  cancel hand control back mid-flight.
 */
 (function () {
   'use strict';
 
-  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-
-  gsap.registerPlugin(ScrollTrigger);
+  if (typeof gsap === 'undefined') return;
+  if (typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+  }
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var motionOff = document.documentElement.classList.contains('j14-no-motion') || reduced;
@@ -22,7 +21,7 @@
 
   var instances = [];
 
-  /** Scale factors that size the fixed stage to the wordmark I-gap. */
+  /** Scale factors that size the stage to the wordmark I-gap. */
   function stemScale(gap) {
     var vw = window.innerWidth || 1;
     var vh = window.innerHeight || 1;
@@ -67,10 +66,10 @@
     this.active = 0;
     this.timer = null;
     this.tl = null;
-    this.st = null;
     this.autoTween = null;
     this.autoPlaying = false;
     this._cancelAuto = this.cancelAutoPlay.bind(this);
+    this._onResize = this.onResize.bind(this);
 
     var self = this;
     this.thumbs.forEach(function (thumb) {
@@ -81,6 +80,7 @@
     });
 
     this.restartAutoplay();
+    window.addEventListener('resize', this._onResize, { passive: true });
 
     if (motionOff) {
       this.showStatic();
@@ -89,7 +89,6 @@
 
     requestAnimationFrame(function () {
       self.buildTimeline();
-      ScrollTrigger.refresh();
       self.maybeAutoPlay();
     });
   }
@@ -113,13 +112,6 @@
     if (this.copy) {
       this.copy.style.pointerEvents = p > 0.82 ? 'auto' : 'none';
     }
-  };
-
-  Intro.prototype.trackEndY = function () {
-    if (!this.track) return 0;
-    if (this.st && typeof this.st.end === 'number') return this.st.end;
-    var top = this.track.getBoundingClientRect().top + (window.scrollY || 0);
-    return Math.max(0, top + this.track.offsetHeight - window.innerHeight);
   };
 
   Intro.prototype.setSlide = function (index) {
@@ -177,28 +169,33 @@
     }
     this.unbindAutoCancel();
 
-    if (soft) {
-      /* Menu open: stop the tween only — do not touch ScrollTrigger / scroll */
-      return;
-    }
+    if (soft) return;
 
-    /* Match scroll to current visual progress, then re-enable scrub */
-    try {
-      var endY = this.trackEndY();
-      window.scrollTo(0, endY * progress);
-      if (this.st && this.st.enable) this.st.enable();
-      if (typeof ScrollTrigger.update === 'function') ScrollTrigger.update();
-    } catch (err) {}
+    /* Keep expand where it was — sticky hero stays put; mosaic scrolls over it */
     this.syncProgress(progress);
   };
 
   Intro.prototype.maybeAutoPlay = function () {
     var self = this;
-    /* On unless explicitly disabled — schema/default / editor checkbox */
-    if (this.section.dataset.autoScroll === 'false') return;
-    if (!this.tl || !this.track) return;
-    if (window.scrollY > 48) return;
-    if (window.location.hash && window.location.hash !== '#') return;
+    if (!this.tl) return;
+    if (window.scrollY > 48) {
+      /* Already mid-page: snap hero open so overlay sections work immediately */
+      this.tl.progress(1);
+      this.syncProgress(1);
+      return;
+    }
+    if (window.location.hash && window.location.hash !== '#') {
+      this.tl.progress(1);
+      this.syncProgress(1);
+      return;
+    }
+
+    /* On unless explicitly disabled */
+    if (this.section.dataset.autoScroll === 'false') {
+      this.tl.progress(1);
+      this.syncProgress(1);
+      return;
+    }
 
     var delay = parseFloat(this.section.dataset.autoScrollDelay, 10);
     if (isNaN(delay)) delay = 0.35;
@@ -208,7 +205,11 @@
     afterPageTransition(function () {
       gsap.delayedCall(delay, function () {
         if (document.documentElement.classList.contains('j14-menu-open')) return;
-        if (window.scrollY > 48) return;
+        if (window.scrollY > 48) {
+          self.tl.progress(1);
+          self.syncProgress(1);
+          return;
+        }
         self.playAutoExpand(duration);
       });
     });
@@ -218,10 +219,6 @@
     var self = this;
     if (!this.tl) return;
 
-    ScrollTrigger.refresh();
-
-    /* Drive the timeline directly — no depending on the browser scroll position */
-    if (this.st && this.st.disable) this.st.disable(false);
     this.tl.pause(0);
     this.syncProgress(0);
 
@@ -242,11 +239,7 @@
         self.section.classList.remove('is-auto-scrolling');
         self.unbindAutoCancel();
         self.autoTween = null;
-
-        var endY = self.trackEndY();
-        window.scrollTo(0, endY);
-        if (self.st && self.st.enable) self.st.enable();
-        if (typeof ScrollTrigger.update === 'function') ScrollTrigger.update();
+        /* Stay at scrollY — sticky hero remains; user scrolls mosaic over it */
         self.syncProgress(1);
       }
     });
@@ -262,9 +255,15 @@
     });
   };
 
+  Intro.prototype.onResize = function () {
+    if (motionOff || !this.tl) return;
+    if (this.tl.progress() < 0.05 && !this.autoPlaying) {
+      this.applyStemScale();
+    }
+  };
+
   Intro.prototype.buildTimeline = function () {
-    var self = this;
-    if (!this.track || !this.stage) return;
+    if (!this.stage) return;
 
     this.applyStemScale();
     gsap.set([this.left, this.right].filter(Boolean), { opacity: 1, x: 0, xPercent: 0 });
@@ -272,31 +271,19 @@
     gsap.set(this.copyParts, { opacity: 0, y: 28 });
     if (this.hint) gsap.set(this.hint, { opacity: 0.7 });
 
+    /* Timeline is time-driven (auto-play) — scroll only moves overlay sections */
     this.tl = gsap.timeline({
       defaults: { ease: 'none' },
       paused: true,
-      scrollTrigger: {
-        trigger: this.track,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 0.65,
-        invalidateOnRefresh: true,
-        onUpdate: function (selfSt) {
+      onUpdate: (function (self) {
+        return function () {
           if (self.autoPlaying) return;
-          self.syncProgress(selfSt.progress);
-        },
-        onRefresh: function () {
-          if (self.autoPlaying) return;
-          if (self.tl && self.tl.progress() < 0.05) {
-            self.applyStemScale();
-          }
-        }
-      }
+          self.syncProgress(self.tl.progress());
+        };
+      })(this)
     });
 
-    this.st = this.tl.scrollTrigger;
-
-    /* Phase 1 — scale I window to full viewport + letters depart (0 → ~0.72) */
+    /* Phase 1 — scale I window to full viewport + letters depart */
     this.tl.to(
       this.stage,
       {
@@ -326,7 +313,7 @@
       this.tl.to(this.hint, { opacity: 0, duration: 0.08 }, 0);
     }
 
-    /* Phase 2 — hero copy (0.72 → 1) */
+    /* Phase 2 — hero copy */
     if (this.copyParts.length) {
       this.tl.to(
         this.copyParts,
@@ -344,16 +331,15 @@
 
   Intro.prototype.destroy = function () {
     this.cancelAutoPlay();
+    window.removeEventListener('resize', this._onResize);
     if (this.timer) clearInterval(this.timer);
     if (this.tl) this.tl.kill();
-    if (this.st) this.st.kill();
   };
 
   function init(scope) {
     scope.querySelectorAll('[data-j14-intro]').forEach(function (el) {
       instances.push(new Intro(el));
     });
-    ScrollTrigger.refresh();
   }
 
   function destroy(scope) {

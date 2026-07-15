@@ -16,8 +16,9 @@
   <div class="j14-intro__track" data-j14-intro-track>
     <div class="j14-intro__sticky">
       {%- comment -%}
-        Fixed 100vw×100vh rear plane. GSAP scales it from the uppercase “I”
-        stem to full bleed; later sections slide up over it (higher z-index).
+        Sticky 100vw×100vh rear hero (Spencer pattern). GSAP scales from the
+        uppercase “I” stem to full bleed; mosaic + later sections sit at a
+        higher z-index and slide up as one unit over it.
       {%- endcomment -%}
       <div class="j14-intro__stage" data-j14-intro-stage aria-hidden="true">
         <div class="j14-intro__slides" data-j14-intro-slides>
@@ -183,8 +184,8 @@
     {
       "type": "range",
       "id": "scroll_length",
-      "label": "Scroll length",
-      "info": "How much scrolling it takes for the hero to scale from the I stem to full screen.",
+      "label": "Scroll length (legacy)",
+      "info": "Kept for theme editor compatibility. Expand is now timed on load; mosaic scrolls over the sticky hero.",
       "min": 150,
       "max": 400,
       "step": 10,
@@ -205,9 +206,9 @@
     {
       "type": "checkbox",
       "id": "auto_scroll",
-      "label": "Auto-play scroll expand on load",
+      "label": "Auto-play hero expand on load",
       "default": true,
-      "info": "Starts the hero scale expand without the shopper scrolling. Manual scroll still takes over."
+      "info": "Scales the I-stem hero open on load. Scrolling then slides mosaic and later sections over the sticky hero."
     },
     {
       "type": "range",
