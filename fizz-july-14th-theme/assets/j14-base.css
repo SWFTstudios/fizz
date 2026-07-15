@@ -458,20 +458,21 @@ html.j14-menu-open main {
 }
 
 /* =============================================================
-   Intro — Spencer-style sticky rear hero + overlay sections
-   .j14-intro-section sticks at 100vh / low z-index while main
-   scrolls. Media scales from the FIZZ I-stem to full viewport
-   inside that sticky plane. Mosaic and later sections sit at a
-   higher z-index and slide up as one unit over the hero.
+   Intro — fixed rear hero + overlay sections (Spencer pattern)
+   The intro section is a 100vh spacer in document flow. Its pin
+   (`.j14-intro__sticky`) is position:fixed at 100vw×100vh with a
+   low z-index. Mosaic and later .shopify-section siblings sit at a
+   higher z-index with opaque backgrounds so they slide up over the
+   locked hero while keeping their internal layout intact.
    ============================================================= */
 .j14-intro-section {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 1;
   height: 100vh;
   height: 100svh;
-  overflow: hidden;
-  background: var(--j14-paper);
+  margin: 0;
+  padding: 0;
+  background: transparent;
 }
 .j14-intro {
   height: 100%;
@@ -479,15 +480,21 @@ html.j14-menu-open main {
 .j14-intro__track {
   height: 100%;
 }
+
+/* Fixed viewport pin — locked behind later sections */
 .j14-intro__sticky {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100svh;
   z-index: 1;
-  height: 100%;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: var(--j14-paper);
   pointer-events: none;
 }
 .j14-intro__sticky a,
@@ -495,15 +502,13 @@ html.j14-menu-open main {
   pointer-events: auto;
 }
 
-/* Full-bleed media inside the sticky hero — GSAP scales I → cover */
+/* Full-bleed media inside the fixed pin — GSAP scales I → cover */
 .j14-intro__stage {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100svh;
-  max-width: none;
+  width: 100%;
+  height: 100%;
   z-index: 0;
   overflow: hidden;
   background: var(--j14-surface);
@@ -695,18 +700,28 @@ html.j14-menu-open main {
   }
 }
 
-/* Sections after intro slide up over the sticky rear hero (Spencer pattern) */
+/* Sections after intro slide up over the fixed rear hero */
+main#main-content > .j14-intro-section ~ .shopify-section,
 .j14-intro-section ~ .shopify-section {
   position: relative;
-  z-index: 6;
+  z-index: 2;
   background: var(--j14-paper);
 }
 .j14-intro-section ~ .j14-ways-section,
 .j14-intro-section ~ .j14-footer-section {
   background: transparent;
 }
+.j14-mosaic-section {
+  z-index: 2;
+  background: var(--j14-paper);
+}
 
-/* Reduced motion / no JS: full hero + copy visible */
+/* Once past the intro spacer, keep the fixed pin behind content */
+.j14-intro.is-done .j14-intro__sticky {
+  pointer-events: none;
+}
+
+/* Reduced motion / no JS: full hero + copy visible (in normal flow) */
 .j14-no-motion .j14-intro-section,
 html:not(.j14-js) .j14-intro-section {
   position: relative;
@@ -721,8 +736,11 @@ html:not(.j14-js) .j14-intro__track {
 .j14-no-motion .j14-intro__sticky,
 html:not(.j14-js) .j14-intro__sticky {
   position: relative;
+  width: auto;
+  height: auto;
   min-height: 100vh;
   min-height: 100svh;
+  z-index: auto;
 }
 .j14-no-motion .j14-intro__stage,
 html:not(.j14-js) .j14-intro__stage {
@@ -786,10 +804,6 @@ html:not(.j14-js) .j14-intro__hint {
 /* =============================================================
    Mosaic — cohesive overlay grid (slides as one unit over hero)
    ============================================================= */
-.j14-mosaic-section {
-  /* Ensure the whole section paints above sticky intro */
-  isolation: isolate;
-}
 .j14-mosaic {
   padding: 4px 0 40px;
   overflow: hidden;
