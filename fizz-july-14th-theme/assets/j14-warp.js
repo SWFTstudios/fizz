@@ -13,6 +13,11 @@
     this.section = section;
     this.viewport = section.querySelector('.j14-warp__viewport');
     this.track = section.querySelector('[data-j14-warp-track]');
+    this.caption = {
+      name: section.querySelector('[data-j14-warp-name]'),
+      price: section.querySelector('[data-j14-warp-price]'),
+      cta: section.querySelector('[data-j14-warp-cta]')
+    };
     this.syncScene = section.dataset.syncScene === 'true';
     this.x = 0;
     this.index = 0;
@@ -190,6 +195,18 @@
         dot.classList.toggle('is-active', i === index);
       });
     }
+    var info = this.realSlideAt(index).dataset;
+    if (this.caption.name) this.caption.name.textContent = info.name || '';
+    if (this.caption.price) {
+      if (info.price) {
+        this.caption.price.textContent = info.price;
+        this.caption.price.hidden = false;
+      } else {
+        this.caption.price.textContent = '';
+        this.caption.price.hidden = true;
+      }
+    }
+    if (this.caption.cta && info.href) this.caption.cta.setAttribute('href', info.href);
     if (this.syncScene) {
       var data = this.realSlideAt(index).dataset;
       var style = this.section.style;
