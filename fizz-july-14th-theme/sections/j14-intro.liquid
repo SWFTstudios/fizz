@@ -16,8 +16,8 @@
   <div class="j14-intro__track" data-j14-intro-track>
     <div class="j14-intro__sticky">
       {%- comment -%}
-        Media is always full-bleed / cover-fit. GSAP animates clip-path from an
-        uppercase “I” stem to the full viewport so images never get scale-zoomed.
+        Fixed 100vw×100vh rear plane. GSAP scales it from the uppercase “I”
+        stem to full bleed; later sections slide up over it (higher z-index).
       {%- endcomment -%}
       <div class="j14-intro__stage" data-j14-intro-stage aria-hidden="true">
         <div class="j14-intro__slides" data-j14-intro-slides>
@@ -184,7 +184,7 @@
       "type": "range",
       "id": "scroll_length",
       "label": "Scroll length",
-      "info": "How much scrolling it takes for the I mask to expand to full screen.",
+      "info": "How much scrolling it takes for the hero to scale from the I stem to full screen.",
       "min": 150,
       "max": 400,
       "step": 10,
@@ -207,7 +207,7 @@
       "id": "auto_scroll",
       "label": "Auto-play scroll expand on load",
       "default": true,
-      "info": "Starts the I-mask expand without the shopper scrolling. Manual scroll still takes over."
+      "info": "Starts the hero scale expand without the shopper scrolling. Manual scroll still takes over."
     },
     {
       "type": "range",

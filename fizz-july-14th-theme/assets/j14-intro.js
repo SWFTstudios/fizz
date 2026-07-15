@@ -1,7 +1,8 @@
 /*
   July 14th intro — GSAP ScrollTrigger.
-  Media is always full-bleed / object-fit: cover. We animate clip-path from an
-  uppercase I stem to the full viewport so imagery is not scale-zoomed.
+  Hero media is fixed (100vw × 100vh) at the rear of the intro stacking
+  context. We scale it from the uppercase I stem to full bleed; sections
+  after the intro sit at a higher z-index and slide up over it.
 
   On load the expand plays automatically as a timed timeline (not dependent on
   the shopper scrolling). After it finishes, scroll position is synced so the
@@ -21,26 +22,17 @@
 
   var instances = [];
 
-  function insetClip(top, right, bottom, left) {
-    return 'inset(' + top + '% ' + right + '% ' + bottom + '% ' + left + '%)';
-  }
-
-  /** I-stem clip matching the wordmark gap box (percent of sticky stage). */
-  function stemClip(stage, gap) {
-    if (!stage || !gap) return insetClip(18, 47, 18, 47);
-    var sr = stage.getBoundingClientRect();
+  /** Scale factors that size the fixed stage to the wordmark I-gap. */
+  function stemScale(gap) {
+    var vw = window.innerWidth || 1;
+    var vh = window.innerHeight || 1;
+    if (!gap) return { x: 0.07, y: 0.56 };
     var gr = gap.getBoundingClientRect();
-    if (!sr.width || !sr.height) return insetClip(18, 47, 18, 47);
-    var top = ((gr.top - sr.top) / sr.height) * 100;
-    var left = ((gr.left - sr.left) / sr.width) * 100;
-    var bottom = ((sr.bottom - gr.bottom) / sr.height) * 100;
-    var right = ((sr.right - gr.right) / sr.width) * 100;
-    return insetClip(
-      Math.max(0, top),
-      Math.max(0, right),
-      Math.max(0, bottom),
-      Math.max(0, left)
-    );
+    if (!gr.width || !gr.height) return { x: 0.07, y: 0.56 };
+    return {
+      x: Math.max(0.02, Math.min(1, gr.width / vw)),
+      y: Math.max(0.02, Math.min(1, gr.height / vh))
+    };
   }
 
   function afterPageTransition(cb) {
@@ -103,7 +95,9 @@
   }
 
   Intro.prototype.showStatic = function () {
-    if (this.stage) gsap.set(this.stage, { clipPath: insetClip(0, 0, 0, 0), webkitClipPath: insetClip(0, 0, 0, 0) });
+    if (this.stage) {
+      gsap.set(this.stage, { scaleX: 1, scaleY: 1, transformOrigin: '50% 50%' });
+    }
     if (this.left) gsap.set(this.left, { opacity: 0, x: 0 });
     if (this.right) gsap.set(this.right, { opacity: 0, x: 0 });
     if (this.copy) gsap.set(this.copy, { opacity: 1, pointerEvents: 'auto' });
@@ -258,12 +252,21 @@
     });
   };
 
+  Intro.prototype.applyStemScale = function () {
+    if (!this.stage) return;
+    var scale = stemScale(this.gap);
+    gsap.set(this.stage, {
+      scaleX: scale.x,
+      scaleY: scale.y,
+      transformOrigin: '50% 50%'
+    });
+  };
+
   Intro.prototype.buildTimeline = function () {
     var self = this;
     if (!this.track || !this.stage) return;
 
-    var startClip = stemClip(this.stage, this.gap);
-    gsap.set(this.stage, { clipPath: startClip, webkitClipPath: startClip });
+    this.applyStemScale();
     gsap.set([this.left, this.right].filter(Boolean), { opacity: 1, x: 0, xPercent: 0 });
     if (this.copy) gsap.set(this.copy, { pointerEvents: 'none' });
     gsap.set(this.copyParts, { opacity: 0, y: 28 });
@@ -285,8 +288,7 @@
         onRefresh: function () {
           if (self.autoPlaying) return;
           if (self.tl && self.tl.progress() < 0.05) {
-            var clip = stemClip(self.stage, self.gap);
-            gsap.set(self.stage, { clipPath: clip, webkitClipPath: clip });
+            self.applyStemScale();
           }
         }
       }
@@ -294,12 +296,12 @@
 
     this.st = this.tl.scrollTrigger;
 
-    /* Phase 1 — expand I mask + letters depart (0 → ~0.72 of timeline) */
+    /* Phase 1 — scale I window to full viewport + letters depart (0 → ~0.72) */
     this.tl.to(
       this.stage,
       {
-        clipPath: insetClip(0, 0, 0, 0),
-        webkitClipPath: insetClip(0, 0, 0, 0),
+        scaleX: 1,
+        scaleY: 1,
         ease: 'power2.inOut',
         duration: 0.72
       },
