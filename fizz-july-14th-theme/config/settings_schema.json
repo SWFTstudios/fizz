@@ -161,9 +161,30 @@
       {
         "type": "checkbox",
         "id": "page_transitions",
-        "label": "Bubble page transitions",
-        "info": "On link click, fizz bubbles burst and ride with a swipe cover before the next page reveals. The destination is preloaded during the transition.",
+        "label": "Enable page transitions",
+        "info": "Animated leave/enter on internal navigation. Prefetches the next page during the transition.",
         "default": true
+      },
+      {
+        "type": "select",
+        "id": "page_transition_style",
+        "label": "Transition style",
+        "options": [
+          { "value": "melt", "label": "Melt — micro-bubbles merge into liquid (recommended)" },
+          { "value": "classic", "label": "Classic — swipe cover + fizz burst" }
+        ],
+        "default": "melt"
+      },
+      {
+        "type": "range",
+        "id": "page_transition_intensity",
+        "min": 50,
+        "max": 150,
+        "step": 5,
+        "unit": "%",
+        "label": "Melt intensity",
+        "default": 100,
+        "info": "Blob count and size for the melt transition."
       }
     ]
   },
