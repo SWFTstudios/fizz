@@ -46,19 +46,20 @@ Then **Online Store → Themes → Add theme → Upload zip file**.
 | `templates/product.json` | Bottle PDP |
 | `assets/fizz-base.css` | All styles + PDP + wrapper resets |
 | `assets/fizz.js` | Motion, swatches, PDP addons/cart |
-| `assets/fizz-transition.js` | Bubble page transitions |
+| `assets/fizz-page-transition.js` | Melt / classic page transitions |
 
 ## Bubble animation
 
-Ambient rising bubbles appear in **hero**, **how it works**, **footer**, and **PDP stage**. They are rendered with **HTML5 canvas** + `requestAnimationFrame` (inspired by [this canvas bubble tutorial](https://www.freecodecamp.org/news/how-to-create-animated-bubbles-with-html5-canvas-and-javascript/)). Page-transition bubbles use the same canvas style in `fizz-transition.js`, layered above the liquid wave overlay.
+Ambient rising bubbles appear in **hero**, **how it works**, **footer**, and **PDP stage**. They are rendered with **HTML5 canvas** + `requestAnimationFrame`. Research notes: [`design/BUBBLE-TRANSITION-RESEARCH.md`](design/BUBBLE-TRANSITION-RESEARCH.md).
 
 ### Canvas engine
 
 - Each `.bubf[data-bubbles]` container gets a `<canvas class="bubf-canvas">` inserted by `initBubbles` in `assets/fizz.js`
-- Particles use `arc()` + `createRadialGradient` (specular highlight + tinted fill) like the CodePen reference
+- Modern glass draw: off-center specular, rim stroke, depth bands (micro / mid / large), optional contact shadow on large bubbles
 - Ambient rising only — no click-to-spawn
 - A single shared animation loop drives all visible fields; `IntersectionObserver` pauses off-screen sections
-- `ring` / `glass` / `bold` theme presets control stroke weight, gradient fill, and highlight intensity
+- Mobile throttles particle count; canvas DPR capped at 2
+- `ring` / `glass` / `foam` / `bold` theme presets control look
 
 ### Quick start (Theme Editor)
 
@@ -69,15 +70,17 @@ Ambient rising bubbles appear in **hero**, **how it works**, **footer**, and **P
    - **Animation peak opacity:** 88%
    - **Bubble size:** 115%
    - **Hero & PDP alpha:** 45%
-   - **Footer alpha:** 38% (footer was historically the faintest)
+   - **Footer alpha:** 38%
+   - **Transition style:** Melt
 
 ### Style presets
 
 | Style | Look | When to use |
 |-------|------|-------------|
 | Ring | Canvas outline, minimal fill | Lightweight / subtle |
-| Glass | Canvas radial-gradient spheres | Default — reads as real bubbles |
-| Bold | Canvas bubbles, thicker stroke + stronger highlight | Dark heroes, marketing screenshots |
+| Glass | Specular + rim + depth bands | Default — modern glass |
+| Foam | Dense micro-fizz, softer fills | High-energy carbonation |
+| Bold | Larger bubbles, thicker stroke + stronger highlight | Dark heroes, marketing screenshots |
 
 ### Opacity troubleshooting
 
@@ -85,7 +88,7 @@ Ambient rising bubbles appear in **hero**, **how it works**, **footer**, and **P
 |---------|-----|
 | Bubbles invisible on dark background | Raise **Hero & PDP alpha** or **How it works alpha** |
 | Bubbles too loud | Lower **Animation peak opacity** or switch style to **Ring** |
-| Footer bubbles too faint | Raise **Footer alpha** (was 16% before this update) |
+| Footer bubbles too faint | Raise **Footer alpha** |
 | No motion at all | Check OS **Reduce motion** setting and **Enable ambient bubbles** toggle |
 | Light colorway (e.g. Arctic Light) | Raise all section alpha sliders or switch to **Bold** style |
 
@@ -100,7 +103,7 @@ Edit the `.bubf` container in section Liquid files (`fizz-hero.liquid`, `fizz-ho
 | `data-bub-seed` | 7 | `data-bub-seed="42"` (changes random layout) |
 | `data-bub-color` | section CSS var | `data-bub-color="var(--hero-bubble-color)"` |
 | `data-bub-peak` | inherits global | `data-bub-peak="0.95"` (per-section peak opacity) |
-| `data-bub-style` | inherits global | `data-bub-style="bold"` (override ring/glass/bold) |
+| `data-bub-style` | inherits global | Documented; style is global via `bubble-style-*` on `<html>` |
 
 Density and size are also scaled globally by theme settings (`--bubble-count-scale`, `--bubble-size-scale`).
 
@@ -117,22 +120,18 @@ Output by `snippets/fizz-theme-tokens.liquid` on `:root`:
 | `--how-bubble-color` | How it works alpha | Bubble tint in how section |
 | `--footer-bubble-color` | Footer alpha | Bubble tint in footer |
 
-The `<html>` element also receives `bubble-style-glass` (or `ring` / `bold`), optional `bubble-wobble`, and `data-bubble-enabled`.
+The `<html>` element also receives `bubble-style-glass` (or `ring` / `foam` / `bold`), optional `bubble-wobble`, `data-bubble-enabled`, and transition data attrs (`data-transition-style`, `data-transition-intensity`, `data-transition-duration-scale`).
 
-### Page transition bubbles
+### Page transitions
 
-Rendered on a **canvas layer above the liquid waves** during internal link navigation (`assets/fizz-transition.js` / `fizz-claude-transition.js`). Uses the same glossy radial-gradient style as ambient bubbles.
+Internal navigation overlay in `assets/fizz-transition.js`:
 
-```js
-var BUB_PEAK = 0.98;       // animation peak opacity
-var LEAVE_BURST = 48;      // bubbles on page leave (+ staggered second burst)
-var ENTER_BURST = 40;      // bubbles on page enter (+ staggered second burst)
-var BUB_STROKE = 'rgba(255,255,255,0.95)';
-var BUB_FILL = 'rgba(210,248,255,0.9)';
-```
+| Style | Behavior |
+|-------|----------|
+| **Melt** (default) | Micro-bubbles rise and merge (SVG goo / metaball), flood with brand accent, navigate; enter fractures the solid field into rising bubbles |
+| **Classic** | Original dual liquid-wave slabs + cyan burst canvas |
 
-Raise `BUB_PEAK` or burst counts for louder transitions. Links with `data-no-transition` skip the effect (homepage hash nav uses this).
-
+Colors pull from `--hero-accent` / `--hero-bg` / `--hero-text` (fallbacks: `--color-accent` / ink / paper). Intensity and duration are merchant-scalable. Links with `data-no-transition` skip the effect. `prefers-reduced-motion` navigates instantly.
 ## Preview
 
 After push, use the preview URL from CLI output or:

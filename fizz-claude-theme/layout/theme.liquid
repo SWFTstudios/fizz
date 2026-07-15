@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ request.locale.iso_code }}" class="fizz-html bubble-style-{{ settings.bubble_style | default: 'glass' }}{% unless settings.bubble_enabled %} bubble-disabled{% endunless %}{% if settings.bubble_wobble %} bubble-wobble{% endif %}" data-bubble-enabled="{% if settings.bubble_enabled %}true{% else %}false{% endif %}">
+<html lang="{{ request.locale.iso_code }}" class="fizz-html bubble-style-{{ settings.bubble_style | default: 'glass' }}{% unless settings.bubble_enabled %} bubble-disabled{% endunless %}{% if settings.bubble_wobble %} bubble-wobble{% endif %}" data-bubble-enabled="{% if settings.bubble_enabled %}true{% else %}false{% endif %}" data-transition-style="{{ settings.page_transition_style | default: 'melt' }}" data-transition-intensity="{{ settings.page_transition_intensity | default: 100 }}" data-transition-duration-scale="{{ settings.page_transition_duration_scale | default: 100 }}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,6 +37,6 @@
     <script src="{{ 'fizz-cart-drawer.js' | asset_url }}" defer></script>
     <script src="{{ 'fizz-search.js' | asset_url }}" defer></script>
     <script src="{{ 'fizz.js' | asset_url }}" defer></script>
-    <script src="{{ 'fizz-transition.js' | asset_url }}" defer></script>
+    <script src="{{ 'fizz-page-transition.js' | asset_url }}" defer></script>
   </body>
 </html>

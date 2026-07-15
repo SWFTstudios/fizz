@@ -3,6 +3,8 @@
   lang="{{ request.locale.iso_code }}"
   class="j14-html{% unless settings.motion_enabled %} j14-no-motion{% endunless %}"
   data-j14-transitions="{% if settings.page_transitions %}true{% else %}false{% endif %}"
+  data-j14-transition-style="{{ settings.page_transition_style | default: 'melt' }}"
+  data-j14-transition-intensity="{{ settings.page_transition_intensity | default: 100 }}"
 >
   <head>
     <meta charset="utf-8">
@@ -40,6 +42,6 @@
     <script src="{{ 'j14-intro.js' | asset_url }}" defer></script>
     <script src="{{ 'j14-scroll.js' | asset_url }}" defer></script>
     <script src="{{ 'j14-carousel.js' | asset_url }}" defer></script>
-    <script src="{{ 'j14-transition.js' | asset_url }}" defer></script>
+    <script src="{{ 'j14-page-transition.js' | asset_url }}" defer></script>
   </body>
 </html>

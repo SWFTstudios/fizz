@@ -25,7 +25,8 @@
       "typo_nav_uppercase": true,
       "typo_accent_italic": true,
       "btn_radius": "pill",
-      "btn_hover_scale": 105
+      "btn_hover_scale": 105,
+      "page_transition_style": "melt"
     },
     "Steel Navy": {
       "colorway_preset": "steel_navy",
@@ -51,7 +52,8 @@
       "typo_nav_uppercase": true,
       "typo_accent_italic": true,
       "btn_radius": "pill",
-      "btn_hover_scale": 105
+      "btn_hover_scale": 105,
+      "page_transition_style": "melt"
     },
     "Citrus Burst": {
       "colorway_preset": "citrus_burst",
@@ -77,7 +79,8 @@
       "typo_nav_uppercase": true,
       "typo_accent_italic": true,
       "btn_radius": "pill",
-      "btn_hover_scale": 105
+      "btn_hover_scale": 105,
+      "page_transition_style": "melt"
     },
     "Berry Night": {
       "colorway_preset": "berry_night",
@@ -103,7 +106,8 @@
       "typo_nav_uppercase": true,
       "typo_accent_italic": true,
       "btn_radius": "pill",
-      "btn_hover_scale": 105
+      "btn_hover_scale": 105,
+      "page_transition_style": "melt"
     },
     "Electric Pool": {
       "colorway_preset": "electric_pool",
@@ -129,7 +133,8 @@
       "typo_nav_uppercase": true,
       "typo_accent_italic": true,
       "btn_radius": "pill",
-      "btn_hover_scale": 105
+      "btn_hover_scale": 105,
+      "page_transition_style": "melt"
     }
   }
 }
