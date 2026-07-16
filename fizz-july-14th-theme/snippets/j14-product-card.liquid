@@ -7,6 +7,7 @@
   assign show_swatches = show_swatches | default: true
   assign show_quick_add = show_quick_add | default: false
   assign media_ratio = media_ratio | default: 'auto'
+  assign media_fit = media_fit | default: 'contain'
   assign featured = product.featured_media
   assign color_option = blank
   for option in product.options_with_values
@@ -58,7 +59,7 @@
   endif
 -%}
 
-<article class="j14-card" data-j14-card>
+<article class="j14-card j14-card--fit-{{ media_fit }}" data-j14-card>
   <a class="j14-card__media-link" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
     <div
       class="j14-card__media j14-card__media--{{ scene }}"

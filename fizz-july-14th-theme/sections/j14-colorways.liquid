@@ -4,13 +4,16 @@
   assign demo_slugs = 'steel-navy,electric-blue,coral-orange,sage-green,charcoal-black,arctic-white' | split: ','
   assign section_height = section.settings.section_height | default: 100
   assign media_height = section.settings.media_height | default: 52
+  assign scroll_per = section.settings.scroll_height_per_colorway | default: 100
 -%}
 <section
   class="j14-ways{% unless section.settings.sync_scene %} j14-ways--static{% endunless %}"
   id="{{ section.settings.anchor_id | default: 'colors' }}"
   data-j14-carousel
+  data-j14-colorway-scroll
   data-sync-scene="{{ section.settings.sync_scene }}"
-  style="--ways-section-height: {{ section_height }}vh; --ways-media-height: min({{ media_height }}vh, 640px);"
+  data-scroll-per="{{ scroll_per }}"
+  style="--ways-section-height: {{ section_height }}vh; --ways-media-height: min({{ media_height }}vh, 640px); --ways-scroll-per: {{ scroll_per }}vh;"
 >
   <div class="j14-ways__head">
     {%- if section.settings.eyebrow != blank -%}
@@ -36,6 +39,10 @@
           {%- assign swatch = scene_parts[4] -%}
           {%- assign btn_text = scene_parts[5] -%}
           {%- assign override_image = blank -%}
+          {%- assign warp = variant.metafields.custom.warp_media.value -%}
+          {%- if warp == blank -%}
+            {%- assign warp = bottle.metafields.custom.warp_media.value -%}
+          {%- endif -%}
           {%- for block in section.blocks -%}
             {%- if block.settings.slug == slug -%}
               {%- if block.settings.bg != blank %}{% assign bg = block.settings.bg %}{% endif -%}
@@ -54,9 +61,15 @@
             data-btn-text="{{ btn_text }}"
             data-text="{{ text_color }}"
             data-swatch="{{ swatch }}"
+            data-variant-id="{{ variant.id }}"
+            data-warp-media-type="{% if warp.media_type == 'video' %}video{% elsif warp %}image{% endif %}"
           >
             <div class="j14-way__media">
-              {%- if override_image != blank -%}
+              {%- if warp != blank and warp.media_type == 'video' -%}
+                {{ warp | video_tag: image_size: '1080x', autoplay: true, loop: true, muted: true, controls: false, playsinline: true, class: 'j14-way__img j14-way__video', preload: 'metadata' }}
+              {%- elsif warp != blank -%}
+                {{ warp | image_url: width: 900 | image_tag: class: 'j14-way__img', loading: 'lazy', sizes: '(min-width: 750px) 34vw, 72vw', widths: '360, 540, 720, 900', alt: variant.title }}
+              {%- elsif override_image != blank -%}
                 {{ override_image | image_url: width: 900 | image_tag: class: 'j14-way__img', loading: 'lazy', sizes: '(min-width: 750px) 34vw, 72vw', widths: '360, 540, 720, 900', alt: variant.title }}
               {%- elsif variant.featured_image -%}
                 {{ variant.featured_image | image_url: width: 900 | image_tag: class: 'j14-way__img', loading: 'lazy', sizes: '(min-width: 750px) 34vw, 72vw', widths: '360, 540, 720, 900', alt: variant.title }}
@@ -101,9 +114,9 @@
   </div>
 
   <div class="j14-ways__controls">
-    <button type="button" class="j14-ways__arrow" data-j14-prev aria-label="{{ 'general.accessibility.previous' | t }}">&larr;</button>
+    <button type="button" class="j14-ways__arrow" data-j14-prev aria-label="Previous colorway">&larr;</button>
     <div class="j14-ways__dots" data-j14-dots role="tablist"></div>
-    <button type="button" class="j14-ways__arrow" data-j14-next aria-label="{{ 'general.accessibility.next' | t }}">&rarr;</button>
+    <button type="button" class="j14-ways__arrow" data-j14-next aria-label="Next colorway">&rarr;</button>
   </div>
 </section>
 
@@ -135,7 +148,7 @@
       "type": "product",
       "id": "product",
       "label": "Bottle product",
-      "info": "One slide is created per variant. Falls back to the theme's default bottle product, then to demo colorways."
+      "info": "One slide is created per variant. Falls back to the theme's default bottle product, then to demo colorways. Variant metafield custom.warp_media overrides panel media when set."
     },
     {
       "type": "text",
@@ -174,6 +187,17 @@
       "step": 2,
       "unit": "vh",
       "default": 52
+    },
+    {
+      "type": "range",
+      "id": "scroll_height_per_colorway",
+      "label": "Scroll height per colorway",
+      "info": "Desktop pin-scroll distance allocated to each colorway step (when GSAP pin is enabled).",
+      "min": 50,
+      "max": 150,
+      "step": 10,
+      "unit": "vh",
+      "default": 100
     }
   ],
   "blocks": [

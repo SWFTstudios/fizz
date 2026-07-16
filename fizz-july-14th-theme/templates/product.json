@@ -34,6 +34,13 @@
       "settings": {
         "eyebrow": "Colorways",
         "tagline": "Sparkling water, dialed to your colorway.",
+        "media_fit": "cover",
+        "gallery_mode": "slider",
+        "show_thumbnails": true,
+        "thumbnails_on_mobile": false,
+        "show_arrows": true,
+        "desktop_layout": "side",
+        "mobile_media_ratio": "4 / 5",
         "stage_mode": "colorway",
         "show_colorway_swatches": true,
         "colorway_label": "Colorway",
@@ -48,7 +55,9 @@
       "type": "j14-related",
       "settings": {
         "heading": "Pairs well with",
-        "limit": 4
+        "limit": 4,
+        "media_fit": "cover",
+        "media_ratio": "4 / 5"
       }
     },
     "footer": {

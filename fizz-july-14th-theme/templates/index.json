@@ -27,14 +27,17 @@
       },
       "block_order": ["slide_1", "slide_2", "slide_3"],
       "settings": {
-        "word_left": "F",
-        "word_right": "ZZ",
         "hero_eyebrow": "The portable sparkling water bottle",
         "hero_heading": "Sparkling water, anywhere.",
         "hero_subheading": "Fill. Twist. Fizz. Cold bubbles in under ten seconds — no machine, no cans.",
         "cta_label": "Shop bottles",
         "scroll_length": 280,
         "autoplay_interval": 5,
+        "autoscroll_enabled": true,
+        "autoscroll_delay": 0.4,
+        "autoscroll_duration": 2.2,
+        "autoscroll_ease": "power2.inOut",
+        "autoscroll_target": 88,
         "show_hint": true,
         "hint_text": "Scroll"
       }
@@ -88,7 +91,8 @@
         "heading": "Pick your color",
         "anchor_id": "colors",
         "cta_label": "Shop this color",
-        "sync_scene": true
+        "sync_scene": true,
+        "scroll_height_per_colorway": 100
       }
     },
     "how": {
@@ -132,28 +136,28 @@
         "flavor_1": {
           "type": "flavor",
           "settings": {
-            "title": "Zesty Lime",
-            "body": "<p>Bright, sharp, and cold-pressed.</p>",
-            "asset": "stitch-flavor-zesty-lime.jpg",
-            "tint": "#dce8c8"
+            "title": "Orange Tangerine",
+            "body": "<p>Sunny citrus with a soft finish.</p>",
+            "asset": "flavor-lifestyle-orange-tangerine.jpg",
+            "tint": "#f4ddc4"
           }
         },
         "flavor_2": {
           "type": "flavor",
           "settings": {
-            "title": "Orange Tangerine",
-            "body": "<p>Sunny citrus with a soft finish.</p>",
-            "asset": "stitch-flavor-orange-tangerine.jpg",
-            "tint": "#f4ddc4"
+            "title": "Cherry Limeade",
+            "body": "<p>Bright cherry with a lime snap.</p>",
+            "asset": "flavor-lifestyle-cherry-limeade.jpg",
+            "tint": "#f0d0d4"
           }
         },
         "flavor_3": {
           "type": "flavor",
           "settings": {
-            "title": "Blood Orange",
-            "body": "<p>Deep citrus with a berry edge.</p>",
-            "asset": "stitch-flavor-blood-orange.jpg",
-            "tint": "#f0cfc4"
+            "title": "Mixed Berry",
+            "body": "<p>Raspberry and blueberry, cold and bold.</p>",
+            "asset": "flavor-lifestyle-mixed-berry.jpg",
+            "tint": "#e4d4e8"
           }
         }
       },
@@ -167,6 +171,16 @@
     },
     "about": {
       "type": "j14-about",
+      "settings": {
+        "eyebrow": "About us",
+        "heading": "Bubbles without the baggage",
+        "body": "<p>We started Fizz because sparkling water should not need a truck, a fridge, or a mountain of cans. One bottle, one pod, endless sparkle.</p>",
+        "asset": "fizz-bottle-hero.jpg",
+        "anchor_id": "about"
+      }
+    },
+    "sustainability": {
+      "type": "j14-sustainability",
       "blocks": {
         "claim_1": {
           "type": "claim",
@@ -195,14 +209,10 @@
       },
       "block_order": ["claim_1", "claim_2", "claim_3"],
       "settings": {
-        "eyebrow": "About us",
-        "heading": "Bubbles without the baggage",
-        "body": "<p>We started Fizz because sparkling water should not need a truck, a fridge, or a mountain of cans. One bottle, one pod, endless sparkle.</p>",
-        "asset": "fizz-bottle-hero.jpg",
-        "anchor_id": "about",
-        "sustain_eyebrow": "Sustainability",
-        "sustain_heading": "Better for the planet, by design",
-        "sustain_body": "<p>Every part of the system is designed to be refilled, returned, or recycled.</p>"
+        "eyebrow": "Sustainability",
+        "heading": "Better for the planet, by design",
+        "body": "<p>Every part of the system is designed to be refilled, returned, or recycled.</p>",
+        "anchor_id": "sustainability"
       }
     },
     "footer": {
@@ -225,5 +235,5 @@
       }
     }
   },
-  "order": ["intro", "mosaic", "colorways", "how", "flavors", "about", "footer"]
+  "order": ["intro", "mosaic", "colorways", "how", "flavors", "about", "sustainability", "footer"]
 }

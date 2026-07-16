@@ -1,0 +1,13 @@
+# Repository-only files — not part of the deployable Online Store 2.0 theme payload.
+# Shopify CLI respects .shopifyignore on theme push/pull.
+# Docs: https://shopify.dev/docs/storefronts/themes/tools/cli
+
+docs/
+design/
+preview/
+scripts/
+*.md
+.git/
+.gitignore
+.DS_Store
+**/Thumbs.db

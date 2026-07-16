@@ -1,9 +1,71 @@
 {%- liquid
   assign cart_count = cart.item_count
+  assign bg_start = section.settings.bg_start | default: '#f4f3ee'
+  assign bg_end = section.settings.bg_end | default: '#e9e7df'
+  assign opacity_pct = section.settings.bg_opacity | default: 92
+  assign opacity = opacity_pct | times: 1.0 | divided_by: 100.0
+  assign text_color = section.settings.text_color | default: '#111214'
+  assign blur_enabled = section.settings.blur_background
+  if blur_enabled == nil
+    assign blur_enabled = true
+  endif
+  assign blur_amount = section.settings.blur_amount | default: 12
+  assign gradient_angle = section.settings.gradient_angle | default: 180
+
+  assign bg_start_a = bg_start | color_modify: 'alpha', opacity
+  assign bg_end_a = bg_end | color_modify: 'alpha', opacity
+  assign text_rgb = text_color | color_to_rgb | remove: 'rgb(' | remove: ')'
+
+  if blur_enabled
+    assign blur_value = 'blur(' | append: blur_amount | append: 'px)'
+  else
+    assign blur_value = 'none'
+  endif
+
+  assign hdr_bg = 'linear-gradient(' | append: gradient_angle | append: 'deg, ' | append: bg_start_a | append: ', ' | append: bg_end_a | append: ')'
+
+  assign menu_match = section.settings.menu_match_header
+  if menu_match == nil
+    assign menu_match = true
+  endif
+
+  if menu_match
+    assign menu_bg = hdr_bg
+    assign menu_blur_value = blur_value
+    assign menu_blur_on = blur_enabled
+  else
+    assign menu_bg_start = section.settings.menu_bg_start | default: '#f4f3ee'
+    assign menu_bg_end = section.settings.menu_bg_end | default: '#e9e7df'
+    assign menu_opacity_pct = section.settings.menu_bg_opacity | default: 92
+    assign menu_opacity = menu_opacity_pct | times: 1.0 | divided_by: 100.0
+    assign menu_gradient_angle = section.settings.menu_gradient_angle | default: 180
+    assign menu_blur_on = section.settings.menu_blur_background
+    if menu_blur_on == nil
+      assign menu_blur_on = true
+    endif
+    assign menu_blur_amount = section.settings.menu_blur_amount | default: 12
+    assign menu_bg_start_a = menu_bg_start | color_modify: 'alpha', menu_opacity
+    assign menu_bg_end_a = menu_bg_end | color_modify: 'alpha', menu_opacity
+    assign menu_bg = 'linear-gradient(' | append: menu_gradient_angle | append: 'deg, ' | append: menu_bg_start_a | append: ', ' | append: menu_bg_end_a | append: ')'
+    if menu_blur_on
+      assign menu_blur_value = 'blur(' | append: menu_blur_amount | append: 'px)'
+    else
+      assign menu_blur_value = 'none'
+    endif
+  endif
 -%}
 <header
-  class="j14-header{% if section.settings.transparent_home and template.name == 'index' %} j14-header--transparent{% endif %}"
+  class="j14-header{% if section.settings.transparent_home and template.name == 'index' %} j14-header--transparent{% endif %}{% if blur_enabled %} j14-header--blur{% endif %}{% if menu_match %} j14-header--menu-match{% endif %}{% if menu_blur_on %} j14-header--menu-blur{% endif %}"
   data-j14-header
+  style="
+    --j14-hdr-bg: {{ hdr_bg }};
+    --j14-hdr-text: {{ text_color }};
+    --j14-hdr-text-rgb: {{ text_rgb }};
+    --j14-hdr-blur: {{ blur_value }};
+    --j14-hdr-opacity: {{ opacity }};
+    --j14-menu-bg: {{ menu_bg }};
+    --j14-menu-blur: {{ menu_blur_value }};
+  "
 >
   <div class="j14-header__inner">
     <a href="{{ routes.root_url }}" class="j14-header__logo" aria-label="{{ shop.name | escape }}">
@@ -111,7 +173,139 @@
       "type": "checkbox",
       "id": "transparent_home",
       "label": "Transparent over homepage intro",
+      "default": true,
+      "info": "Header starts clear on the homepage until you scroll or open the mobile menu."
+    },
+    {
+      "type": "header",
+      "content": "Sticky header bar"
+    },
+    {
+      "type": "paragraph",
+      "content": "Styles the fixed top nav bar on mobile and desktop."
+    },
+    {
+      "type": "color",
+      "id": "bg_start",
+      "label": "Gradient start",
+      "default": "#f4f3ee"
+    },
+    {
+      "type": "color",
+      "id": "bg_end",
+      "label": "Gradient end",
+      "default": "#e9e7df"
+    },
+    {
+      "type": "range",
+      "id": "gradient_angle",
+      "label": "Gradient angle",
+      "min": 0,
+      "max": 360,
+      "step": 15,
+      "unit": "deg",
+      "default": 180
+    },
+    {
+      "type": "range",
+      "id": "bg_opacity",
+      "label": "Background opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 92
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & icon color",
+      "default": "#111214"
+    },
+    {
+      "type": "checkbox",
+      "id": "blur_background",
+      "label": "Blur background",
+      "default": true,
+      "info": "Applies backdrop blur behind the sticky header bar."
+    },
+    {
+      "type": "range",
+      "id": "blur_amount",
+      "label": "Blur strength",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Mobile dropdown menu"
+    },
+    {
+      "type": "paragraph",
+      "content": "When matching is on, the open menu shares the header background so they read as one panel. Turn matching off to style the dropdown independently."
+    },
+    {
+      "type": "checkbox",
+      "id": "menu_match_header",
+      "label": "Mobile menu matches header background",
       "default": true
+    },
+    {
+      "type": "color",
+      "id": "menu_bg_start",
+      "label": "Menu gradient start",
+      "default": "#f4f3ee",
+      "visible_if": "{{ section.settings.menu_match_header == false }}"
+    },
+    {
+      "type": "color",
+      "id": "menu_bg_end",
+      "label": "Menu gradient end",
+      "default": "#e9e7df",
+      "visible_if": "{{ section.settings.menu_match_header == false }}"
+    },
+    {
+      "type": "range",
+      "id": "menu_gradient_angle",
+      "label": "Menu gradient angle",
+      "min": 0,
+      "max": 360,
+      "step": 15,
+      "unit": "deg",
+      "default": 180,
+      "visible_if": "{{ section.settings.menu_match_header == false }}"
+    },
+    {
+      "type": "range",
+      "id": "menu_bg_opacity",
+      "label": "Menu background opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 92,
+      "visible_if": "{{ section.settings.menu_match_header == false }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "menu_blur_background",
+      "label": "Menu blur background",
+      "default": true,
+      "visible_if": "{{ section.settings.menu_match_header == false }}"
+    },
+    {
+      "type": "range",
+      "id": "menu_blur_amount",
+      "label": "Menu blur strength",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12,
+      "visible_if": "{{ section.settings.menu_match_header == false }}"
     }
   ],
   "blocks": [

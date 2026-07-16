@@ -4,7 +4,12 @@
   {%- assign related_products = collections.all.products | slice: 0, section.settings.limit -%}
 {%- endif -%}
 
-<section class="j14-related">
+{%- liquid
+  assign media_fit = section.settings.media_fit | default: 'cover'
+  assign media_ratio = section.settings.media_ratio | default: '4 / 5'
+-%}
+
+<section class="j14-related j14-related--fit-{{ media_fit }}">
   <h2 class="j14-heading j14-related__heading">{{ section.settings.heading | escape }}</h2>
   <div
     class="j14-related__rail"
@@ -17,7 +22,8 @@
           product: related,
           show_swatches: true,
           show_quick_add: false,
-          media_ratio: 'auto'
+          media_ratio: media_ratio,
+          media_fit: media_fit
         %}
       {%- endunless -%}
     {%- endfor -%}
@@ -59,6 +65,28 @@
       "max": 8,
       "step": 1,
       "default": 4
+    },
+    {
+      "type": "select",
+      "id": "media_fit",
+      "label": "Card media fit",
+      "options": [
+        { "value": "cover", "label": "Cover (fill frame)" },
+        { "value": "contain", "label": "Contain (packshot)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Card media ratio",
+      "options": [
+        { "value": "4 / 5", "label": "4:5" },
+        { "value": "1 / 1", "label": "1:1" },
+        { "value": "3 / 4", "label": "3:4" },
+        { "value": "auto", "label": "Auto" }
+      ],
+      "default": "4 / 5"
     }
   ],
   "enabled_on": {
