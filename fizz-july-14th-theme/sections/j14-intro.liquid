@@ -6,15 +6,20 @@
   class="j14-intro"
   data-j14-intro
   data-autoplay-interval="{{ section.settings.autoplay_interval }}"
-  style="--j14-intro-len: {{ section.settings.scroll_length }}vh;"
+  data-autoscroll-enabled="{% if section.settings.autoscroll_enabled %}true{% else %}false{% endif %}"
+  data-autoscroll-delay="{{ section.settings.autoscroll_delay }}"
+  data-autoscroll-duration="{{ section.settings.autoscroll_duration }}"
+  data-autoscroll-ease="{{ section.settings.autoscroll_ease }}"
+  data-autoscroll-target="{{ section.settings.autoscroll_target }}"
+  style="--j14-intro-len: {{ section.settings.scroll_length }}vh; --j14-intro-mask: url('{{ 'Fizz_Logo_Intro.svg' | asset_url }}'); --j14-intro-mask-mobile: url('{{ 'Fizz_Logo_INTRO_SVG_Mobile.svg' | asset_url }}');"
 >
   <h1 class="j14-visually-hidden">{{ section.settings.seo_heading | default: shop.name }}</h1>
 
   <div class="j14-intro__track" data-j14-intro-track>
     <div class="j14-intro__sticky">
       {%- comment -%}
-        Media is always full-bleed / cover-fit. GSAP animates clip-path from an
-        uppercase “I” stem to the full viewport so images never get scale-zoomed.
+        Hero media stays full-bleed. A paper-colored mask with transparent FIZZ
+        letter cutouts scales from the I stem so the visitor flies through.
       {%- endcomment -%}
       <div class="j14-intro__stage" data-j14-intro-stage aria-hidden="true">
         <div class="j14-intro__slides" data-j14-intro-slides>
@@ -46,14 +51,8 @@
         </div>
       </div>
 
-      <div class="j14-intro__word" aria-hidden="true">
-        <span class="j14-intro__half j14-intro__half--left" data-j14-intro-left>
-          {{- section.settings.word_left | default: 'F' | escape -}}
-        </span>
-        <span class="j14-intro__gap" data-j14-intro-gap aria-hidden="true"></span>
-        <span class="j14-intro__half j14-intro__half--right" data-j14-intro-right>
-          {{- section.settings.word_right | default: 'ZZ' | escape -}}
-        </span>
+      <div class="j14-intro__mask" data-j14-intro-mask aria-hidden="true">
+        <div class="j14-intro__mask-fill"></div>
       </div>
 
       <div class="j14-intro__hero-copy" data-j14-intro-copy>
@@ -123,16 +122,8 @@
       "content": "Wordmark"
     },
     {
-      "type": "text",
-      "id": "word_left",
-      "label": "Word — left of the I mask",
-      "default": "F"
-    },
-    {
-      "type": "text",
-      "id": "word_right",
-      "label": "Word — right of the I mask",
-      "default": "ZZ"
+      "type": "paragraph",
+      "content": "Paper mask uses Fizz_Logo_Intro.svg (desktop) and Fizz_Logo_INTRO_SVG_Mobile.svg (mobile). Hero media shows through the transparent letter cutouts; scroll scales through the I."
     },
     {
       "type": "text",
@@ -201,6 +192,65 @@
     },
     {
       "type": "header",
+      "content": "Auto-play on load"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoscroll_enabled",
+      "label": "Auto-scroll through intro on load",
+      "default": true,
+      "info": "Scrolls the visitor through the intro animation automatically. Any scroll, click, touch, or key press cancels it."
+    },
+    {
+      "type": "range",
+      "id": "autoscroll_delay",
+      "label": "Auto-scroll delay",
+      "info": "Pause before auto-scroll starts so the logo is visible briefly.",
+      "min": 0,
+      "max": 3,
+      "step": 0.1,
+      "unit": "s",
+      "default": 0.4
+    },
+    {
+      "type": "range",
+      "id": "autoscroll_duration",
+      "label": "Auto-scroll duration",
+      "info": "How long the auto-scroll animation takes (speed).",
+      "min": 0.6,
+      "max": 6,
+      "step": 0.1,
+      "unit": "s",
+      "default": 2.2
+    },
+    {
+      "type": "select",
+      "id": "autoscroll_ease",
+      "label": "Auto-scroll easing",
+      "default": "power2.inOut",
+      "options": [
+        { "value": "none", "label": "Linear" },
+        { "value": "power1.out", "label": "Ease out" },
+        { "value": "power1.in", "label": "Ease in" },
+        { "value": "power1.inOut", "label": "Ease in-out" },
+        { "value": "power2.inOut", "label": "Ease in-out (medium)" },
+        { "value": "power3.inOut", "label": "Ease in-out (strong)" },
+        { "value": "expo.out", "label": "Ease out (strong)" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "autoscroll_target",
+      "label": "Auto-scroll end progress",
+      "info": "How far into the intro track to land (88% ≈ hero copy fully revealed).",
+      "min": 60,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 88
+    },
+    {
+      "type": "header",
       "content": "Scroll hint"
     },
     {
@@ -260,8 +310,6 @@
     {
       "name": "J14 Intro",
       "settings": {
-        "word_left": "F",
-        "word_right": "ZZ",
         "hero_eyebrow": "The portable sparkling water bottle",
         "hero_heading": "Sparkling water, anywhere.",
         "hero_subheading": "Fill. Twist. Fizz. Cold bubbles in under ten seconds — no machine, no cans.",

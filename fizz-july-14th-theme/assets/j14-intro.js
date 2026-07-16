@@ -1,7 +1,7 @@
 /*
   July 14th intro — GSAP ScrollTrigger.
-  Media is always full-bleed / object-fit: cover. We animate clip-path from an
-  uppercase I stem to the full viewport so imagery is not scale-zoomed.
+  Hero media stays full-bleed. A paper mask with transparent FIZZ letter
+  cutouts scales from the I stem origin so the visitor flies through.
 */
 (function () {
   'use strict';
@@ -16,35 +16,35 @@
 
   var instances = [];
 
-  function insetClip(top, right, bottom, left) {
-    return 'inset(' + top + '% ' + right + '% ' + bottom + '% ' + left + '%)';
+  var MOBILE_MQ = window.matchMedia('(max-width: 749px)');
+
+  /** Desktop: Fizz_Logo_Intro.svg (3038×1888). Mobile: Fizz_Logo_INTRO_SVG_Mobile.svg (viewBox 1926×4512). */
+  function getMaskMetrics() {
+    if (MOBILE_MQ.matches) {
+      return { aspect: 1926 / 4512, stem: 74 / 1926, origin: '43.15% 49.90%', cover: true };
+    }
+    return { aspect: 3038 / 1888, stem: 0.027, origin: '45.24% 49.76%', cover: true };
   }
 
-  /** I-stem clip matching the wordmark gap box (percent of sticky stage). */
-  function stemClip(stage, gap) {
-    if (!stage || !gap) return insetClip(18, 47, 18, 47);
-    var sr = stage.getBoundingClientRect();
-    var gr = gap.getBoundingClientRect();
-    if (!sr.width || !sr.height) return insetClip(18, 47, 18, 47);
-    var top = ((gr.top - sr.top) / sr.height) * 100;
-    var left = ((gr.left - sr.left) / sr.width) * 100;
-    var bottom = ((sr.bottom - gr.bottom) / sr.height) * 100;
-    var right = ((sr.right - gr.right) / sr.width) * 100;
-    return insetClip(
-      Math.max(0, top),
-      Math.max(0, right),
-      Math.max(0, bottom),
-      Math.max(0, left)
-    );
+  /**
+   * Scale needed so the I stem hole covers the viewport width.
+   * Both breakpoints use mask-size: cover for full-bleed paper.
+   */
+  function computeFlyThroughScale() {
+    var m = getMaskMetrics();
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    var logoW = m.cover ? Math.max(w, h * m.aspect) : Math.min(w, h * m.aspect);
+    var stemPx = logoW * m.stem;
+    if (!stemPx) return 40;
+    return (w / stemPx) * 1.08;
   }
 
   function Intro(section) {
     this.section = section;
     this.track = section.querySelector('[data-j14-intro-track]');
     this.stage = section.querySelector('[data-j14-intro-stage]');
-    this.gap = section.querySelector('[data-j14-intro-gap]');
-    this.left = section.querySelector('[data-j14-intro-left]');
-    this.right = section.querySelector('[data-j14-intro-right]');
+    this.mask = section.querySelector('[data-j14-intro-mask]');
     this.copy = section.querySelector('[data-j14-intro-copy]');
     this.hint = section.querySelector('[data-j14-intro-hint]');
     this.copyParts = section.querySelectorAll(
@@ -56,6 +56,9 @@
     this.timer = null;
     this.tl = null;
     this.st = null;
+    this.autoScrollTimer = null;
+    this.autoScrollTween = null;
+    this.endScale = computeFlyThroughScale();
 
     var self = this;
     this.thumbs.forEach(function (thumb) {
@@ -72,18 +75,16 @@
       return;
     }
 
-    /* Measure after fonts/layout; slight delay avoids wrong stem clip. */
     var selfBuild = this;
     requestAnimationFrame(function () {
       selfBuild.buildTimeline();
       ScrollTrigger.refresh();
+      selfBuild.autoScroll();
     });
   }
 
   Intro.prototype.showStatic = function () {
-    if (this.stage) gsap.set(this.stage, { clipPath: insetClip(0, 0, 0, 0), webkitClipPath: insetClip(0, 0, 0, 0) });
-    if (this.left) gsap.set(this.left, { opacity: 0, x: 0 });
-    if (this.right) gsap.set(this.right, { opacity: 0, x: 0 });
+    if (this.mask) gsap.set(this.mask, { opacity: 0, visibility: 'hidden' });
     if (this.copy) gsap.set(this.copy, { opacity: 1, pointerEvents: 'auto' });
     if (this.copyParts.length) gsap.set(this.copyParts, { opacity: 1, y: 0 });
     if (this.hint) gsap.set(this.hint, { opacity: 0 });
@@ -123,11 +124,15 @@
 
   Intro.prototype.buildTimeline = function () {
     var self = this;
-    if (!this.track || !this.stage) return;
+    if (!this.track || !this.mask) return;
 
-    var startClip = stemClip(this.stage, this.gap);
-    gsap.set(this.stage, { clipPath: startClip, webkitClipPath: startClip });
-    gsap.set([this.left, this.right].filter(Boolean), { opacity: 1, x: 0, xPercent: 0 });
+    var maskMetrics = getMaskMetrics();
+    this.endScale = computeFlyThroughScale();
+    gsap.set(this.mask, {
+      scale: 1,
+      opacity: 1,
+      transformOrigin: maskMetrics.origin
+    });
     if (this.copy) gsap.set(this.copy, { pointerEvents: 'none' });
     gsap.set(this.copyParts, { opacity: 0, y: 28 });
     if (this.hint) gsap.set(this.hint, { opacity: 0.7 });
@@ -150,10 +155,14 @@
           }
         },
         onRefresh: function () {
-          /* Recalculate I stem from the gap after layout. */
+          var metrics = getMaskMetrics();
+          self.endScale = computeFlyThroughScale();
           if (self.tl && self.tl.progress() < 0.05) {
-            var clip = stemClip(self.stage, self.gap);
-            gsap.set(self.stage, { clipPath: clip, webkitClipPath: clip });
+            gsap.set(self.mask, {
+              scale: 1,
+              opacity: 1,
+              transformOrigin: metrics.origin
+            });
           }
         }
       }
@@ -161,37 +170,26 @@
 
     this.st = this.tl.scrollTrigger;
 
-    /* Phase 1 — expand I mask + letters depart (0 → ~0.72 of timeline) */
+    /* Phase 1 — scale mask from I stem until cutout fills the viewport */
     this.tl.to(
-      this.stage,
+      this.mask,
       {
-        clipPath: insetClip(0, 0, 0, 0),
-        webkitClipPath: insetClip(0, 0, 0, 0),
+        scale: function () {
+          return self.endScale;
+        },
         ease: 'power2.inOut',
         duration: 0.72
       },
       0
     );
 
-    if (this.left) {
-      this.tl.to(
-        this.left,
-        { xPercent: -160, opacity: 0, ease: 'power2.in', duration: 0.45 },
-        0.12
-      );
-    }
-    if (this.right) {
-      this.tl.to(
-        this.right,
-        { xPercent: 160, opacity: 0, ease: 'power2.in', duration: 0.45 },
-        0.12
-      );
-    }
+    this.tl.to(this.mask, { opacity: 0, duration: 0.12 }, 0.68);
+
     if (this.hint) {
       this.tl.to(this.hint, { opacity: 0, duration: 0.08 }, 0);
     }
 
-    /* Phase 2 — slow fade of hero copy (0.72 → 1) */
+    /* Phase 2 — hero copy fade in */
     if (this.copyParts.length) {
       this.tl.to(
         this.copyParts,
@@ -209,8 +207,75 @@
 
   Intro.prototype.destroy = function () {
     if (this.timer) clearInterval(this.timer);
+    if (this.autoScrollTimer) clearTimeout(this.autoScrollTimer);
+    if (this.autoScrollTween) this.autoScrollTween.kill();
     if (this.tl) this.tl.kill();
     if (this.st) this.st.kill();
+  };
+
+  /**
+   * On load, tween window scroll through the intro ScrollTrigger so the
+   * visitor lands on hero copy without manually scrolling. Any user input cancels.
+   */
+  Intro.prototype.autoScroll = function () {
+    var self = this;
+    var d = this.section.dataset;
+    if (motionOff || d.autoscrollEnabled !== 'true') return;
+    if (window.Shopify && window.Shopify.designMode) return;
+    if (window.scrollY > 4 || !this.st) return;
+
+    var delay = (parseFloat(d.autoscrollDelay) || 0) * 1000;
+    var duration = parseFloat(d.autoscrollDuration) || 2.2;
+    var ease = d.autoscrollEase || 'power2.inOut';
+    var target = (parseFloat(d.autoscrollTarget) || 88) / 100;
+    var proxy = { y: window.scrollY };
+    var cancelled = false;
+    var events = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
+
+    function detach() {
+      events.forEach(function (evt) {
+        window.removeEventListener(evt, cancel);
+      });
+    }
+
+    function cancel() {
+      if (cancelled) return;
+      cancelled = true;
+      if (self.autoScrollTimer) {
+        clearTimeout(self.autoScrollTimer);
+        self.autoScrollTimer = null;
+      }
+      if (self.autoScrollTween) {
+        self.autoScrollTween.kill();
+        self.autoScrollTween = null;
+      }
+      detach();
+    }
+
+    events.forEach(function (evt) {
+      window.addEventListener(evt, cancel, { passive: true });
+    });
+
+    this.autoScrollTimer = setTimeout(function () {
+      self.autoScrollTimer = null;
+      if (cancelled || !self.st) {
+        detach();
+        return;
+      }
+      var targetY = self.st.start + (self.st.end - self.st.start) * target;
+      self.autoScrollTween = gsap.to(proxy, {
+        y: targetY,
+        duration: duration,
+        ease: ease,
+        onUpdate: function () {
+          if (!cancelled) window.scrollTo(0, proxy.y);
+        },
+        onComplete: function () {
+          self.autoScrollTween = null;
+          detach();
+        }
+      });
+    }, delay);
   };
 
   function init(scope) {

@@ -106,9 +106,56 @@ save / style switch.
 
 ## Reference implementation notes
 
-- Structure mirrors `/workspace/fizz-claude-theme` (standalone OS 2.0 theme:
-  `layout/`, `config/`, `locales/`, `sections/`, `snippets/`, `templates/`,
-  `assets/`, `design/`).
+- Structure mirrors a standalone OS 2.0 theme layout (`layout/`, `config/`,
+  `locales/`, `sections/`, `snippets/`, `templates/`, `assets/`, `design/`).
 - Colorway slug/scene logic was adapted (copied and renamed with the `j14-`
-  prefix) from `fizz-claude-theme` snippets; no files outside
-  `fizz-july-14th-theme/` were modified.
+  prefix) from earlier Fizz Claude snippets into this package.
+
+## 6. Intro mask fly-through (GSAP + CSS mask)
+
+Later iterations replaced the original “vanilla only / no GSAP” intro with a
+GSAP ScrollTrigger scrub. Current architecture (storefront runtime):
+
+1. Full-bleed hero media stage (no `clip-path`).
+2. Paper fill layer using `background: var(--j14-paper)`.
+3. CSS `mask-image` pointing at `Fizz_Logo_Intro.svg` (desktop) or
+   `Fizz_Logo_INTRO_SVG_Mobile.svg` (max-width 749px).
+4. `mask-mode: alpha` so transparent letter cutouts reveal the hero even when
+   the embedded PNG’s opaque pixels are near-black (luminance masking would
+   invert the intended look).
+5. Desktop `mask-size: cover` for full viewport paper; mobile also covers.
+6. JS scales the mask from a measured I-stem `transform-origin` until the
+   stem hole fills the viewport, then fades the mask and fades in hero copy.
+7. Optional auto-scroll tweens `window.scrollY` through the ScrollTrigger
+   range; cancelled on user input; disabled in the theme editor and for
+   reduced motion.
+
+Hardcoded stem metrics (Liquid cannot measure SVG holes at runtime) live in
+`assets/j14-intro.js` and matching CSS origins. Replacing a mask asset
+requires re-measurement — see `docs/05-intro-flythrough.md`.
+
+Isolated lab (not deployed; listed in `.shopifyignore`):
+`preview/intro-mask-flythrough.html`.
+
+### CLI tooling notes (verified against shopify.dev)
+
+- Theme directory structure and `.shopifyignore`:
+  https://shopify.dev/docs/storefronts/themes/tools/cli
+- Theme Check: https://shopify.dev/docs/storefronts/themes/tools/theme-check
+- `theme push` flags / live overwrite:
+  https://shopify.dev/docs/api/shopify-cli/theme/theme-push
+
+**Operational limitation:** `shopify theme dev` may fail when the CLI identity
+lacks `read_themes` / development-theme creation scopes. Production workflow
+for this store uses Theme Check + isolated preview + explicit
+`theme push --theme 188630794525 --allow-live`.
+
+## Limitations (additions)
+
+| Limitation | Source | Mitigation |
+| --- | --- | --- |
+| CSS mask RGB ≠ brand paper | Asset export | Paper from `--j14-paper`; alpha mask only |
+| Mask origin not measurable in Liquid | Liquid runtime | Hardcoded % after offline analysis |
+| Case-sensitive asset URLs | Shopify CDN | Canonical filenames; avoid macOS case collisions |
+| Max 5 Theme styles | settings_data | Five presets shipped; no sixth |
+| No JSON parse in Liquid | Liquid docs | Slug/scene maps mirrored in snippets |

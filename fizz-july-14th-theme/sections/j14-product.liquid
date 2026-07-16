@@ -11,12 +11,36 @@
   assign stage_bg = scene_parts[0] | default: settings.color_surface
   assign stage_bg_end = scene_parts[1] | default: settings.color_dark
   assign stage_text = scene_parts[3] | default: settings.color_dark_text
+
+  assign media_fit = section.settings.media_fit | default: 'cover'
+  assign gallery_mode = section.settings.gallery_mode | default: 'slider'
+  assign desktop_layout = section.settings.desktop_layout | default: 'side'
+  assign mobile_ratio = section.settings.mobile_media_ratio | default: '4 / 5'
+  assign show_thumbs = section.settings.show_thumbnails
+  if show_thumbs == nil
+    assign show_thumbs = true
+  endif
+  assign thumbs_mobile = section.settings.thumbnails_on_mobile
+  if thumbs_mobile == nil
+    assign thumbs_mobile = false
+  endif
+  assign show_arrows = section.settings.show_arrows
+  if show_arrows == nil
+    assign show_arrows = true
+  endif
+  assign media_count = product.media.size
 -%}
 <section
-  class="j14-product"
+  class="j14-product j14-product--fit-{{ media_fit }} j14-product--gallery-{{ gallery_mode }} j14-product--layout-{{ desktop_layout }}{% if show_thumbs %} j14-product--thumbs{% endif %}{% if thumbs_mobile %} j14-product--thumbs-mobile{% endif %}"
   data-j14-product
+  data-gallery-mode="{{ gallery_mode }}"
   data-stage-mode="{{ section.settings.stage_mode }}"
-  style="--pdp-stage-bg: {{ stage_bg }}; --pdp-stage-bg-end: {{ stage_bg_end }}; --pdp-stage-text: {{ stage_text }};"
+  style="
+    --pdp-stage-bg: {{ stage_bg }};
+    --pdp-stage-bg-end: {{ stage_bg_end }};
+    --pdp-stage-text: {{ stage_text }};
+    --j14-pdp-media-ratio: {{ mobile_ratio }};
+  "
 >
   <div class="j14-product__layout">
     <div class="j14-product__gallery">
@@ -25,11 +49,12 @@
         data-j14-pdp-stage
       >
         <div class="j14-product__media-rail" data-j14-media-rail>
-          {%- if product.media.size > 0 -%}
+          {%- if media_count > 0 -%}
             {%- for media in product.media -%}
               <div
                 class="j14-product__media{% if forloop.first %} is-active{% endif %}"
                 data-media-id="{{ media.id }}"
+                data-media-index="{{ forloop.index0 }}"
               >
                 {%- case media.media_type -%}
                   {%- when 'video' -%}
@@ -44,6 +69,8 @@
                       if forloop.first
                         assign media_loading = 'eager'
                       endif
+                      assign focal = media.preview_image.presentation.focal_point | default: 'center'
+                      assign media_style = 'object-position: ' | append: focal
                     -%}
                     {{
                       media
@@ -53,13 +80,14 @@
                         loading: media_loading,
                         sizes: '(min-width: 750px) 55vw, 100vw',
                         widths: '540, 720, 1080, 1400',
-                        alt: media.alt
+                        alt: media.alt,
+                        style: media_style
                     }}
                   {%- endcase -%}
               </div>
             {%- endfor -%}
           {%- else -%}
-            <div class="j14-product__media is-active" data-media-id="fallback">
+            <div class="j14-product__media is-active" data-media-id="fallback" data-media-index="0">
               <img
                 src="{{ 'fizz-bottle-product-' | append: color_slug | append: '.png' | asset_url }}"
                 class="j14-product__media-el j14-product__media-el--contain"
@@ -71,20 +99,47 @@
             </div>
           {%- endif -%}
         </div>
+
+        {%- if gallery_mode == 'slider' and show_arrows and media_count > 1 -%}
+          <button type="button" class="j14-product__arrow j14-product__arrow--prev" data-j14-gallery-prev aria-label="Previous image">
+            <span aria-hidden="true">&larr;</span>
+          </button>
+          <button type="button" class="j14-product__arrow j14-product__arrow--next" data-j14-gallery-next aria-label="Next image">
+            <span aria-hidden="true">&rarr;</span>
+          </button>
+        {%- endif -%}
       </div>
 
-      {%- if product.media.size > 1 -%}
-        <div class="j14-product__thumbs">
+      {%- if media_count > 1 -%}
+        {%- if show_thumbs -%}
+          <div class="j14-product__thumbs" data-j14-thumbs>
+            {%- for media in product.media -%}
+              <button
+                type="button"
+                class="j14-product__thumb{% if forloop.first %} is-active{% endif %}"
+                data-j14-thumb
+                data-media-id="{{ media.id }}"
+                data-media-index="{{ forloop.index0 }}"
+                aria-label="{{ 'products.product.media_label' | t: index: forloop.index }}"
+                aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+              >
+                {{ media.preview_image | image_url: width: 180 | image_tag: loading: 'lazy', alt: '' }}
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        <div class="j14-product__dots" data-j14-gallery-dots role="tablist" aria-label="Gallery slides">
           {%- for media in product.media -%}
             <button
               type="button"
-              class="j14-product__thumb{% if forloop.first %} is-active{% endif %}"
-              data-j14-thumb
+              class="j14-product__dot{% if forloop.first %} is-active{% endif %}"
+              data-j14-dot
               data-media-id="{{ media.id }}"
-              aria-label="{{ 'products.product.media_label' | t: index: forloop.index }}"
-            >
-              {{ media.preview_image | image_url: width: 180 | image_tag: loading: 'lazy', alt: '' }}
-            </button>
+              data-media-index="{{ forloop.index0 }}"
+              aria-label="Go to image {{ forloop.index }}"
+              aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+            ></button>
           {%- endfor -%}
         </div>
       {%- endif -%}
@@ -268,11 +323,16 @@
     var atcLabel = section.querySelector('[data-j14-atc-label]');
     var wayLabel = section.querySelector('[data-j14-way-label]');
     var stage = section.querySelector('[data-j14-pdp-stage]');
+    var rail = section.querySelector('[data-j14-media-rail]');
     var fallback = section.querySelector('[data-j14-fallback-bottle]');
+    var slides = Array.prototype.slice.call(section.querySelectorAll('.j14-product__media'));
+    var galleryMode = section.dataset.galleryMode || 'slider';
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var moneyFormat = {{ shop.money_format | json }};
     var soldOutText = {{ 'products.product.sold_out' | t | json }};
     var addText = {{ section.settings.atc_label | default: 'Add to cart' | json }};
     var unavailableText = {{ 'products.product.unavailable' | t | json }};
+    var index = 0;
 
     function formatMoney(cents) {
       var value = (cents / 100).toFixed(2);
@@ -286,14 +346,44 @@
       });
     }
 
-    function showMedia(mediaId) {
-      if (!mediaId) return;
-      section.querySelectorAll('.j14-product__media').forEach(function (media) {
-        media.classList.toggle('is-active', media.dataset.mediaId === String(mediaId));
+    function setIndex(next) {
+      if (!slides.length) return;
+      index = ((next % slides.length) + slides.length) % slides.length;
+      var mediaId = slides[index].dataset.mediaId;
+      showMedia(mediaId, true);
+    }
+
+    function syncSliderTransform() {
+      if (!rail || galleryMode !== 'slider') return;
+      rail.style.transition = reduceMotion ? 'none' : 'transform 0.35s ease';
+      rail.style.transform = 'translateX(-' + index * 100 + '%)';
+    }
+
+    function showMedia(mediaId, fromIndex) {
+      if (!mediaId && mediaId !== 0) return;
+      var found = -1;
+      slides.forEach(function (media, i) {
+        var active = media.dataset.mediaId === String(mediaId);
+        media.classList.toggle('is-active', active);
+        if (active) found = i;
       });
+      if (found > -1) index = found;
+
       section.querySelectorAll('[data-j14-thumb]').forEach(function (thumb) {
-        thumb.classList.toggle('is-active', thumb.dataset.mediaId === String(mediaId));
+        var on = thumb.dataset.mediaId === String(mediaId);
+        thumb.classList.toggle('is-active', on);
+        thumb.setAttribute('aria-current', on ? 'true' : 'false');
       });
+      section.querySelectorAll('[data-j14-dot]').forEach(function (dot) {
+        var on = dot.dataset.mediaId === String(mediaId);
+        dot.classList.toggle('is-active', on);
+        dot.setAttribute('aria-current', on ? 'true' : 'false');
+      });
+
+      if (!fromIndex && found > -1) {
+        /* keep index in sync when colorway jumps to a media id */
+      }
+      syncSliderTransform();
     }
 
     function stageFromSwatch(id) {
@@ -373,6 +463,16 @@
         showMedia(thumb.dataset.mediaId);
       });
     });
+    section.querySelectorAll('[data-j14-dot]').forEach(function (dot) {
+      dot.addEventListener('click', function () {
+        showMedia(dot.dataset.mediaId);
+      });
+    });
+    var prevBtn = section.querySelector('[data-j14-gallery-prev]');
+    var nextBtn = section.querySelector('[data-j14-gallery-next]');
+    if (prevBtn) prevBtn.addEventListener('click', function () { setIndex(index - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { setIndex(index + 1); });
+
     section.querySelectorAll('[data-j14-swatch]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var options;
@@ -399,6 +499,41 @@
         });
       });
     });
+
+    /* Touch / pointer swipe for slider */
+    if (galleryMode === 'slider' && stage && slides.length > 1) {
+      var startX = 0;
+      var deltaX = 0;
+      var dragging = false;
+      stage.addEventListener('pointerdown', function (e) {
+        if (e.target.closest('button, a, video, model-viewer')) return;
+        dragging = true;
+        startX = e.clientX;
+        deltaX = 0;
+        stage.setPointerCapture(e.pointerId);
+        if (rail) rail.style.transition = 'none';
+      });
+      stage.addEventListener('pointermove', function (e) {
+        if (!dragging || !rail) return;
+        deltaX = e.clientX - startX;
+        var pct = (deltaX / stage.offsetWidth) * 100;
+        rail.style.transform = 'translateX(calc(-' + index * 100 + '% + ' + pct + '%))';
+      });
+      function endDrag() {
+        if (!dragging) return;
+        dragging = false;
+        if (Math.abs(deltaX) > 48) {
+          setIndex(index + (deltaX < 0 ? 1 : -1));
+        } else {
+          syncSliderTransform();
+        }
+        deltaX = 0;
+      }
+      stage.addEventListener('pointerup', endDrag);
+      stage.addEventListener('pointercancel', endDrag);
+    }
+
+    syncSliderTransform();
   })();
 </script>
 
@@ -425,6 +560,73 @@
       "default": "Sparkling water, anywhere."
     },
     {
+      "type": "header",
+      "content": "Gallery"
+    },
+    {
+      "type": "select",
+      "id": "media_fit",
+      "label": "Media fit",
+      "options": [
+        { "value": "cover", "label": "Cover (fill stage)" },
+        { "value": "contain", "label": "Contain (packshot)" }
+      ],
+      "default": "cover",
+      "info": "Cover fills lifestyle photos. Use Contain for studio bottle cutouts that must not crop."
+    },
+    {
+      "type": "select",
+      "id": "gallery_mode",
+      "label": "Gallery mode",
+      "options": [
+        { "value": "slider", "label": "Slider (swipe)" },
+        { "value": "fade", "label": "Fade" }
+      ],
+      "default": "slider"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_thumbnails",
+      "label": "Show thumbnails",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "thumbnails_on_mobile",
+      "label": "Show thumbnails on mobile",
+      "default": false,
+      "info": "When off, mobile uses swipe + dots instead of thumbnails."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show previous / next arrows",
+      "default": true,
+      "visible_if": "{{ section.settings.gallery_mode == 'slider' }}"
+    },
+    {
+      "type": "select",
+      "id": "desktop_layout",
+      "label": "Desktop layout",
+      "options": [
+        { "value": "side", "label": "Gallery beside buy box" },
+        { "value": "stack", "label": "Gallery above buy box" }
+      ],
+      "default": "side"
+    },
+    {
+      "type": "select",
+      "id": "mobile_media_ratio",
+      "label": "Mobile media ratio",
+      "options": [
+        { "value": "4 / 5", "label": "4:5" },
+        { "value": "1 / 1", "label": "1:1" },
+        { "value": "3 / 4", "label": "3:4" },
+        { "value": "auto", "label": "Auto height" }
+      ],
+      "default": "4 / 5"
+    },
+    {
       "type": "select",
       "id": "stage_mode",
       "label": "Media stage style",
@@ -435,6 +637,10 @@
       ],
       "default": "colorway",
       "info": "Colorway scene syncs with the selected bottle variant and every theme colorway preset."
+    },
+    {
+      "type": "header",
+      "content": "Buy box"
     },
     {
       "type": "checkbox",

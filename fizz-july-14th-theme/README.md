@@ -1,56 +1,130 @@
-# July 14th Custom Design — standalone Shopify theme
+# July 14th Custom Design
 
-A standalone Shopify Online Store 2.0 theme for Fizz, inspired by the scroll
-intro on spencerkofoed.com. Mobile-first, vanilla CSS/JS (no GSAP, Swiper, or
-other libraries).
+A standalone Shopify Online Store 2.0 theme for Fizz. Scroll-driven homepage
+narrative, colorway-aware commerce, GSAP intro mask fly-through, and
+merchant-editable sections throughout.
 
-## Homepage flow (`templates/index.json`)
+**Source of truth:** this package (`fizz-july-14th-theme/`). Do **not** push
+the sibling `fizz/` package for July 14 work — that package’s default homepage
+is a different design system.
 
-1. **J14 Intro** (`sections/j14-intro.liquid`) — brand wordmark split around a
-   media window that expands to full screen as the visitor scrolls; editable
-   media slides (image / Shopify video / YouTube / Vimeo) with a thumbnail
-   strip.
-2. **J14 Media Mosaic** (`j14-mosaic.liquid`) — admin-editable grid of photo
-   and video tiles that slides up from the bottom on scroll; per-tile span,
-   height, caption, and link controls.
-3. **J14 Colorways Carousel** (`j14-colorways.liquid`) — swipe/scroll-snap
-   carousel of bottle colors driven by a product's variants; active slide
-   syncs the section background and CTA (`?variant=` deep link).
-4. **J14 How To Use** (`j14-how-sticky.liquid`) — sticky full-viewport scene;
-   each step's photo wipes in as the visitor scrolls through the track.
-5. **J14 Flavors** (`j14-flavors.liquid`) — three flavor packs with product
-   pickers, explore links, and "pair with a bottle" links.
-6. **J14 About + Sustainability** (`j14-about.liquid`) — brand story plus
-   sustainability stat blocks.
-7. **J14 Footer** (`j14-footer.liquid`) — headline CTA, newsletter, links.
+| | |
+| --- | --- |
+| Store | `g9rykd-jt.myshopify.com` |
+| Live theme | July 14th Custom Design (`#188630794525`) |
+| Docs book | [`docs/`](docs/) |
 
-## Editor-editable
+---
 
-All copy, media, buttons, colors, products, and collections are section or
-theme settings. Global brand colors, fonts (`font_picker`), page width, and
-button radius live in **Theme settings** (`config/settings_schema.json`).
+## What you get
 
-## Motion
+1. **Intro mask fly-through** — paper-colored SVG alpha mask with transparent
+   FIZZ letter cutouts; scroll scales through the **I** stem into a full-bleed
+   hero slider (desktop + mobile masks).
+2. **Homepage story** — mosaic gallery, colorways carousel, sticky how-to,
+   flavors, about, sustainability, footer.
+3. **Commerce** — product gallery (slider/fade), colorway swatches, related
+   products, collection / cart / search templates.
+4. **Theme styles** — five colorway presets (Shopify’s max), typography, motion,
+   and page transitions (melt / classic).
+5. **Merchant control** — every section is editor-editable; warp metafields
+   drive per-variant carousel media and scene colors.
 
-`assets/j14-scroll.js` is a single rAF + IntersectionObserver engine for the
-intro, mosaic, and how-to sections; `assets/j14-carousel.js` powers the
-colorways rail. Both respect `prefers-reduced-motion` (and the Theme settings
-"Enable scroll animations" toggle) with static fallbacks, and re-initialize on
-theme editor events (`shopify:section:load`, `shopify:block:select`).
+---
 
-## Commerce templates
-
-`product.json` (gallery, variant pills, price/ATC updates, accordions,
-recommendations), `collection.json`, `list-collections.json`, `cart.json`,
-`search.json`, `page.json`, `404.json`, plus `layout/password.liquid`.
-
-## Development
+## Quick start
 
 ```sh
-shopify theme dev --path fizz-july-14th-theme     # local preview
-shopify theme check --path fizz-july-14th-theme   # lint
-shopify theme push --path fizz-july-14th-theme --unpublished --theme "July 14th Custom Design"
+# From the repository root
+cd fizz-july-14th-theme
+
+# Lint (Liquid / JSON / theme best practices)
+shopify theme check --path .
+
+# Targeted push to the live July 14 theme
+shopify theme push \
+  --path . \
+  --store g9rykd-jt.myshopify.com \
+  --theme 188630794525 \
+  --allow-live
+
+# Optional: define warp / scene metafields once per store
+./scripts/setup-warp-metafields.sh
 ```
 
-See `design/JULY14-DESIGN-RESEARCH.md` for the Shopify platform research and
-documented limitations behind this build.
+**Isolated intro preview** (no Shopify CLI required):
+
+```sh
+# From fizz-july-14th-theme/
+python3 -m http.server 4173
+# Open http://localhost:4173/preview/intro-mask-flythrough.html
+```
+
+> **Note:** `shopify theme dev` may fail on this store if the CLI identity
+> lacks `read_themes` / theme-create scopes. Prefer Theme Check + the isolated
+> preview + explicit `theme push` (see [Chapter 10](docs/10-development-deployment.md)
+> and [Chapter 11](docs/11-troubleshooting.md)).
+
+---
+
+## Documentation book
+
+Read these chapters in order if you are building or extending the theme from
+scratch. Jump around if you already know Shopify themes.
+
+| Ch | Title | Start here if you need… |
+| --: | --- | --- |
+| 00 | [Overview](docs/00-overview.md) | Goals, finished experience, package boundaries |
+| 01 | [From scratch](docs/01-from-scratch.md) | CLI, auth, store, first verification |
+| 02 | [Theme architecture](docs/02-theme-architecture.md) | OS 2.0 folders, Liquid vs editor |
+| 03 | [Design system](docs/03-design-system.md) | Tokens, presets, typography, assets |
+| 04 | [Homepage build](docs/04-homepage-build.md) | Section-by-section homepage |
+| 05 | [Intro fly-through](docs/05-intro-flythrough.md) | Mask math, GSAP timeline, auto-scroll |
+| 06 | [Commerce](docs/06-commerce.md) | PDP, collections, cart, header |
+| 07 | [Colorways & metafields](docs/07-colorways-metafields.md) | Presets + warp metafield tutorial |
+| 08 | [Motion & accessibility](docs/08-motion-accessibility.md) | Scroll engine, transitions, a11y |
+| 09 | [Merchant guide](docs/09-merchant-guide.md) | Day-to-day theme editor workflows |
+| 10 | [Development & deployment](docs/10-development-deployment.md) | Check, push, Git, rollback |
+| 11 | [Troubleshooting](docs/11-troubleshooting.md) | Permissions, masks, cache, motion |
+| 12 | [File reference](docs/12-file-reference.md) | Annotated map + asset catalog |
+| 13 | [Build history](docs/13-build-history.md) | Why decisions changed over time |
+
+Platform research (Shopify limits and sources):
+[`design/JULY14-DESIGN-RESEARCH.md`](design/JULY14-DESIGN-RESEARCH.md)
+
+---
+
+## Homepage order
+
+`templates/index.json`:
+
+1. `j14-intro` — mask fly-through + hero slides
+2. `j14-mosaic` — media grid
+3. `j14-colorways` — bottle variants / warp media
+4. `j14-how-sticky` — sticky how-to scrub
+5. `j14-flavors` — flavor packs
+6. `j14-about` — brand story
+7. `j14-sustainability` — stats / claims
+8. `j14-footer` — CTA, newsletter, links
+
+---
+
+## Motion stack
+
+| Script | Role |
+| --- | --- |
+| `gsap.min.js` + `ScrollTrigger.min.js` | Intro scrub timeline |
+| `j14-intro.js` | Mask scale / fade, auto-scroll, slide carousel |
+| `j14-scroll.js` | Mosaic + how-to rAF / IntersectionObserver |
+| `j14-carousel.js` | Colorways scroll-snap rail |
+| `j14-page-transition.js` | Melt / classic internal navigation |
+
+All respect `prefers-reduced-motion` and Theme settings → **Enable scroll
+animations**.
+
+---
+
+## License / ownership
+
+Internal Fizz / SWFT Studios theme package. Not submitted to the Shopify Theme
+Store.
