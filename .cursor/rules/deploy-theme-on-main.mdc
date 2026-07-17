@@ -1,0 +1,20 @@
+---
+description: On merge to main, the July 14th theme is deployed to Shopify via GitHub Actions
+alwaysApply: true
+---
+
+# Deploy theme on merge to main
+
+Merges (and pushes) to `main` that touch `fizz-july-14th-theme/**` automatically **push that theme to the live Shopify store** via [.github/workflows/deploy-theme.yml](.github/workflows/deploy-theme.yml).
+
+## Agent rules
+
+1. **Do not** run `shopify theme push` yourself after merging to `main` unless CI failed or the user explicitly asks for a manual push — CI owns live deploys.
+2. When finishing theme work, **open/merge a PR into `main`** so the workflow runs; a feature-branch commit alone does not update the live theme.
+3. Required repo secret (set once in GitHub → Settings → Secrets):
+   - `SHOPIFY_CLI_THEME_TOKEN` — Theme Access password (`shptka_…`)
+4. Optional repo variables (defaults match current live theme):
+   - `SHOPIFY_STORE` — default `g9rykd-jt.myshopify.com`
+   - `SHOPIFY_THEME_ID` — default `188630794525` (July 14th Custom Design)
+5. Manual re-deploy: GitHub → Actions → **Deploy Shopify theme** → Run workflow.
+6. If deploy fails, fix auth/secrets or path issues first; do not silent-fallback to a different theme directory (`fizz/`, `fizz-claude-theme/`) unless the user asks.
