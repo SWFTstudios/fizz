@@ -242,3 +242,18 @@ Extending to **global theme tokens** requires an explicit merchant toggle and Li
 | 2026-07-09 | Cursor agent | Initial research report; Phase 2 implementation |
 | 2026-07-13 | Cursor agent | Variant product media research + implementation notes |
 | 2026-07-13 | Cursor agent | Bottle PDP bundle cards + scene hero image pipeline |
+
+---
+
+## July 14 homepage (2026-07-15)
+
+**Template:** `templates/index.july14.json` (`template.suffix == 'july14'`)
+
+| Topic | Finding |
+|-------|---------|
+| Alternate index templates | JSON templates with suffixes create alternate homepage templates assignable in theme editor / `?view=july14` |
+| Media settings | `image_picker`, `video`, `video_url` (YouTube/Vimeo) on section blocks — [Settings](https://shopify.dev/docs/storefronts/themes/architecture/settings) |
+| Metafield storefront access | Definitions need `access.storefront: PUBLIC_READ` for Liquid `variant.metafields.custom.*` |
+| `file_reference` media | Resolve via `.value`; check `media_type == 'video'` then `video_tag` / else `image_url` |
+| Max blocks | 50 blocks per section — mosaic capped at 24 in schema |
+

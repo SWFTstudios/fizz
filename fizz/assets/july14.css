@@ -222,41 +222,19 @@ fieldset {
    Header
    ============================================================= */
 .j14-header {
-  --j14-hdr-bg: linear-gradient(180deg, rgba(244, 243, 238, 0.92), rgba(233, 231, 223, 0.92));
-  --j14-hdr-text: var(--j14-ink);
-  --j14-hdr-text-rgb: var(--j14-ink-rgb);
-  --j14-hdr-blur: blur(12px);
-  --j14-menu-bg: var(--j14-hdr-bg);
-  --j14-menu-blur: var(--j14-hdr-blur);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 50;
-  color: var(--j14-hdr-text);
-  background: transparent;
-  transition: background 0.25s ease, box-shadow 0.25s ease, backdrop-filter 0.25s ease, color 0.25s ease;
+  color: var(--j14-ink);
+  transition: background 0.25s ease, box-shadow 0.25s ease;
 }
-.j14-header:not(.j14-header--transparent),
 .j14-header.is-scrolled,
 .j14-header.is-open {
-  background: var(--j14-hdr-bg);
-  box-shadow: 0 1px 0 rgba(var(--j14-hdr-text-rgb), 0.08);
-}
-.j14-header--menu-match.is-open {
-  box-shadow: none;
-}
-.j14-header--blur:not(.j14-header--transparent),
-.j14-header--blur.is-scrolled,
-.j14-header--blur.is-open {
-  backdrop-filter: var(--j14-hdr-blur);
-  -webkit-backdrop-filter: var(--j14-hdr-blur);
-}
-.j14-header--transparent:not(.is-scrolled):not(.is-open) {
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  background: rgba(var(--j14-paper-rgb), 0.92);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 0 rgba(var(--j14-ink-rgb), 0.08);
 }
 .j14-header__inner {
   display: flex;
@@ -269,7 +247,6 @@ fieldset {
 }
 .j14-header__logo {
   text-decoration: none;
-  color: inherit;
   flex: 0 0 auto;
 }
 .j14-header__logo-img {
@@ -281,36 +258,17 @@ fieldset {
   font-size: 1.15rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: inherit;
 }
 .j14-header__nav {
-  /* Explicit viewport height: backdrop-filter on .j14-header creates a fixed
-     containing block, so inset/bottom alone collapses to content height. */
-  --j14-nav-top: 56px;
   position: fixed;
-  left: 0;
-  right: 0;
-  top: var(--j14-nav-top);
-  bottom: auto;
-  width: 100%;
-  height: calc(100vh - var(--j14-nav-top));
-  height: calc(100dvh - var(--j14-nav-top));
-  min-height: calc(100vh - var(--j14-nav-top));
-  min-height: calc(100dvh - var(--j14-nav-top));
-  box-sizing: border-box;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  background: var(--j14-menu-bg);
+  inset: 0;
+  top: 56px;
+  background: var(--j14-paper);
   padding: 24px var(--j14-gutter);
   transform: translateY(-8px);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease, background 0.25s ease, backdrop-filter 0.25s ease;
-  color: var(--j14-hdr-text);
-}
-.j14-header--menu-blur .j14-header__nav {
-  backdrop-filter: var(--j14-menu-blur);
-  -webkit-backdrop-filter: var(--j14-menu-blur);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 .j14-header.is-open .j14-header__nav {
   opacity: 1;
@@ -328,14 +286,12 @@ fieldset {
   font-size: 1.6rem;
   text-transform: var(--j14-heading-transform);
   text-decoration: none;
-  color: inherit;
-  border-bottom: 1px solid rgba(var(--j14-hdr-text-rgb), 0.1);
+  border-bottom: 1px solid rgba(var(--j14-ink-rgb), 0.1);
 }
 .j14-header__actions {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: inherit;
 }
 .j14-header__cart {
   position: relative;
@@ -345,7 +301,6 @@ fieldset {
   width: 44px;
   height: 44px;
   text-decoration: none;
-  color: inherit;
 }
 .j14-header__cart-count {
   position: absolute;
@@ -364,41 +319,28 @@ fieldset {
   font-weight: 700;
 }
 .j14-header__toggle {
-  position: relative;
   display: inline-flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
+  gap: 6px;
   width: 44px;
   height: 44px;
-  padding: 0;
+  padding: 10px;
   background: none;
   border: 0;
-  color: inherit;
 }
 .j14-header__toggle-bar {
-  /* Center both bars, then offset — avoids :last-child matching the
-     visually-hidden label span that follows the two bars. */
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  top: 50%;
+  display: block;
   height: 2px;
-  margin-top: -1px;
+  width: 100%;
   background: currentColor;
   transition: transform 0.2s ease;
-  transform-origin: center;
 }
-.j14-header__toggle-bar:nth-child(1) {
-  transform: translateY(-4px);
+.j14-header.is-open .j14-header__toggle-bar:first-child {
+  transform: translateY(4px) rotate(45deg);
 }
-.j14-header__toggle-bar:nth-child(2) {
-  transform: translateY(4px);
-}
-.j14-header.is-open .j14-header__toggle-bar:nth-child(1) {
-  transform: rotate(45deg);
-}
-.j14-header.is-open .j14-header__toggle-bar:nth-child(2) {
-  transform: rotate(-45deg);
+.j14-header.is-open .j14-header__toggle-bar:last-child {
+  transform: translateY(-4px) rotate(-45deg);
 }
 .j14-menu-open {
   overflow: hidden;
@@ -407,17 +349,7 @@ fieldset {
 @media (min-width: 750px) {
   .j14-header__nav {
     position: static;
-    left: auto;
-    right: auto;
-    top: auto;
-    bottom: auto;
-    width: auto;
-    height: auto;
-    min-height: 0;
-    overflow: visible;
     background: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
     padding: 0;
     opacity: 1;
     transform: none;
@@ -445,34 +377,35 @@ fieldset {
 }
 
 /* =============================================================
-   Intro (FIZZ mask fly-through — load-only, scale from I stem)
-   Hero is full-bleed; paper mask with letter cutouts scales away on load.
+   Intro (FIZZ uppercase I mask — GSAP clip-path expand)
+   Media is always full-bleed + object-fit: cover; clip reveals it.
    ============================================================= */
 .j14-intro__track {
-  position: relative;
-  min-height: 100vh;
-  min-height: 100svh;
+  height: var(--j14-intro-len, 280vh);
 }
 .j14-intro__sticky {
-  position: relative;
-  min-height: 100vh;
-  min-height: 100svh;
+  position: sticky;
+  top: 0;
   height: 100vh;
   height: 100svh;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--j14-intro-mask-fill, var(--j14-paper));
+  background: var(--j14-paper);
 }
 
-/* Full-viewport media stage behind the mask */
+/* Full-viewport media stage (clipped to uppercase I stem by JS) */
 .j14-intro__stage {
   position: absolute;
   inset: 0;
   z-index: 1;
   overflow: hidden;
   background: var(--j14-surface);
+  will-change: clip-path;
+  /* Approx uppercase I stem until GSAP measures the gap and takes over */
+  clip-path: inset(22% 46.5% 22% 46.5%);
+  -webkit-clip-path: inset(22% 46.5% 22% 46.5%);
 }
 .j14-intro__slides {
   position: absolute;
@@ -494,55 +427,34 @@ fieldset {
   object-position: center center;
 }
 
-/* Paper mask overlay — opaque fill + transparent letter cutouts via SVG alpha */
-.j14-intro__mask {
-  position: absolute;
-  inset: 0;
+.j14-intro__word {
+  --j14-intro-type: clamp(4.4rem, 18vw, 14rem);
+  --j14-intro-i-width: clamp(28px, 7.5vw, 78px);
+  position: relative;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2px, 0.45vw, 8px);
+  width: 100%;
   pointer-events: none;
-  transform-origin: 45.24% 49.76%;
+}
+.j14-intro__half {
+  font-family: var(--j14-font-heading);
+  font-weight: var(--j14-font-heading-weight);
+  font-size: var(--j14-intro-type);
+  line-height: 0.85;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
   will-change: transform, opacity;
 }
-/* After fly-through: permanently remove bitmap mask from layout/compositor */
-.j14-intro.is-done .j14-intro__mask {
-  display: none;
-  visibility: hidden;
-  pointer-events: none;
-  will-change: auto;
-}
-.j14-intro__mask-fill {
-  width: 100%;
-  height: 100%;
-  background: var(--j14-intro-mask-fill, var(--j14-paper));
-  -webkit-mask-image: var(--j14-intro-mask);
-  mask-image: var(--j14-intro-mask);
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  /* Alpha channel (not luminance) — opaque SVG pixels show paper; transparent letters reveal hero */
-  -webkit-mask-source-type: alpha;
-  mask-mode: alpha;
-}
-@media (min-width: 750px) {
-  .j14-intro__mask-fill {
-    /* Full-bleed paper on wide viewports — contain left hero visible on the sides */
-    -webkit-mask-size: cover;
-    mask-size: cover;
-  }
-}
-@media (max-width: 749px) {
-  .j14-intro__mask-fill {
-    -webkit-mask-image: var(--j14-intro-mask-mobile);
-    mask-image: var(--j14-intro-mask-mobile);
-    -webkit-mask-size: cover;
-    mask-size: cover;
-  }
-  .j14-intro__mask {
-    transform-origin: 37.59% 49.78%;
-  }
+/* Spacer sized like an uppercase I stem — GSAP reads this box for the start clip */
+.j14-intro__gap {
+  display: block;
+  width: var(--j14-intro-i-width);
+  height: calc(var(--j14-intro-type) * 0.82);
+  flex: 0 0 auto;
 }
 
 /* Hero copy — GSAP fades children; scrim sits above media */
@@ -674,12 +586,25 @@ fieldset {
 }
 
 /* Reduced motion / no JS: full hero + copy visible */
-.j14-no-motion .j14-intro__mask,
-html:not(.j14-js) .j14-intro__mask {
-  display: none;
+.j14-no-motion .j14-intro__track,
+html:not(.j14-js) .j14-intro__track {
+  height: auto;
+}
+.j14-no-motion .j14-intro__sticky,
+html:not(.j14-js) .j14-intro__sticky {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+.j14-no-motion .j14-intro__stage,
+html:not(.j14-js) .j14-intro__stage {
+  clip-path: inset(0) !important;
+  -webkit-clip-path: inset(0) !important;
+}
+.j14-no-motion .j14-intro__word,
+html:not(.j14-js) .j14-intro__word {
   opacity: 0;
   pointer-events: none;
-  visibility: hidden;
 }
 .j14-no-motion .j14-intro__hero-copy,
 html:not(.j14-js) .j14-intro__hero-copy {
@@ -718,6 +643,12 @@ html:not(.j14-js) .j14-intro__hint {
   }
   .j14-intro__hero-sub {
     max-width: 40ch;
+  }
+}
+@media (min-width: 1440px) {
+  .j14-intro__word {
+    --j14-intro-type: clamp(8rem, 12vw, 15rem);
+    --j14-intro-i-width: clamp(48px, 5.5vw, 86px);
   }
 }
 
@@ -1413,15 +1344,9 @@ html:not(.j14-js) .j14-how__step {
   max-width: var(--j14-page-width);
   margin: 0 auto;
 }
-.j14-product {
-  --j14-pdp-media-ratio: 4 / 5;
-}
 .j14-product__layout {
   display: grid;
   gap: 28px;
-}
-.j14-product--layout-stack .j14-product__layout {
-  grid-template-columns: 1fr;
 }
 .j14-product__gallery {
   display: grid;
@@ -1430,18 +1355,10 @@ html:not(.j14-js) .j14-how__step {
 }
 .j14-product__stage {
   position: relative;
-  aspect-ratio: var(--j14-pdp-media-ratio);
-  min-height: 0;
-  height: auto;
+  min-height: min(72vw, 560px);
   background: var(--j14-surface);
   overflow: hidden;
-  touch-action: pan-y;
   transition: background 0.45s ease, color 0.45s ease;
-}
-.j14-product--fit-contain .j14-product__stage {
-  aspect-ratio: auto;
-  min-height: min(72vw, 560px);
-  height: min(72vw, 560px);
 }
 .j14-product__stage--surface {
   background: var(--j14-surface);
@@ -1458,11 +1375,10 @@ html:not(.j14-js) .j14-how__step {
   );
   color: var(--pdp-stage-text);
 }
-.j14-product--fit-contain .j14-product__stage::after {
+.j14-product__stage::after {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 1;
   pointer-events: none;
   background:
     radial-gradient(ellipse 80% 55% at 50% 110%, rgba(0, 0, 0, 0.22), transparent 70%),
@@ -1472,72 +1388,24 @@ html:not(.j14-js) .j14-how__step {
 .j14-product__media-rail {
   position: relative;
   z-index: 1;
-  width: 100%;
-  height: 100%;
   min-height: inherit;
+  height: min(72vw, 560px);
 }
-/* Fade mode — stacked absolute slides */
-.j14-product--gallery-fade .j14-product__media-rail {
-  min-height: inherit;
-  height: 100%;
-}
-.j14-product--gallery-fade .j14-product__media {
+.j14-product__media {
   position: absolute;
   inset: 0;
+  display: grid;
+  place-items: end center;
+  padding: 8% 10% 6%;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease;
 }
-.j14-product--gallery-fade .j14-product__media.is-active {
+.j14-product__media.is-active {
   opacity: 1;
   pointer-events: auto;
-}
-/* Slider mode — horizontal track */
-.j14-product--gallery-slider .j14-product__media-rail {
-  display: flex;
-  height: 100%;
-  will-change: transform;
-}
-.j14-product--gallery-slider .j14-product__media {
-  position: relative;
-  flex: 0 0 100%;
-  width: 100%;
-  height: 100%;
-  opacity: 1;
-  pointer-events: auto;
-}
-.j14-product--fit-contain .j14-product__media {
-  display: grid;
-  place-items: end center;
-  padding: 8% 10% 6%;
-}
-.j14-product--fit-cover .j14-product__media {
-  display: block;
-  position: relative;
-  padding: 0;
-}
-.j14-product--gallery-fade.j14-product--fit-cover .j14-product__media {
-  position: absolute;
 }
 .j14-product__media-el {
-  display: block;
-}
-.j14-product--fit-cover .j14-product__media-el {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  filter: none;
-}
-.j14-product--fit-cover .j14-product__media video.j14-product__media-el,
-.j14-product--fit-cover .j14-product__media iframe.j14-product__media-el {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.j14-product--fit-contain .j14-product__media-el {
   width: auto;
   height: auto;
   max-width: 100%;
@@ -1547,40 +1415,13 @@ html:not(.j14-js) .j14-how__step {
   filter: drop-shadow(0 28px 36px rgba(0, 0, 0, 0.28));
 }
 .j14-product__media-el--contain {
-  object-fit: contain !important;
-  width: auto !important;
-  height: auto !important;
-  max-width: 100%;
-  max-height: 100%;
+  object-fit: contain;
 }
-.j14-product__arrow {
-  position: absolute;
-  top: 50%;
-  z-index: 3;
-  transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
-  color: var(--j14-ink);
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-}
-.j14-product__arrow--prev { left: 10px; }
-.j14-product__arrow--next { right: 10px; }
-.j14-product__arrow:hover { background: #fff; }
 .j14-product__thumbs {
-  display: none;
+  display: flex;
   gap: 8px;
   overflow-x: auto;
   scrollbar-width: none;
-}
-.j14-product--thumbs .j14-product__thumbs {
-  display: flex;
 }
 .j14-product__thumbs::-webkit-scrollbar {
   display: none;
@@ -1593,7 +1434,6 @@ html:not(.j14-js) .j14-how__step {
   background: var(--j14-surface);
   overflow: hidden;
   border-radius: calc(var(--j14-btn-radius) * 0.5);
-  cursor: pointer;
 }
 .j14-product__thumb img {
   width: 100%;
@@ -1602,44 +1442,6 @@ html:not(.j14-js) .j14-how__step {
 }
 .j14-product__thumb.is-active {
   border-color: var(--j14-ink);
-}
-.j14-product__dots {
-  display: none;
-  justify-content: center;
-  gap: 8px;
-  padding: 4px 0;
-}
-.j14-product--gallery-slider .j14-product__dots {
-  display: flex;
-}
-@media (min-width: 750px) {
-  .j14-product--thumbs .j14-product__dots {
-    display: none;
-  }
-}
-@media (max-width: 749px) {
-  .j14-product--thumbs:not(.j14-product--thumbs-mobile) .j14-product__thumbs {
-    display: none;
-  }
-  .j14-product--thumbs-mobile .j14-product__dots {
-    display: none;
-  }
-  .j14-product--thumbs:not(.j14-product--thumbs-mobile).j14-product--gallery-slider .j14-product__dots {
-    display: flex;
-  }
-}
-.j14-product__dot {
-  width: 8px;
-  height: 8px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: rgba(var(--j14-ink-rgb, 17, 18, 20), 0.28);
-  cursor: pointer;
-}
-.j14-product__dot.is-active {
-  background: var(--j14-ink);
-  transform: scale(1.15);
 }
 .j14-product__panel {
   display: grid;
@@ -1841,26 +1643,15 @@ html:not(.j14-js) .j14-how__step {
   .j14-product {
     padding-top: 110px;
   }
-  .j14-product--layout-side .j14-product__layout {
+  .j14-product__layout {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     gap: clamp(28px, 4vw, 72px);
     align-items: start;
   }
-  .j14-product--layout-stack .j14-product__layout {
-    grid-template-columns: 1fr;
-    max-width: 920px;
-  }
-  .j14-product--fit-contain .j14-product__stage,
-  .j14-product--fit-contain .j14-product__media-rail {
+  .j14-product__stage,
+  .j14-product__media-rail {
     min-height: min(70vh, 720px);
     height: min(70vh, 720px);
-    aspect-ratio: auto;
-  }
-  .j14-product--fit-cover .j14-product__stage {
-    aspect-ratio: 4 / 5;
-    min-height: 0;
-    height: auto;
-    max-height: min(78vh, 820px);
   }
   .j14-product__panel {
     position: sticky;
@@ -2080,29 +1871,6 @@ html:not(.j14-js) .j14-how__step {
   margin: 18px auto 10px;
   filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.22));
   transition: transform 0.45s ease;
-}
-.j14-card--fit-cover .j14-card__media {
-  place-items: stretch;
-  min-height: 0;
-}
-.j14-card--fit-cover .j14-card__media:not([style*='auto']) {
-  aspect-ratio: var(--j14-card-ratio, 4 / 5);
-}
-.j14-card--fit-cover .j14-card__wash {
-  opacity: 0.35;
-}
-.j14-card--fit-cover .j14-card__img {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-  margin: 0;
-  object-fit: cover;
-  object-position: center;
-  filter: none;
 }
 .j14-card__img--ph {
   width: 100%;

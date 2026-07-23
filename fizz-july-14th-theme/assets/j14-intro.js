@@ -1,35 +1,33 @@
 /*
-  July 14th intro — GSAP ScrollTrigger.
+  July 14th intro — load-only GSAP timeline (no scroll scrub).
   Hero media stays full-bleed. A paper mask with transparent FIZZ letter
-  cutouts scales from the I stem origin so the visitor flies through.
+  cutouts scales from the I stem, then is permanently removed so the visitor
+  lands on the hero. Interrupt jumps to the completed state.
 */
 (function () {
   'use strict';
 
-  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-
-  gsap.registerPlugin(ScrollTrigger);
+  if (typeof gsap === 'undefined') return;
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var motionOff = document.documentElement.classList.contains('j14-no-motion') || reduced;
   if (reduced) document.documentElement.classList.add('j14-no-motion');
 
   var instances = [];
-
   var MOBILE_MQ = window.matchMedia('(max-width: 749px)');
+  var INTERRUPT_EVENTS = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
 
-  /** Desktop: Fizz_Logo_Intro.svg (3038×1888). Mobile: Fizz_Logo_INTRO_SVG_Mobile.svg (viewBox 1926×4512). */
+  /**
+   * Desktop: Fizz_Logo_Intro.svg (viewBox ≈ 3036×1886, PNG 3038×1888).
+   * Mobile: Fizz_Logo_INTRO_SVG_Mobile.svg (viewBox 1926×3128).
+   */
   function getMaskMetrics() {
     if (MOBILE_MQ.matches) {
-      return { aspect: 1926 / 4512, stem: 74 / 1926, origin: '43.15% 49.90%', cover: true };
+      return { aspect: 1926 / 3128, stem: 135 / 1926, origin: '37.59% 49.78%', cover: true };
     }
     return { aspect: 3038 / 1888, stem: 0.027, origin: '45.24% 49.76%', cover: true };
   }
 
-  /**
-   * Scale needed so the I stem hole covers the viewport width.
-   * Both breakpoints use mask-size: cover for full-bleed paper.
-   */
   function computeFlyThroughScale() {
     var m = getMaskMetrics();
     var w = window.innerWidth;
@@ -42,8 +40,6 @@
 
   function Intro(section) {
     this.section = section;
-    this.track = section.querySelector('[data-j14-intro-track]');
-    this.stage = section.querySelector('[data-j14-intro-stage]');
     this.mask = section.querySelector('[data-j14-intro-mask]');
     this.copy = section.querySelector('[data-j14-intro-copy]');
     this.hint = section.querySelector('[data-j14-intro-hint]');
@@ -55,10 +51,9 @@
     this.active = 0;
     this.timer = null;
     this.tl = null;
-    this.st = null;
-    this.autoScrollTimer = null;
-    this.autoScrollTween = null;
-    this.endScale = computeFlyThroughScale();
+    this.delayTimer = null;
+    this.completed = false;
+    this.onInterrupt = null;
 
     var self = this;
     this.thumbs.forEach(function (thumb) {
@@ -70,25 +65,50 @@
 
     this.restartAutoplay();
 
-    if (motionOff) {
+    var d = section.dataset;
+    var animEnabled = d.autoscrollEnabled !== 'false';
+    var designMode = window.Shopify && window.Shopify.designMode;
+
+    if (motionOff || designMode || !animEnabled) {
       this.showStatic();
       return;
     }
 
-    var selfBuild = this;
     requestAnimationFrame(function () {
-      selfBuild.buildTimeline();
-      ScrollTrigger.refresh();
-      selfBuild.autoScroll();
+      self.playIntro();
     });
   }
 
+  Intro.prototype.tearDownMask = function () {
+    if (!this.mask) return;
+    gsap.set(this.mask, {
+      opacity: 0,
+      scale: 1,
+      visibility: 'hidden',
+      clearProps: 'willChange'
+    });
+    this.mask.style.display = 'none';
+    this.mask.style.willChange = 'auto';
+  };
+
+  Intro.prototype.finish = function () {
+    if (this.completed) return;
+    this.completed = true;
+    this.detachInterrupt();
+    this.tearDownMask();
+    if (this.copy) gsap.set(this.copy, { opacity: 1, pointerEvents: 'auto' });
+    if (this.copyParts.length) gsap.set(this.copyParts, { opacity: 1, y: 0 });
+    if (this.hint) gsap.set(this.hint, { opacity: 0.7 });
+    this.section.classList.add('is-zoomed', 'is-copy-in', 'is-done');
+  };
+
   Intro.prototype.showStatic = function () {
-    if (this.mask) gsap.set(this.mask, { opacity: 0, visibility: 'hidden' });
+    this.tearDownMask();
     if (this.copy) gsap.set(this.copy, { opacity: 1, pointerEvents: 'auto' });
     if (this.copyParts.length) gsap.set(this.copyParts, { opacity: 1, y: 0 });
     if (this.hint) gsap.set(this.hint, { opacity: 0 });
     this.section.classList.add('is-zoomed', 'is-copy-in', 'is-done');
+    this.completed = true;
   };
 
   Intro.prototype.setSlide = function (index) {
@@ -122,167 +142,154 @@
     }, interval * 1000);
   };
 
-  Intro.prototype.buildTimeline = function () {
-    var self = this;
-    if (!this.track || !this.mask) return;
-
-    var maskMetrics = getMaskMetrics();
-    this.endScale = computeFlyThroughScale();
-    gsap.set(this.mask, {
-      scale: 1,
-      opacity: 1,
-      transformOrigin: maskMetrics.origin
-    });
-    if (this.copy) gsap.set(this.copy, { pointerEvents: 'none' });
-    gsap.set(this.copyParts, { opacity: 0, y: 28 });
-    if (this.hint) gsap.set(this.hint, { opacity: 0.7 });
-
-    this.tl = gsap.timeline({
-      defaults: { ease: 'none' },
-      scrollTrigger: {
-        trigger: this.track,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 0.65,
-        invalidateOnRefresh: true,
-        onUpdate: function (selfSt) {
-          var p = selfSt.progress;
-          self.section.classList.toggle('is-zoomed', p > 0.62);
-          self.section.classList.toggle('is-copy-in', p > 0.82);
-          self.section.classList.toggle('is-done', p >= 0.98);
-          if (self.copy) {
-            self.copy.style.pointerEvents = p > 0.82 ? 'auto' : 'none';
-          }
-        },
-        onRefresh: function () {
-          var metrics = getMaskMetrics();
-          self.endScale = computeFlyThroughScale();
-          if (self.tl && self.tl.progress() < 0.05) {
-            gsap.set(self.mask, {
-              scale: 1,
-              opacity: 1,
-              transformOrigin: metrics.origin
-            });
-          }
-        }
-      }
-    });
-
-    this.st = this.tl.scrollTrigger;
-
-    /* Phase 1 — scale mask from I stem until cutout fills the viewport */
-    this.tl.to(
-      this.mask,
-      {
-        scale: function () {
-          return self.endScale;
-        },
-        ease: 'power2.inOut',
-        duration: 0.72
-      },
-      0
-    );
-
-    this.tl.to(this.mask, { opacity: 0, duration: 0.12 }, 0.68);
-
-    if (this.hint) {
-      this.tl.to(this.hint, { opacity: 0, duration: 0.08 }, 0);
-    }
-
-    /* Phase 2 — hero copy fade in */
-    if (this.copyParts.length) {
-      this.tl.to(
-        this.copyParts,
-        {
-          opacity: 1,
-          y: 0,
-          stagger: 0.08,
-          ease: 'power2.out',
-          duration: 0.28
-        },
-        0.72
-      );
-    }
+  Intro.prototype.detachInterrupt = function () {
+    if (!this.onInterrupt) return;
+    INTERRUPT_EVENTS.forEach(function (evt) {
+      window.removeEventListener(evt, this.onInterrupt);
+    }, this);
+    this.onInterrupt = null;
   };
 
-  Intro.prototype.destroy = function () {
-    if (this.timer) clearInterval(this.timer);
-    if (this.autoScrollTimer) clearTimeout(this.autoScrollTimer);
-    if (this.autoScrollTween) this.autoScrollTween.kill();
-    if (this.tl) this.tl.kill();
-    if (this.st) this.st.kill();
+  Intro.prototype.attachInterrupt = function () {
+    var self = this;
+    this.onInterrupt = function () {
+      self.skipToEnd();
+    };
+    INTERRUPT_EVENTS.forEach(function (evt) {
+      window.addEventListener(evt, self.onInterrupt, { passive: true });
+    });
   };
 
-  /**
-   * On load, tween window scroll through the intro ScrollTrigger so the
-   * visitor lands on hero copy without manually scrolling. Any user input cancels.
-   */
-  Intro.prototype.autoScroll = function () {
+  Intro.prototype.skipToEnd = function () {
+    if (this.completed) return;
+    if (this.delayTimer) {
+      clearTimeout(this.delayTimer);
+      this.delayTimer = null;
+    }
+    if (this.tl) {
+      this.tl.progress(1);
+      this.tl.kill();
+      this.tl = null;
+    }
+    this.finish();
+  };
+
+  Intro.prototype.playIntro = function () {
     var self = this;
+    if (!this.mask) {
+      this.showStatic();
+      return;
+    }
+
     var d = this.section.dataset;
-    if (motionOff || d.autoscrollEnabled !== 'true') return;
-    if (window.Shopify && window.Shopify.designMode) return;
-    if (window.scrollY > 4 || !this.st) return;
-
     var delay = (parseFloat(d.autoscrollDelay) || 0) * 1000;
     var duration = parseFloat(d.autoscrollDuration) || 2.2;
     var ease = d.autoscrollEase || 'power2.inOut';
-    var target = (parseFloat(d.autoscrollTarget) || 88) / 100;
-    var proxy = { y: window.scrollY };
-    var cancelled = false;
-    var events = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
+    if (ease === 'none') ease = 'none';
 
-    function detach() {
-      events.forEach(function (evt) {
-        window.removeEventListener(evt, cancel);
-      });
-    }
+    var metrics = getMaskMetrics();
+    this.endScale = computeFlyThroughScale();
 
-    function cancel() {
-      if (cancelled) return;
-      cancelled = true;
-      if (self.autoScrollTimer) {
-        clearTimeout(self.autoScrollTimer);
-        self.autoScrollTimer = null;
-      }
-      if (self.autoScrollTween) {
-        self.autoScrollTween.kill();
-        self.autoScrollTween = null;
-      }
-      detach();
-    }
-
-    events.forEach(function (evt) {
-      window.addEventListener(evt, cancel, { passive: true });
+    gsap.set(this.mask, {
+      scale: 1,
+      opacity: 1,
+      visibility: 'visible',
+      display: 'block',
+      transformOrigin: metrics.origin,
+      willChange: 'transform, opacity'
     });
+    if (this.copy) gsap.set(this.copy, { pointerEvents: 'none', opacity: 0 });
+    gsap.set(this.copyParts, { opacity: 0, y: 28 });
+    if (this.hint) gsap.set(this.hint, { opacity: 0.7 });
 
-    this.autoScrollTimer = setTimeout(function () {
-      self.autoScrollTimer = null;
-      if (cancelled || !self.st) {
-        detach();
-        return;
-      }
-      var targetY = self.st.start + (self.st.end - self.st.start) * target;
-      self.autoScrollTween = gsap.to(proxy, {
-        y: targetY,
-        duration: duration,
-        ease: ease,
-        onUpdate: function () {
-          if (!cancelled) window.scrollTo(0, proxy.y);
-        },
+    this.attachInterrupt();
+
+    this.delayTimer = setTimeout(function () {
+      self.delayTimer = null;
+      if (self.completed) return;
+
+      self.endScale = computeFlyThroughScale();
+      var fly = duration * 0.72;
+      var fadeStart = duration * 0.55;
+      var fadeDur = duration * 0.22;
+      var copyStart = duration * 0.7;
+      var copyDur = duration * 0.3;
+
+      self.tl = gsap.timeline({
         onComplete: function () {
-          self.autoScrollTween = null;
-          detach();
+          self.tl = null;
+          self.finish();
         }
       });
+
+      self.tl.to(
+        self.mask,
+        {
+          scale: self.endScale,
+          ease: ease,
+          duration: fly,
+          onUpdate: function () {
+            var p = self.tl ? self.tl.progress() : 1;
+            self.section.classList.toggle('is-zoomed', p > 0.55);
+            self.section.classList.toggle('is-copy-in', p > 0.75);
+          }
+        },
+        0
+      );
+
+      self.tl.to(
+        self.mask,
+        {
+          opacity: 0,
+          duration: fadeDur,
+          ease: 'power1.in',
+          onComplete: function () {
+            self.tearDownMask();
+          }
+        },
+        fadeStart
+      );
+
+      if (self.hint) {
+        self.tl.to(self.hint, { opacity: 0, duration: 0.2 }, 0);
+      }
+
+      if (self.copyParts.length) {
+        self.tl.to(
+          self.copyParts,
+          {
+            opacity: 1,
+            y: 0,
+            stagger: Math.min(0.08, copyDur / 4),
+            ease: 'power2.out',
+            duration: copyDur * 0.85
+          },
+          copyStart
+        );
+      }
+
+      if (self.copy) {
+        self.tl.set(self.copy, { opacity: 1, pointerEvents: 'auto' }, copyStart);
+      }
+
+      /* Restore scroll hint after landing on hero */
+      if (self.hint) {
+        self.tl.to(self.hint, { opacity: 0.7, duration: 0.25 }, duration * 0.9);
+      }
     }, delay);
+  };
+
+  Intro.prototype.destroy = function () {
+    this.detachInterrupt();
+    if (this.timer) clearInterval(this.timer);
+    if (this.delayTimer) clearTimeout(this.delayTimer);
+    if (this.tl) this.tl.kill();
   };
 
   function init(scope) {
     scope.querySelectorAll('[data-j14-intro]').forEach(function (el) {
       instances.push(new Intro(el));
     });
-    ScrollTrigger.refresh();
   }
 
   function destroy(scope) {

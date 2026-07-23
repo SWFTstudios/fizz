@@ -1,0 +1,221 @@
+<section class="j14-flavors" id="{{ section.settings.anchor_id | default: 'flavors' }}">
+  <div class="j14-flavors__head">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="j14-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.heading != blank -%}
+      <h2 class="j14-heading j14-flavors__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="j14-flavors__sub">{{ section.settings.subheading | escape }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="j14-flavors__grid">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign flavor_product = block.settings.product
+        assign panel_url = block.settings.link
+        if panel_url == blank and flavor_product != blank
+          assign panel_url = flavor_product.url
+        endif
+        assign panel_title = block.settings.title
+        if panel_title == blank and flavor_product != blank
+          assign panel_title = flavor_product.title
+        endif
+      -%}
+      <article class="j14-flavor" {{ block.shopify_attributes }}>
+        <a class="j14-flavor__media-link" {% if panel_url != blank %}href="{{ panel_url }}"{% endif %}>
+          <div class="j14-flavor__media" style="--flavor-tint: {{ block.settings.tint | default: '#e9e7df' }};">
+            {%- liquid
+              assign panel_image = block.settings.image
+              if panel_image == blank and flavor_product != blank
+                assign panel_image = flavor_product.featured_media
+              endif
+            -%}
+            {%- render 'july14-media',
+              video: block.settings.video,
+              image: panel_image,
+              asset: block.settings.asset,
+              alt: panel_title,
+              class: 'j14-flavor__img',
+              sizes: '(min-width: 750px) 33vw, 84vw'
+            -%}
+          </div>
+        </a>
+        <div class="j14-flavor__info">
+          <h3 class="j14-flavor__title">{{ panel_title | default: 'Flavor pack' | escape }}</h3>
+          {%- if block.settings.body != blank -%}
+            <div class="j14-flavor__body">{{ block.settings.body }}</div>
+          {%- endif -%}
+          <p class="j14-flavor__price">
+            {%- if flavor_product != blank -%}
+              {{ flavor_product.price | money }}
+            {%- endif -%}
+          </p>
+          <div class="j14-flavor__actions">
+            {%- if panel_url != blank -%}
+              <a class="j14-btn" href="{{ panel_url }}">{{ block.settings.cta_label | default: 'Explore' | escape }}</a>
+            {%- endif -%}
+            {%- liquid
+              assign pair_href = block.settings.pair_url
+              if pair_href == blank and settings.fizz_claude_bottle_product != blank
+                assign pair_href = settings.fizz_claude_bottle_product.url
+              endif
+            -%}
+            {%- if pair_href != blank -%}
+              <a
+                class="j14-btn j14-btn--ghost"
+                href="{{ pair_href }}"
+              >
+                {{- block.settings.pair_label | default: 'Pair with a bottle' | escape -}}
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+      </article>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "July14 Flavors",
+  "tag": "section",
+  "class": "j14-flavors-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Flavors"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Three packs. Zero sugar."
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Real fruit flavor drops made for sparkling water."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "flavors"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "flavor",
+      "name": "Flavor pack",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product",
+          "info": "Provides the default title, image, price and link."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title override"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Description"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image override"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Overrides the image. Autoplays muted."
+        },
+        {
+          "type": "text",
+          "id": "asset",
+          "label": "Theme asset fallback",
+          "info": "Advanced: filename of a theme asset."
+        },
+        {
+          "type": "color",
+          "id": "tint",
+          "label": "Panel tint",
+          "default": "#e9e7df"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link override"
+        },
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "Button label",
+          "default": "Explore"
+        },
+        {
+          "type": "text",
+          "id": "pair_label",
+          "label": "Pairing button label",
+          "default": "Pair with a bottle"
+        },
+        {
+          "type": "url",
+          "id": "pair_url",
+          "label": "Pairing link",
+          "info": "Defaults to the theme's default bottle product."
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "July14 Flavors",
+      "blocks": [
+        {
+          "type": "flavor",
+          "settings": {
+            "title": "Zesty Lime",
+            "body": "<p>Bright, sharp, and cold-pressed.</p>",
+            "asset": "stitch-flavor-zesty-lime.jpg",
+            "tint": "#dce8c8"
+          }
+        },
+        {
+          "type": "flavor",
+          "settings": {
+            "title": "Orange Tangerine",
+            "body": "<p>Sunny citrus with a soft finish.</p>",
+            "asset": "stitch-flavor-orange-tangerine.jpg",
+            "tint": "#f4ddc4"
+          }
+        },
+        {
+          "type": "flavor",
+          "settings": {
+            "title": "Blood Orange",
+            "body": "<p>Deep citrus with a berry edge.</p>",
+            "asset": "stitch-flavor-blood-orange.jpg",
+            "tint": "#f0cfc4"
+          }
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index", "page", "collection", "product"]
+  }
+}
+{% endschema %}

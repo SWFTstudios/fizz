@@ -19,8 +19,8 @@ is a different design system.
 ## What you get
 
 1. **Intro mask fly-through** — paper-colored SVG alpha mask with transparent
-   FIZZ letter cutouts; scroll scales through the **I** stem into a full-bleed
-   hero slider (desktop + mobile masks).
+   FIZZ letter cutouts; on page load the mask scales through the **I** stem into
+   a full-bleed hero slider (desktop + mobile masks), then is removed.
 2. **Homepage story** — mosaic gallery, colorways carousel, sticky how-to,
    flavors, about, sustainability, footer.
 3. **Commerce** — product gallery (slider/fade), colorway swatches, related
@@ -113,7 +113,7 @@ Platform research (Shopify limits and sources):
 
 | Script | Role |
 | --- | --- |
-| `gsap.min.js` + `ScrollTrigger.min.js` | Intro scrub timeline |
+| `gsap.min.js` + `ScrollTrigger.min.js` | Intro load timeline (GSAP); ScrollTrigger reserved for other sections |
 | `j14-intro.js` | Mask scale / fade, auto-scroll, slide carousel |
 | `j14-scroll.js` | Mosaic + how-to rAF / IntersectionObserver |
 | `j14-carousel.js` | Colorways scroll-snap rail |

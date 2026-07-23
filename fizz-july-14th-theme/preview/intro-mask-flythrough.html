@@ -3,12 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FIZZ intro mask fly-through — isolated preview</title>
+  <title>FIZZ intro mask fly-through — load-only preview</title>
   <style>
     :root {
       --j14-paper: #e8edf5;
       --j14-ink: #0f1a2e;
-      --j14-intro-len: 280vh;
       --mask-origin-x: 45.24%;
       --mask-origin-y: 49.76%;
       --j14-intro-mask: url('../assets/Fizz_Logo_Intro.svg');
@@ -23,10 +22,15 @@
     }
     .preview-banner strong { font-size: 13px; }
     .preview-banner span { opacity: 0.75; }
-    .j14-intro__track { height: var(--j14-intro-len); }
+    .j14-intro__track {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100svh;
+    }
     .j14-intro__sticky {
-      position: sticky; top: 0; height: 100vh; height: 100svh;
-      overflow: hidden; background: var(--j14-paper);
+      position: relative;
+      height: 100vh; height: 100svh;
+      overflow: hidden; background: var(--j14-intro-mask-fill, var(--j14-paper));
     }
     .j14-intro__stage { position: absolute; inset: 0; z-index: 1; overflow: hidden; background: #0a1220; }
     .j14-intro__media { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
@@ -35,11 +39,17 @@
       transform-origin: var(--mask-origin-x) var(--mask-origin-y);
       will-change: transform, opacity;
     }
+    .j14-intro.is-done .j14-intro__mask {
+      display: none;
+      visibility: hidden;
+      pointer-events: none;
+      will-change: auto;
+    }
     .j14-intro__mask-fill {
-      width: 100%; height: 100%; background: var(--j14-paper);
+      width: 100%; height: 100%; background: var(--j14-intro-mask-fill, var(--j14-paper));
       -webkit-mask-image: var(--j14-intro-mask);
       mask-image: var(--j14-intro-mask);
-      -webkit-mask-size: contain; mask-size: contain;
+      -webkit-mask-size: cover; mask-size: cover;
       -webkit-mask-position: center; mask-position: center;
       -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
       -webkit-mask-source-type: alpha;
@@ -50,23 +60,20 @@
       display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
       padding: clamp(24px, 6vw, 64px); text-align: center; pointer-events: none;
       background: linear-gradient(to top, rgba(10, 18, 32, 0.55) 0%, transparent 55%);
+      opacity: 0;
     }
+    .j14-intro.is-zoomed .j14-intro__hero-copy { opacity: 1; }
+    .j14-intro.is-copy-in .j14-intro__hero-copy { pointer-events: auto; }
     .j14-intro__hero-eyebrow, .j14-intro__hero-heading, .j14-intro__hero-sub {
       opacity: 0; transform: translateY(28px); color: #fff; max-width: 28rem;
     }
     .j14-intro__hero-eyebrow { font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; margin: 0 0 12px; }
     .j14-intro__hero-heading { font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 700; line-height: 1.05; margin: 0 0 16px; }
     .j14-intro__hero-sub { font-size: clamp(1rem, 2.5vw, 1.25rem); margin: 0; }
-    .j14-intro.is-copy-in .j14-intro__hero-eyebrow,
-    .j14-intro.is-copy-in .j14-intro__hero-heading,
-    .j14-intro.is-copy-in .j14-intro__hero-sub {
-      opacity: 1; transform: translateY(0);
-      transition: opacity 0.5s ease, transform 0.5s ease;
-    }
     .j14-intro__hint {
       position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
       z-index: 5; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--j14-ink); opacity: 0.7;
+      color: #fff; opacity: 0.7;
     }
     .after-section { min-height: 50vh; padding: 48px 24px; text-align: center; background: var(--j14-paper); }
     .origin-marker {
@@ -80,13 +87,13 @@
 <body>
   <div class="preview-banner">
     <div>
-      <strong>Isolated preview</strong> — mask fly-through (not the live theme)<br>
-      <span>Scroll or wait for auto-scroll · wheel/touch cancels · press D for I-origin dot</span>
+      <strong>Isolated preview</strong> — load-only mask fly-through<br>
+      <span>Auto-plays on load · wheel/touch/click skips to hero · press D for I-origin dot</span>
     </div>
-    <span id="progress">0%</span>
+    <span id="progress">idle</span>
   </div>
   <section class="j14-intro" data-j14-intro>
-    <div class="j14-intro__track" data-j14-intro-track>
+    <div class="j14-intro__track">
       <div class="j14-intro__sticky">
         <div class="j14-intro__stage">
           <img class="j14-intro__media" src="../assets/bottle-lifestyle-group-sky-hero.jpg" alt="" width="1920" height="1080">
@@ -95,7 +102,7 @@
           <div class="j14-intro__mask-fill"></div>
         </div>
         <div class="origin-marker" title="I stem transform-origin"></div>
-        <div class="j14-intro__hero-copy">
+        <div class="j14-intro__hero-copy" data-j14-intro-copy>
           <p class="j14-intro__hero-eyebrow">Hydration, elevated</p>
           <h2 class="j14-intro__hero-heading">Meet FIZZ</h2>
           <p class="j14-intro__hero-sub">Six colorways. Three flavors. One bottle you'll actually carry.</p>
@@ -104,65 +111,90 @@
       </div>
     </div>
   </section>
-  <div class="after-section"><p>End of intro track — main page content would continue here.</p></div>
+  <div class="after-section"><p>Hero complete — page content continues here (normal scroll).</p></div>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script>
     (function () {
-      gsap.registerPlugin(ScrollTrigger);
       var section = document.querySelector('[data-j14-intro]');
-      var track = document.querySelector('[data-j14-intro-track]');
       var mask = document.querySelector('[data-j14-intro-mask]');
+      var copy = document.querySelector('[data-j14-intro-copy]');
       var hint = document.querySelector('[data-j14-intro-hint]');
       var copyParts = section.querySelectorAll('.j14-intro__hero-eyebrow, .j14-intro__hero-heading, .j14-intro__hero-sub');
       var progressEl = document.getElementById('progress');
       var MASK_ASPECT = 3038 / 1888, STEM_RATIO = 0.027, ORIGIN = '45.24% 49.76%';
+      var DELAY = 400, DURATION = 2.2, EASE = 'power2.inOut';
+      var completed = false, tl = null, delayTimer = null;
+      var events = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
+
       function computeFlyThroughScale() {
         var w = window.innerWidth, h = window.innerHeight;
-        var logoW = Math.min(w, h * MASK_ASPECT);
+        var logoW = Math.max(w, h * MASK_ASPECT);
         return (w / (logoW * STEM_RATIO)) * 1.08;
       }
-      gsap.set(mask, { scale: 1, opacity: 1, transformOrigin: ORIGIN });
+
+      function tearDownMask() {
+        gsap.set(mask, { opacity: 0, scale: 1, visibility: 'hidden', clearProps: 'willChange' });
+        mask.style.display = 'none';
+        mask.style.willChange = 'auto';
+      }
+
+      function finish() {
+        if (completed) return;
+        completed = true;
+        events.forEach(function (e) { window.removeEventListener(e, skipToEnd); });
+        tearDownMask();
+        gsap.set(copy, { opacity: 1, pointerEvents: 'auto' });
+        gsap.set(copyParts, { opacity: 1, y: 0 });
+        if (hint) gsap.set(hint, { opacity: 0.7 });
+        section.classList.add('is-zoomed', 'is-copy-in', 'is-done');
+        progressEl.textContent = 'done';
+      }
+
+      function skipToEnd() {
+        if (completed) return;
+        if (delayTimer) { clearTimeout(delayTimer); delayTimer = null; }
+        if (tl) { tl.progress(1); tl.kill(); tl = null; }
+        finish();
+      }
+
+      events.forEach(function (e) { window.addEventListener(e, skipToEnd, { passive: true }); });
+
+      gsap.set(mask, { scale: 1, opacity: 1, transformOrigin: ORIGIN, willChange: 'transform, opacity' });
+      gsap.set(copy, { opacity: 0, pointerEvents: 'none' });
       gsap.set(copyParts, { opacity: 0, y: 28 });
       if (hint) gsap.set(hint, { opacity: 0.7 });
-      var endScale = computeFlyThroughScale();
-      var tl = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-          trigger: track, start: 'top top', end: 'bottom bottom', scrub: 0.65, invalidateOnRefresh: true,
-          onUpdate: function (st) {
-            progressEl.textContent = Math.round(st.progress * 100) + '%';
-            section.classList.toggle('is-zoomed', st.progress > 0.62);
-            section.classList.toggle('is-copy-in', st.progress > 0.82);
-          },
-          onRefresh: function () {
-            endScale = computeFlyThroughScale();
-            if (tl.progress() < 0.05) gsap.set(mask, { scale: 1, transformOrigin: ORIGIN });
+
+      delayTimer = setTimeout(function () {
+        delayTimer = null;
+        var endScale = computeFlyThroughScale();
+        var fly = DURATION * 0.72;
+        var fadeStart = DURATION * 0.55;
+        var fadeDur = DURATION * 0.22;
+        var copyStart = DURATION * 0.7;
+        var copyDur = DURATION * 0.3;
+
+        tl = gsap.timeline({
+          onComplete: function () { tl = null; finish(); },
+          onUpdate: function () {
+            var p = tl ? tl.progress() : 1;
+            progressEl.textContent = Math.round(p * 100) + '%';
+            section.classList.toggle('is-zoomed', p > 0.55);
+            section.classList.toggle('is-copy-in', p > 0.75);
           }
-        }
-      });
-      var st = tl.scrollTrigger;
-      tl.to(mask, { scale: function () { return endScale; }, ease: 'power2.inOut', duration: 0.72 }, 0);
-      tl.to(mask, { opacity: 0, duration: 0.12 }, 0.68);
-      if (hint) tl.to(hint, { opacity: 0, duration: 0.08 }, 0);
-      tl.to(copyParts, { opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out', duration: 0.28 }, 0.72);
-      var cancelled = false, events = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
-      function cancelAuto() {
-        if (cancelled) return; cancelled = true;
-        if (autoTween) autoTween.kill(); if (autoTimer) clearTimeout(autoTimer);
-        events.forEach(function (e) { window.removeEventListener(e, cancelAuto); });
-      }
-      events.forEach(function (e) { window.addEventListener(e, cancelAuto, { passive: true }); });
-      var autoTween, autoTimer;
-      autoTimer = setTimeout(function () {
-        if (cancelled || window.scrollY > 4) return;
-        var proxy = { y: 0 }, targetY = st.start + (st.end - st.start) * 0.88;
-        autoTween = gsap.to(proxy, {
-          y: targetY, duration: 2.2, ease: 'power2.inOut',
-          onUpdate: function () { if (!cancelled) window.scrollTo(0, proxy.y); },
-          onComplete: cancelAuto
         });
-      }, 600);
+        tl.to(mask, { scale: endScale, ease: EASE, duration: fly }, 0);
+        tl.to(mask, {
+          opacity: 0, duration: fadeDur, ease: 'power1.in',
+          onComplete: tearDownMask
+        }, fadeStart);
+        if (hint) tl.to(hint, { opacity: 0, duration: 0.2 }, 0);
+        tl.to(copyParts, {
+          opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out', duration: copyDur * 0.85
+        }, copyStart);
+        tl.set(copy, { opacity: 1, pointerEvents: 'auto' }, copyStart);
+        if (hint) tl.to(hint, { opacity: 0.7, duration: 0.25 }, DURATION * 0.9);
+      }, DELAY);
+
       window.addEventListener('keydown', function (e) {
         if (e.key === 'd' || e.key === 'D') section.classList.toggle('show-debug');
       });

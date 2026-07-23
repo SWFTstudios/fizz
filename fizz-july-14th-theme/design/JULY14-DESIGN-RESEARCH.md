@@ -111,31 +111,31 @@ save / style switch.
 - Colorway slug/scene logic was adapted (copied and renamed with the `j14-`
   prefix) from earlier Fizz Claude snippets into this package.
 
-## 6. Intro mask fly-through (GSAP + CSS mask)
+## 6. Intro mask fly-through (load-only GSAP)
 
-Later iterations replaced the original “vanilla only / no GSAP” intro with a
-GSAP ScrollTrigger scrub. Current architecture (storefront runtime):
+Later iterations replaced scroll-scrubbed intro with a **one-shot page-load**
+GSAP timeline. Current architecture (storefront runtime):
 
-1. Full-bleed hero media stage (no `clip-path`).
-2. Paper fill layer using `background: var(--j14-paper)`.
+1. Full-bleed hero media stage in a normal `100svh` section (no multi-vh sticky track).
+2. Paper fill layer using `background: var(--j14-intro-mask-fill, var(--j14-paper))`
+   (optional section `mask_color` overrides Theme style paper for the cutout only).
 3. CSS `mask-image` pointing at `Fizz_Logo_Intro.svg` (desktop) or
    `Fizz_Logo_INTRO_SVG_Mobile.svg` (max-width 749px).
-4. `mask-mode: alpha` so transparent letter cutouts reveal the hero even when
-   the embedded PNG’s opaque pixels are near-black (luminance masking would
-   invert the intended look).
-5. Desktop `mask-size: cover` for full viewport paper; mobile also covers.
-6. JS scales the mask from a measured I-stem `transform-origin` until the
-   stem hole fills the viewport, then fades the mask and fades in hero copy.
-7. Optional auto-scroll tweens `window.scrollY` through the ScrollTrigger
-   range; cancelled on user input; disabled in the theme editor and for
-   reduced motion.
+4. `mask-mode: alpha` so transparent letter cutouts reveal the hero.
+5. On load, GSAP scales the mask from a measured I-stem `transform-origin`,
+   fades it, then permanently tears it down (`display: none`, scale reset).
+6. Hero copy fades in; visitor is already on the hero — normal page scroll follows.
+7. User interrupt jumps to the completed state. Theme editor and reduced motion
+   show the static completed hero (no animation).
 
-Hardcoded stem metrics (Liquid cannot measure SVG holes at runtime) live in
-`assets/j14-intro.js` and matching CSS origins. Replacing a mask asset
-requires re-measurement — see `docs/05-intro-flythrough.md`.
+Hardcoded stem metrics live in `assets/j14-intro.js` and matching CSS origins.
+Mobile uses viewBox `1926×3128`. See `docs/05-intro-flythrough.md`.
 
 Isolated lab (not deployed; listed in `.shopifyignore`):
 `preview/intro-mask-flythrough.html`.
+
+Section `color` settings for `mask_color` follow standard Online Store 2.0
+section schema: https://shopify.dev/docs/storefronts/themes/architecture/settings/input-settings#color
 
 ### CLI tooling notes (verified against shopify.dev)
 
@@ -154,7 +154,8 @@ for this store uses Theme Check + isolated preview + explicit
 
 | Limitation | Source | Mitigation |
 | --- | --- | --- |
-| CSS mask RGB ≠ brand paper | Asset export | Paper from `--j14-paper`; alpha mask only |
+| CSS mask RGB ≠ brand paper | Asset export | Paper from `--j14-intro-mask-fill` / `--j14-paper`; alpha mask only |
+| Bitmap mask pixelates at extreme CSS scale | PNG-in-SVG + ~40× transform | Load-only timeline + permanent `display: none` teardown after fade |
 | Mask origin not measurable in Liquid | Liquid runtime | Hardcoded % after offline analysis |
 | Case-sensitive asset URLs | Shopify CDN | Canonical filenames; avoid macOS case collisions |
 | Max 5 Theme styles | settings_data | Five presets shipped; no sixth |

@@ -1,6 +1,6 @@
 /*
   July 14th theme — mosaic + sticky how scroll engine.
-  Intro fly-through is handled by j14-intro.js (load-only GSAP, no scrub).
+  Intro expand is handled by j14-intro.js (GSAP ScrollTrigger).
 */
 (function () {
   'use strict';
