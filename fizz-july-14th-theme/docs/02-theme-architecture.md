@@ -11,7 +11,7 @@ fizz-july-14th-theme/
 ├── config/          # settings_schema.json + settings_data.json
 ├── layout/          # theme.liquid, password.liquid
 ├── locales/         # en.default.json
-├── sections/        # j14-* merchant sections + header-group.json
+├── sections/        # j14-* merchant sections + header-group.json + footer-group.json
 ├── snippets/        # media, tokens, colorway helpers, cards
 ├── templates/       # JSON templates (index, product, …)
 ├── docs/            # This book (not deployed — see .shopifyignore)
@@ -74,7 +74,8 @@ flowchart TB
 2. `j14-theme-tokens` snippet (CSS custom properties)
 3. Header group sections
 4. `{{ content_for_layout }}`
-5. Deferred scripts: GSAP → ScrollTrigger → intro → scroll → carousel →
+5. Footer group sections (`footer-group.json` → `j14-footer`)
+6. Deferred scripts: GSAP → ScrollTrigger → intro → scroll → carousel →
    page transitions
 
 `class="j14-no-motion"` is applied when Theme settings disable motion or when

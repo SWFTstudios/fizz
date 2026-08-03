@@ -42,15 +42,7 @@
         "empty_text": "No products in this collection yet.",
         "padding_y": 48
       }
-    },
-    "footer": {
-      "type": "j14-footer",
-      "settings": {
-        "headline": "Sparkling water, anywhere.",
-        "cta_label": "Shop bottles",
-        "show_newsletter": false
-      }
     }
   },
-  "order": ["main", "footer"]
+  "order": ["main"]
 }
