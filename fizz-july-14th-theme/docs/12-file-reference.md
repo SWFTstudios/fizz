@@ -13,6 +13,7 @@
 | `assets/j14-intro.js` | Intro mask + auto-scroll |
 | `assets/j14-scroll.js` | Mosaic / how-to |
 | `assets/j14-carousel.js` | Colorways rail |
+| `assets/j14-stats.js` | Stats count-up |
 | `assets/j14-page-transition.js` | Page transitions |
 | `assets/j14-transition.js` | Transition helpers / colors |
 | `assets/gsap.min.js` | GSAP core |
@@ -29,7 +30,9 @@
 | `j14-flavors.liquid` | Home |
 | `j14-about.liquid` | Home |
 | `j14-sustainability.liquid` | Home |
-| `j14-footer.liquid` | Many |
+| `j14-stats.liquid` | Home (+ any template) |
+| `j14-footer.liquid` | Footer group |
+| `j14-footer-2.liquid` | Footer group (glassmorphic) |
 | `j14-header.liquid` | Header group |
 | `j14-product.liquid` | Product |
 | `j14-related.liquid` | Product |
@@ -41,6 +44,7 @@
 | `j14-404.liquid` | 404 |
 | `j14-password.liquid` | Password |
 | `header-group.json` | Header section group |
+| `footer-group.json` | Footer section group |
 
 ## Snippets
 

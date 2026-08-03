@@ -150,6 +150,41 @@ lacks `read_themes` / development-theme creation scopes. Production workflow
 for this store uses Theme Check + isolated preview + explicit
 `theme push --theme 188630794525 --allow-live`.
 
+## 7. Glassmorphic footer (media background + frosted card)
+
+Verified against input settings and section groups before building
+`sections/j14-footer.liquid` as a global footer-group section:
+
+- `video` (Shopify Files MP4 picker): https://shopify.dev/docs/storefronts/themes/architecture/settings/input-settings#video — **no `default`**; returns a video object for `video_tag`
+- `image_picker`: same docs page — Files + upload; focal point supported; no `default`
+- `link_list`: same docs — native menu picker for footer nav columns
+- Section groups (`type: "footer"`): https://shopify.dev/docs/storefronts/themes/architecture/section-groups — rendered from layout via `{% sections 'footer-group' %}` so one footer applies across templates (mirrors `header-group`)
+
+**Storefront vs editor**
+
+- Background layer is absolute cover media (`object-fit: cover`, centered). Glass card sits above with merchant-controlled `backdrop-filter` blur, tint alpha, and text color.
+- Theme editor re-renders Liquid on setting change; no scroll-driven JS required for the footer.
+
+**Architecture choice**
+
+- Footer lives in `sections/footer-group.json` + `layout/theme.liquid`, not duplicated in each JSON template.
+- Content priority for background: Shopify `video` → `image` → theme `asset` filename → placeholder (via `snippets/j14-media.liquid`). **No `video_url`** for this layer.
+
+## 8. Glassmorphic stats section (reusable page section)
+
+`sections/j14-stats.liquid` reuses the same cover-media + frosted-glass pattern as
+Footer 2, but as an addable page section (`enabled_on: templates *`).
+
+- Block-driven CSS grid: merchant sets columns at desktop / tablet / mobile;
+  blocks fill cells; rows auto-flow (`max_blocks` 12).
+- Count-up numbers are **client-only** (`assets/j14-stats.js` + IntersectionObserver).
+  Liquid prints the final value for no-JS; JS resets to 0 then animates when motion
+  is allowed.
+- Body copy is `richtext` so merchants can bold key phrases. Number + suffix are
+  separate fields so the unit stays static while the numeral animates.
+- Same media limitations as §7 (no YouTube/Vimeo cover bg; muted autoplay; solid
+  tint fallback under `backdrop-filter`).
+
 ## Limitations (additions)
 
 | Limitation | Source | Mitigation |
@@ -159,3 +194,9 @@ for this store uses Theme Check + isolated preview + explicit
 | Case-sensitive asset URLs | Shopify CDN | Canonical filenames; avoid macOS case collisions |
 | Max 5 Theme styles | settings_data | Five presets shipped; no sixth |
 | No JSON parse in Liquid | Liquid docs | Slug/scene maps mirrored in snippets |
+| `video` setting has no `default` | input-settings | Image / theme-asset / placeholder fallback |
+| YouTube/Vimeo unsuitable as cover bg | iframe layout / autoplay | Omit `video_url` from glass cover cascade |
+| Autoplay requires muted video | Browser autoplay policies | `video_tag` muted + loop + playsinline |
+| `backdrop-filter` uneven support | CSS / Safari quirks | Solid tinted `background` always present; blur additive |
+| Video motion vs reduced motion | a11y | Hide autoplay video under `prefers-reduced-motion`; keep image or tint |
+| Count-up needs JS | Browser runtime | Final value in HTML; skip animation when motion off |

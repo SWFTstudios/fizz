@@ -49,9 +49,25 @@ with the five presets.
 
 - Separate copy + media; claim stats on sustainability  
 
-### Footer
+### J14 Stats (addable on any page)
 
-- Headline, CTA, newsletter, link blocks  
+- Glassmorphic card over video/image background (same pattern as Footer 2)  
+- Heading + subheading + responsive multi-column stat grid  
+- Per-stat richtext body, number, suffix, decimals; optional count-up on scroll  
+- Column counts for desktop / tablet / mobile; type-scale controls  
+
+Seeded on the homepage after Sustainability. Add via **Add section → J14 Stats**.
+
+### Footer (Footer group — all pages)
+
+- **J14 Footer** — original dark band (headline, CTA, newsletter, link blocks)  
+- **J14 Footer 2** — glassmorphic card over video/image background  
+  - Background video (Shopify Files MP4) or image, cover full bleed  
+  - Glass controls: blur, tint, opacity, text color  
+  - Up to three menu columns (`link_list` pickers from Navigation)  
+  - Social links from Theme settings  
+
+Both ship in the Footer group by default (classic first, glass second). Hide or reorder in the theme editor under **Footer**. 
 
 ## Media tips
 

@@ -79,16 +79,22 @@
     "name": "Typography",
     "settings": [
       {
+        "type": "paragraph",
+        "content": "Brand typeface is Helvetica Neue LT Std site-wide (headings + body). Shopify font pickers below are unused."
+      },
+      {
         "type": "font_picker",
         "id": "font_heading",
-        "label": "Headings",
-        "default": "anton_n4"
+        "label": "Headings (unused)",
+        "default": "anton_n4",
+        "info": "Kept for compatibility. Live site uses Helvetica Neue LT Std."
       },
       {
         "type": "font_picker",
         "id": "font_body",
-        "label": "Body",
-        "default": "work_sans_n4"
+        "label": "Body (unused)",
+        "default": "work_sans_n4",
+        "info": "Kept for compatibility. Live site uses Helvetica Neue LT Std."
       },
       {
         "type": "range",

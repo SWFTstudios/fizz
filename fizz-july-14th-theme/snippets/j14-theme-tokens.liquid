@@ -1,12 +1,9 @@
 {% comment %}
   Global CSS design tokens.
   Colors resolve from colorway_preset (or custom pickers when enabled).
+  Brand typeface is Helvetica Neue LT Std (assets/j14-fonts.css) site-wide.
 {% endcomment %}
 {%- liquid
-  assign heading_font = settings.font_heading
-  assign body_font = settings.font_body
-  assign body_font_bold = body_font | font_modify: 'weight', 'bolder'
-
   assign preset_id = settings.colorway_preset | default: 'lime_fizz'
   capture preset_raw
     render 'j14-colorway-preset-data', preset: preset_id
@@ -42,10 +39,6 @@
   endif
 -%}
 <style>
-  {{ heading_font | font_face: font_display: 'swap' }}
-  {{ body_font | font_face: font_display: 'swap' }}
-  {% if body_font_bold %}{{ body_font_bold | font_face: font_display: 'swap' }}{% endif %}
-
   :root {
     --j14-paper: {{ paper }};
     --j14-ink: {{ ink }};
@@ -56,10 +49,10 @@
     --j14-ink-rgb: {{ ink | color_to_rgb | remove: 'rgb(' | remove: ')' }};
     --j14-paper-rgb: {{ paper | color_to_rgb | remove: 'rgb(' | remove: ')' }};
 
-    --j14-font-heading: {{ heading_font.family }}, {{ heading_font.fallback_families }};
-    --j14-font-heading-weight: {{ heading_font.weight }};
-    --j14-font-body: {{ body_font.family }}, {{ body_font.fallback_families }};
-    --j14-font-body-weight: {{ body_font.weight }};
+    --j14-font-heading: "Helvetica Neue LT Std", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --j14-font-heading-weight: 700;
+    --j14-font-body: "Helvetica Neue LT Std", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --j14-font-body-weight: 400;
     --j14-heading-scale: {{ settings.heading_scale | divided_by: 100.0 }};
     --j14-heading-transform: {% if settings.heading_uppercase %}uppercase{% else %}none{% endif %};
 

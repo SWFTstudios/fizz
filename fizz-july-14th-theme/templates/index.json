@@ -215,25 +215,65 @@
         "anchor_id": "sustainability"
       }
     },
-    "footer": {
-      "type": "j14-footer",
+    "stats": {
+      "type": "j14-stats",
       "blocks": {
-        "link_shop": {
-          "type": "link",
-          "settings": { "label": "Shop all", "url": "/collections/all" }
+        "stat_1": {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Americans consume <strong>30 billion seltzer cans</strong> annually</p>",
+            "number": "30",
+            "suffix": "B",
+            "decimals": 0
+          }
         },
-        "link_search": {
-          "type": "link",
-          "settings": { "label": "Search", "url": "/search" }
+        "stat_2": {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Generating over <strong>200k metric tons of CO2e</strong> from aluminum processing</p>",
+            "number": "200",
+            "suffix": "K",
+            "decimals": 0
+          }
+        },
+        "stat_3": {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Offsetting it requires <strong>3.3 million tree seedlings</strong></p>",
+            "number": "3.3",
+            "suffix": "M",
+            "decimals": 1
+          }
+        },
+        "stat_4": {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Over a period of <strong>10 years</strong> to absorb the emissions</p>",
+            "number": "10",
+            "suffix": "YRS",
+            "decimals": 0
+          }
         }
       },
-      "block_order": ["link_shop", "link_search"],
+      "block_order": ["stat_1", "stat_2", "stat_3", "stat_4"],
       "settings": {
-        "headline": "Sparkling water, anywhere.",
-        "cta_label": "Shop bottles",
-        "show_newsletter": true
+        "heading": "KEEP YOUR CO₂ WHERE IT BELONGS - IN YOUR DRINK",
+        "subheading": "Seltzer by the numbers :",
+        "anchor_id": "stats",
+        "columns_desktop": 4,
+        "columns_tablet": 2,
+        "columns_mobile": 1,
+        "animate_numbers": true,
+        "count_duration": 1600,
+        "fill_height": true,
+        "stats_area_min_height": 280,
+        "glass_blur": 18,
+        "glass_opacity": 22,
+        "glass_tint": "#6a8a8c",
+        "text_color": "#ffffff",
+        "min_height": 520
       }
     }
   },
-  "order": ["intro", "mosaic", "colorways", "how", "flavors", "about", "sustainability", "footer"]
+  "order": ["intro", "mosaic", "colorways", "how", "flavors", "about", "sustainability", "stats"]
 }
