@@ -1,0 +1,53 @@
+<!doctype html>
+<html
+  lang="{{ request.locale.iso_code }}"
+  class="nf-html{% unless settings.motion_enabled %} nf-no-motion{% endunless %}"
+  data-nf-transitions="{% if settings.page_transitions %}true{% else %}false{% endif %}"
+  data-nf-transition-style="{{ settings.page_transition_style | default: 'melt' }}"
+  data-nf-transition-intensity="{{ settings.page_transition_intensity | default: 100 }}"
+>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+    <link rel="canonical" href="{{ canonical_url }}">
+    {{ content_for_header }}
+
+    {{ 'nf-fonts.css' | asset_url | stylesheet_tag }}
+    {{ 'nf-base.css' | asset_url | stylesheet_tag }}
+    {{ 'nf-neofizz.css' | asset_url | stylesheet_tag }}
+    {% render 'nf-theme-tokens' %}
+    <script>
+      document.documentElement.classList.add('nf-js');
+    </script>
+  </head>
+
+  <body class="nf template-{{ template.name | handle }}">
+    <a class="nf-skip-link" href="#main-content">{{ 'general.accessibility.skip_to_content' | t }}</a>
+
+    {% sections 'header-group' %}
+
+    <main id="main-content" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+
+    <script src="{{ 'gsap.min.js' | asset_url }}" defer></script>
+    <script src="{{ 'ScrollTrigger.min.js' | asset_url }}" defer></script>
+    <script src="{{ 'nf-hero.js' | asset_url }}" defer></script>
+    <script src="{{ 'nf-motion.js' | asset_url }}" defer></script>
+    <script src="{{ 'nf-scroll.js' | asset_url }}" defer></script>
+    <script src="{{ 'nf-carousel.js' | asset_url }}" defer></script>
+    <script src="{{ 'nf-stats.js' | asset_url }}" defer></script>
+    <script src="{{ 'nf-page-transition.js' | asset_url }}" defer></script>
+  </body>
+</html>

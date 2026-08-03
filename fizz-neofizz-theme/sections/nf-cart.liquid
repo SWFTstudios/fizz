@@ -1,0 +1,70 @@
+<section class="nf-cart">
+  <h1 class="nf-heading nf-cart__title">{{ 'cart.general.title' | t }}</h1>
+
+  {%- if cart.item_count > 0 -%}
+    {% form 'cart', cart, class: 'nf-cart__form' %}
+      <ul class="nf-cart__items">
+        {%- for item in cart.items -%}
+          <li class="nf-cart__item">
+            <a href="{{ item.url }}" class="nf-cart__item-media">
+              {%- if item.image -%}
+                {{ item.image | image_url: width: 240 | image_tag: loading: 'lazy', widths: '120, 240', sizes: '96px', alt: item.title }}
+              {%- endif -%}
+            </a>
+            <div class="nf-cart__item-info">
+              <a class="nf-cart__item-title" href="{{ item.url }}">{{ item.product.title | escape }}</a>
+              {%- unless item.product.has_only_default_variant -%}
+                <p class="nf-cart__item-variant">{{ item.variant.title | escape }}</p>
+              {%- endunless -%}
+              <p class="nf-cart__item-price">{{ item.final_price | money }}</p>
+              <div class="nf-cart__item-controls">
+                <label class="nf-visually-hidden" for="Qty-{{ item.index | plus: 1 }}">
+                  {{ 'cart.general.quantity_label' | t: title: item.product.title }}
+                </label>
+                <input
+                  id="Qty-{{ item.index | plus: 1 }}"
+                  class="nf-input nf-cart__qty"
+                  type="number"
+                  name="updates[]"
+                  value="{{ item.quantity }}"
+                  min="0"
+                >
+                <a class="nf-cart__remove" href="{{ item.url_to_remove }}">{{ 'cart.general.remove' | t }}</a>
+              </div>
+            </div>
+            <p class="nf-cart__item-total">{{ item.final_line_price | money }}</p>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      <div class="nf-cart__summary">
+        <p class="nf-cart__subtotal">
+          <span>{{ 'cart.general.subtotal' | t }}</span>
+          <span>{{ cart.total_price | money }}</span>
+        </p>
+        <p class="nf-cart__note">{{ 'cart.general.taxes_and_shipping_at_checkout' | t }}</p>
+        <div class="nf-cart__actions">
+          <button type="submit" name="update" class="nf-btn nf-btn--ghost">{{ 'cart.general.update' | t }}</button>
+          <button type="submit" name="checkout" class="nf-btn nf-btn--accent">{{ 'cart.general.checkout' | t }}</button>
+        </div>
+      </div>
+    {% endform %}
+  {%- else -%}
+    <div class="nf-cart__empty">
+      <p>{{ 'cart.general.empty' | t }}</p>
+      <a class="nf-btn" href="{{ routes.all_products_collection_url }}">{{ 'cart.general.continue_shopping' | t }}</a>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "NF Cart",
+  "tag": "section",
+  "class": "nf-cart-section",
+  "settings": [],
+  "enabled_on": {
+    "templates": ["cart"]
+  }
+}
+{% endschema %}

@@ -1,0 +1,498 @@
+{%- liquid
+  assign glass_blur = section.settings.glass_blur | default: 18
+  assign glass_opacity_pct = section.settings.glass_opacity | default: 22
+  assign glass_opacity = glass_opacity_pct | times: 1.0 | divided_by: 100.0
+  assign glass_tint = section.settings.glass_tint | default: '#6a8a8c'
+  assign glass_tint_a = glass_tint | color_modify: 'alpha', glass_opacity
+  assign text_color = section.settings.text_color | default: '#ffffff'
+  assign text_rgb = text_color | color_to_rgb | remove: 'rgb(' | remove: ')'
+  assign min_height = section.settings.min_height | default: 520
+  assign glass_padding = section.settings.glass_padding | default: 48
+  assign overlay_pct = section.settings.overlay_opacity | default: 15
+  assign overlay_a = overlay_pct | times: 1.0 | divided_by: 100.0
+  assign inset = section.settings.glass_inset | default: 28
+  assign cols_d = section.settings.columns_desktop | default: 4
+  assign cols_t = section.settings.columns_tablet | default: 2
+  assign cols_m = section.settings.columns_mobile | default: 1
+  assign col_gap = section.settings.column_gap | default: 0
+  assign row_gap = section.settings.row_gap | default: 32
+  assign heading_size = section.settings.heading_size | default: 28
+  assign subheading_size = section.settings.subheading_size | default: 16
+  assign body_size = section.settings.body_size | default: 14
+  assign number_size = section.settings.number_size | default: 96
+  assign suffix_size = section.settings.suffix_size | default: 22
+  assign count_duration = section.settings.count_duration | default: 1600
+  assign stats_area_min = section.settings.stats_area_min_height | default: 280
+  assign fill_height = section.settings.fill_height
+  if fill_height == nil
+    assign fill_height = true
+  endif
+  assign animate = section.settings.animate_numbers
+  if animate == nil
+    assign animate = true
+  endif
+  assign anchor = section.settings.anchor_id | default: 'stats'
+-%}
+<section
+  class="nf-stats{% if fill_height %} nf-stats--fill{% endif %}"
+  id="{{ anchor | handle | escape }}"
+  data-nf-stats
+  data-nf-stats-animate="{% if animate and settings.motion_enabled %}true{% else %}false{% endif %}"
+  data-nf-stats-duration="{{ count_duration }}"
+  style="
+    --nf-stats-min-height: {{ min_height }}px;
+    --nf-stats-area-min: {{ stats_area_min }}px;
+    --nf-stats-glass-bg: {{ glass_tint_a }};
+    --nf-stats-glass-blur: blur({{ glass_blur }}px);
+    --nf-stats-text: {{ text_color }};
+    --nf-stats-text-rgb: {{ text_rgb }};
+    --nf-stats-glass-pad: {{ glass_padding }}px;
+    --nf-stats-overlay: {{ overlay_a }};
+    --nf-stats-inset: {{ inset }}px;
+    --nf-stats-cols-d: {{ cols_d }};
+    --nf-stats-cols-t: {{ cols_t }};
+    --nf-stats-cols-m: {{ cols_m }};
+    --nf-stats-col-gap: {{ col_gap }}px;
+    --nf-stats-row-gap: {{ row_gap }}px;
+    --nf-stats-heading-size: {{ heading_size }}px;
+    --nf-stats-subheading-size: {{ subheading_size }}px;
+    --nf-stats-body-size: {{ body_size }}px;
+    --nf-stats-number-size: {{ number_size }}px;
+    --nf-stats-suffix-size: {{ suffix_size }}px;
+  "
+>
+  <div class="nf-stats__media" aria-hidden="true">
+    {% render 'nf-media',
+      video: section.settings.background_video,
+      image: section.settings.background_image,
+      asset: section.settings.background_asset,
+      class: 'nf-stats__bg',
+      alt: '',
+      loading: 'lazy',
+      sizes: '100vw',
+      autoplay: true
+    %}
+    <div class="nf-stats__overlay"></div>
+  </div>
+
+  <div class="nf-stats__glass">
+    <div class="nf-stats__inner">
+      {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
+        <header class="nf-stats__header">
+          {%- if section.settings.heading != blank -%}
+            <h2 class="nf-stats__heading">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+          {%- if section.settings.subheading != blank -%}
+            <p class="nf-stats__subheading">{{ section.settings.subheading | escape }}</p>
+          {%- endif -%}
+        </header>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <div
+          class="nf-stats__grid nf-stats__grid--d-{{ cols_d }} nf-stats__grid--t-{{ cols_t }} nf-stats__grid--m-{{ cols_m }}"
+          role="list"
+        >
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'stat' -%}
+              {%- liquid
+                assign num_raw = block.settings.number | default: '0' | strip
+                assign decimals = block.settings.decimals | default: 0
+                assign size_mod = block.settings.number_size | default: 'inherit'
+              -%}
+              <article
+                class="nf-stats__cell{% if size_mod != 'inherit' %} nf-stats__cell--num-{{ size_mod }}{% endif %}"
+                role="listitem"
+                {{ block.shopify_attributes }}
+              >
+                {%- if block.settings.body != blank -%}
+                  <div class="nf-stats__body">{{ block.settings.body }}</div>
+                {%- endif -%}
+                <p class="nf-stats__figure">
+                  <span
+                    class="nf-stats__value"
+                    data-nf-count
+                    data-target="{{ num_raw | escape }}"
+                    data-decimals="{{ decimals }}"
+                    data-duration="{{ count_duration }}"
+                  >{{ num_raw | escape }}</span>
+                  {%- if block.settings.suffix != blank -%}
+                    <span class="nf-stats__suffix">{{ block.settings.suffix | escape }}</span>
+                  {%- endif -%}
+                </p>
+              </article>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "NF Stats",
+  "tag": "section",
+  "class": "nf-stats-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "KEEP YOUR CO₂ WHERE IT BELONGS - IN YOUR DRINK"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Seltzer by the numbers :"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "stats"
+    },
+    {
+      "type": "header",
+      "content": "Background media"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background video",
+      "info": "Shopify Files MP4. Autoplay is muted and looped."
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "text",
+      "id": "background_asset",
+      "label": "Theme asset fallback",
+      "info": "Filename in theme assets/ when video and image are empty."
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "label": "Minimum height",
+      "min": 320,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "default": 520
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Media overlay opacity",
+      "min": 0,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Glass style"
+    },
+    {
+      "type": "range",
+      "id": "glass_blur",
+      "label": "Glass blur",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "glass_opacity",
+      "label": "Glass tint opacity",
+      "min": 5,
+      "max": 80,
+      "step": 1,
+      "unit": "%",
+      "default": 22
+    },
+    {
+      "type": "color",
+      "id": "glass_tint",
+      "label": "Glass tint",
+      "default": "#6a8a8c"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "glass_padding",
+      "label": "Glass inner padding",
+      "min": 16,
+      "max": 96,
+      "step": 2,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "glass_inset",
+      "label": "Glass inset from edges",
+      "min": 0,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Grid"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns (desktop)",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_tablet",
+      "label": "Columns (tablet)",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "label": "Columns (mobile)",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Column gap",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "label": "Row gap",
+      "min": 0,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "checkbox",
+      "id": "fill_height",
+      "label": "Stretch stats to fill glass below heading",
+      "default": true,
+      "info": "Body stays top-aligned; numbers pin to the bottom of each column."
+    },
+    {
+      "type": "range",
+      "id": "stats_area_min_height",
+      "label": "Stats area min height",
+      "min": 160,
+      "max": 640,
+      "step": 10,
+      "unit": "px",
+      "default": 280,
+      "info": "Minimum height of the columns under the heading (dividers span this)."
+    },
+    {
+      "type": "header",
+      "content": "Type scale"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 16,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "subheading_size",
+      "label": "Subheading size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "label": "Body size",
+      "min": 11,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "number_size",
+      "label": "Number size",
+      "min": 40,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "suffix_size",
+      "label": "Suffix size",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "header",
+      "content": "Motion"
+    },
+    {
+      "type": "checkbox",
+      "id": "animate_numbers",
+      "label": "Animate numbers on scroll",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "count_duration",
+      "label": "Count-up duration",
+      "min": 400,
+      "max": 4000,
+      "step": 100,
+      "unit": "ms",
+      "default": 1600
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Body",
+          "default": "<p>Americans consume <strong>30 billion seltzer cans</strong> annually</p>"
+        },
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number",
+          "default": "30",
+          "info": "Numeric value for count-up (e.g. 30, 3.3, 200)."
+        },
+        {
+          "type": "text",
+          "id": "suffix",
+          "label": "Suffix",
+          "default": "B"
+        },
+        {
+          "type": "range",
+          "id": "decimals",
+          "label": "Decimal places",
+          "min": 0,
+          "max": 2,
+          "step": 1,
+          "default": 0
+        },
+        {
+          "type": "select",
+          "id": "number_size",
+          "label": "Number size override",
+          "options": [
+            { "value": "inherit", "label": "Inherit section" },
+            { "value": "s", "label": "S" },
+            { "value": "m", "label": "M" },
+            { "value": "l", "label": "L" },
+            { "value": "xl", "label": "XL" }
+          ],
+          "default": "inherit"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "NF Stats",
+      "blocks": [
+        {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Americans consume <strong>30 billion seltzer cans</strong> annually</p>",
+            "number": "30",
+            "suffix": "B",
+            "decimals": 0
+          }
+        },
+        {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Generating over <strong>200k metric tons of CO2e</strong> from aluminum processing</p>",
+            "number": "200",
+            "suffix": "K",
+            "decimals": 0
+          }
+        },
+        {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Offsetting it requires <strong>3.3 million tree seedlings</strong></p>",
+            "number": "3.3",
+            "suffix": "M",
+            "decimals": 1
+          }
+        },
+        {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Over a period of <strong>10 years</strong> to absorb the emissions</p>",
+            "number": "10",
+            "suffix": "YRS",
+            "decimals": 0
+          }
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["*"]
+  }
+}
+{% endschema %}

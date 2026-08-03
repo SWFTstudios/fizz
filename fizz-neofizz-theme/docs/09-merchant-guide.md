@@ -1,0 +1,99 @@
+# Chapter 09 — Merchant guide
+
+Day-to-day editing without touching code.
+
+## Theme settings (global)
+
+| Group | What to change |
+| --- | --- |
+| Colorway | Preset or custom colors |
+| Typography | Heading / body fonts, scale, uppercase |
+| Layout | Page width, gutters |
+| Buttons | Corner radius |
+| Motion | Scroll animations, page transitions |
+| Products | Default bottle product |
+| Social | Profile URLs |
+
+Also switch **Theme style** at the top of the editor to keep pickers aligned
+with the five presets.
+
+## Homepage sections
+
+### Intro
+
+- Hero eyebrow / heading / subheading / CTA  
+- Scroll length (taller = slower scrub)  
+- Auto-scroll on/off, delay, duration, easing, end progress  
+- Media slide blocks (image / Shopify video / YouTube / Vimeo / asset name)  
+
+### Mosaic
+
+- Heading, anchors, gaps, columns  
+- Per-tile media + span  
+
+### Colorways
+
+- Eyebrow / heading / CTA label  
+- Bottle product assignment  
+- Sync scene toggle  
+
+### How to use
+
+- Steps with title, body, media  
+
+### Flavors
+
+- Three flavor blocks with products, tints, lifestyle art  
+
+### About / Sustainability
+
+- Separate copy + media; claim stats on sustainability  
+
+### NF Stats (addable on any page)
+
+- Glassmorphic card over video/image background (same pattern as Footer 2)  
+- Heading + subheading + responsive multi-column stat grid  
+- Per-stat richtext body, number, suffix, decimals; optional count-up on scroll  
+- Column counts for desktop / tablet / mobile; type-scale controls  
+
+Seeded on the homepage after Sustainability. Add via **Add section → NF Stats**.
+
+### Footer (Footer group — all pages)
+
+- **NF Footer** — original dark band (headline, CTA, newsletter, link blocks)  
+- **NF Footer 2** — glassmorphic card over video/image background  
+  - Background video (Shopify Files MP4) or image, cover full bleed  
+  - Glass controls: blur, tint, opacity, text color  
+  - Up to three menu columns (`link_list` pickers from Navigation)  
+  - Social links from Theme settings  
+
+Both ship in the Footer group by default (classic first, glass second). Hide or reorder in the theme editor under **Footer**. 
+
+## Media tips
+
+1. Prefer Shopify Files uploads via the image/video pickers.  
+2. Theme asset filenames are fallbacks for demo content.  
+3. Videos must be muted to autoplay in browsers.  
+4. After replacing large images, hard-refresh or wait for CDN cache.
+
+## Product page
+
+- Gallery mode and media fit for packshots vs lifestyle  
+- Colorway swatches on/off  
+- Accordion / trust point blocks  
+- Related product media framing  
+
+## Header
+
+- Transparent home bar  
+- Gradient / blur intensity  
+- Mobile menu styling  
+
+## When to call a developer
+
+- Replacing intro mask SVGs (origin math)  
+- New metafield definitions  
+- New section types beyond presets  
+- Performance optimization of very large assets  
+
+Next: [Chapter 10 — Development & deployment](10-development-deployment.md)

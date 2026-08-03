@@ -1,0 +1,65 @@
+{
+  "sections": {
+    "main": {
+      "type": "nf-product",
+      "blocks": {
+        "trust_1": {
+          "type": "trust",
+          "settings": {
+            "label": "Free shipping over $50"
+          }
+        },
+        "trust_2": {
+          "type": "trust",
+          "settings": {
+            "label": "30-day easy returns"
+          }
+        },
+        "acc_1": {
+          "type": "accordion",
+          "settings": {
+            "title": "Details",
+            "body": "<p>Food-grade materials. Built for sparkling water on demand. Pair with FIZZ flavor packs for the full ritual.</p>"
+          }
+        },
+        "acc_2": {
+          "type": "accordion",
+          "settings": {
+            "title": "Shipping and returns",
+            "body": "<p>Free shipping on starter kits over $50. Hassle-free returns within 30 days.</p>"
+          }
+        }
+      },
+      "block_order": ["trust_1", "trust_2", "acc_1", "acc_2"],
+      "settings": {
+        "eyebrow": "Colorways",
+        "tagline": "Sparkling water, dialed to your colorway.",
+        "media_fit": "cover",
+        "gallery_mode": "slider",
+        "show_thumbnails": true,
+        "thumbnails_on_mobile": false,
+        "show_arrows": true,
+        "desktop_layout": "side",
+        "mobile_media_ratio": "4 / 5",
+        "stage_mode": "colorway",
+        "show_colorway_swatches": true,
+        "colorway_label": "Colorway",
+        "show_vendor": false,
+        "show_quantity": true,
+        "atc_label": "Add to cart",
+        "show_description": true,
+        "show_dynamic_checkout": false
+      }
+    },
+    "related": {
+      "type": "nf-related",
+      "settings": {
+        "heading": "Pairs well with",
+        "limit": 4,
+        "media_fit": "cover",
+        "media_ratio": "4 / 5"
+      }
+    }
+  },
+  "order": ["main", "related"]
+}

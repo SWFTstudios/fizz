@@ -1,0 +1,67 @@
+<section class="nf-search">
+  <h1 class="nf-heading nf-search__title">{{ 'general.search.search' | t }}</h1>
+
+  <form action="{{ routes.search_url }}" method="get" role="search" class="nf-search__form">
+    <label class="nf-visually-hidden" for="NFSearchInput">{{ 'general.search.search' | t }}</label>
+    <input
+      id="NFSearchInput"
+      class="nf-input nf-search__input"
+      type="search"
+      name="q"
+      value="{{ search.terms | escape }}"
+      placeholder="{{ 'general.search.placeholder' | t }}"
+    >
+    <input type="hidden" name="options[prefix]" value="last">
+    <button type="submit" class="nf-btn">{{ 'general.search.search' | t }}</button>
+  </form>
+
+  {%- if search.performed -%}
+    {%- if search.results_count > 0 -%}
+      <p class="nf-search__count">
+        {{ 'general.search.results_with_count' | t: count: search.results_count, terms: search.terms }}
+      </p>
+      {%- paginate search.results by 12 -%}
+        <div class="nf-collection__grid nf-collection__grid--3">
+          {%- for result in search.results -%}
+            {%- if result.object_type == 'product' -%}
+              {% render 'nf-product-card', product: result %}
+            {%- else -%}
+              <article class="nf-card nf-card--text">
+                <a href="{{ result.url }}" class="nf-card__link">
+                  <div class="nf-card__info">
+                    <h3 class="nf-card__title">{{ result.title | escape }}</h3>
+                  </div>
+                </a>
+              </article>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+        {%- if paginate.pages > 1 -%}
+          <nav class="nf-pagination" aria-label="Pagination">
+            {%- if paginate.previous -%}
+              <a class="nf-btn nf-btn--ghost" href="{{ paginate.previous.url }}">{{ 'general.pagination.previous' | t }}</a>
+            {%- endif -%}
+            <span class="nf-pagination__status">{{ paginate.current_page }} / {{ paginate.pages }}</span>
+            {%- if paginate.next -%}
+              <a class="nf-btn nf-btn--ghost" href="{{ paginate.next.url }}">{{ 'general.pagination.next' | t }}</a>
+            {%- endif -%}
+          </nav>
+        {%- endif -%}
+      {%- endpaginate -%}
+    {%- else -%}
+      <p class="nf-search__none">{{ 'general.search.no_results' | t: terms: search.terms }}</p>
+    {%- endif -%}
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "NF Search",
+  "tag": "section",
+  "class": "nf-search-section",
+  "settings": [],
+  "enabled_on": {
+    "templates": ["search"]
+  }
+}
+{% endschema %}

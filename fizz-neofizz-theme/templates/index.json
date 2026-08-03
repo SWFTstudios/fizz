@@ -1,0 +1,302 @@
+{
+  "sections": {
+    "hero": {
+      "type": "nf-hero",
+      "blocks": {
+        "slide_1": {
+          "type": "media",
+          "settings": {
+            "label": "On the go",
+            "asset": "nf-lifestyle-hero-01.jpg"
+          }
+        },
+        "slide_2": {
+          "type": "media",
+          "settings": {
+            "label": "Drive",
+            "asset": "nf-lifestyle-hero-02.jpg"
+          }
+        },
+        "slide_3": {
+          "type": "media",
+          "settings": {
+            "label": "Active",
+            "asset": "nf-lifestyle-hero-03.jpg"
+          }
+        },
+        "slide_4": {
+          "type": "media",
+          "settings": {
+            "label": "Field",
+            "asset": "nf-lifestyle-hero-04.jpg"
+          }
+        },
+        "slide_5": {
+          "type": "media",
+          "settings": {
+            "label": "Court",
+            "asset": "nf-lifestyle-hero-05.jpg"
+          }
+        }
+      },
+      "block_order": ["slide_1", "slide_2", "slide_3", "slide_4", "slide_5"],
+      "settings": {
+        "hero_eyebrow": "Fast, secure and portable",
+        "hero_heading": "Sparkling water, anywhere.",
+        "hero_subheading": "Fill. Twist. Fizz. Cold bubbles in under ten seconds — no machine, no cans.",
+        "cta_label": "Shop bottles",
+        "cta2_label": "Shop",
+        "autoplay_interval": 5,
+        "scroll_length": 180,
+        "loader_enabled": true,
+        "loader_duration": 5.6
+      }
+    },
+    "marquee": {
+      "type": "nf-marquee",
+      "blocks": {
+        "w1": { "type": "word", "settings": { "text": "FIZZ ANYWHERE" } },
+        "w2": { "type": "word", "settings": { "text": "ZERO SUGAR" } },
+        "w3": { "type": "word", "settings": { "text": "REAL FRUIT" } },
+        "w4": { "type": "word", "settings": { "text": "60 FIZZES PER POD" } },
+        "w5": { "type": "word", "settings": { "text": "PORTABLE" } },
+        "w6": { "type": "word", "settings": { "text": "COLD BUBBLES" } }
+      },
+      "block_order": ["w1", "w2", "w3", "w4", "w5", "w6"],
+      "settings": {
+        "show_glyph": true
+      }
+    },
+    "story": {
+      "type": "nf-story-split",
+      "settings": {
+        "eyebrow": "Technology",
+        "heading": "Bubbles without the baggage",
+        "body": "<p>We started Fizz because sparkling water should not need a truck, a fridge, or a mountain of cans. One bottle, one pod, endless sparkle.</p>",
+        "cta_label": "Learn more",
+        "asset": "nf-lifestyle-story-01.jpg",
+        "anchor_id": "about"
+      }
+    },
+    "bento": {
+      "type": "nf-product-bento",
+      "blocks": {
+        "c1": {
+          "type": "card",
+          "settings": {
+            "span": "full",
+            "icon_label": "01",
+            "title": "Portable fizz",
+            "body": "<p>Carbonate anywhere. Cold bubbles in under ten seconds — no machine, no cans.</p>",
+            "button_label": "Shop bottles",
+            "asset": "nf-lifestyle-hero-03.jpg"
+          }
+        },
+        "c2": {
+          "type": "card",
+          "settings": {
+            "span": "half",
+            "icon_label": "02",
+            "title": "Real flavor packs",
+            "body": "<p>Zero sugar. Real fruit. Drop a pack and sip.</p>",
+            "asset": "nf-lifestyle-feature-01.jpg"
+          }
+        },
+        "c3": {
+          "type": "card",
+          "settings": {
+            "span": "half",
+            "icon_label": "03",
+            "title": "60 fizzes per pod",
+            "body": "<p>Recyclable CO₂ pods that keep the sparkle coming.</p>",
+            "asset": "nf-lifestyle-feature-02.jpg"
+          }
+        }
+      },
+      "block_order": ["c1", "c2", "c3"],
+      "settings": {
+        "eyebrow": "Products",
+        "heading": "What's possible with Fizz",
+        "anchor_id": "colors"
+      }
+    },
+    "how": {
+      "type": "nf-how-sticky",
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "title": "Fill with cold water",
+            "body": "<p>Cold water carbonates best. Fill to the line, no further.</p>",
+            "asset": "nf-lifestyle-how-01.jpg",
+            "button_label": "Shop bottles"
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "title": "Twist the pod",
+            "body": "<p>Lock a CO2 pod into the base and give it a quarter turn.</p>",
+            "asset": "nf-lifestyle-how-02.jpg"
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "title": "Sip the sparkle",
+            "body": "<p>Add a flavor pack if you like. Bubbles in under ten seconds.</p>",
+            "asset": "nf-lifestyle-how-03.jpg",
+            "button_label": "Shop flavors"
+          }
+        }
+      },
+      "block_order": ["step_1", "step_2", "step_3"],
+      "settings": {
+        "eyebrow": "How it works",
+        "heading": "Fizz in three moves",
+        "anchor_id": "how"
+      }
+    },
+    "features": {
+      "type": "nf-features",
+      "blocks": {
+        "f1": {
+          "type": "feature",
+          "settings": {
+            "tag": "custom",
+            "title": "Customizable product",
+            "body": "<p>Pick your colorway and make every sip feel like yours.</p>",
+            "dot_count": 3,
+            "asset": "nf-lifestyle-story-02.jpg"
+          }
+        },
+        "f2": {
+          "type": "feature",
+          "settings": {
+            "tag": "flex",
+            "title": "Flexibility and flavor",
+            "body": "<p>Water, iced tea, or juice — carbonate what you already drink.</p>",
+            "dot_count": 5,
+            "asset": "nf-lifestyle-feature-01.jpg"
+          }
+        },
+        "f3": {
+          "type": "feature",
+          "settings": {
+            "tag": "performance",
+            "title": "Scalability",
+            "body": "<p>60 fizzes per pod. Scale up for the week, or down for the commute.</p>",
+            "dot_count": 7,
+            "asset": "nf-lifestyle-feature-02.jpg"
+          }
+        }
+      },
+      "block_order": ["f1", "f2", "f3"],
+      "settings": {
+        "eyebrow": "Key features",
+        "heading": "The best in the business",
+        "anchor_id": "features"
+      }
+    },
+    "stats": {
+      "type": "nf-stats",
+      "blocks": {
+        "stat_1": {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Americans consume <strong>30 billion seltzer cans</strong> daily</p>",
+            "number": "30",
+            "suffix": "B",
+            "decimals": 0
+          }
+        },
+        "stat_2": {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Generating over <strong>200k metric tons of CO2e</strong> from aluminum processing</p>",
+            "number": "200",
+            "suffix": "K",
+            "decimals": 0
+          }
+        },
+        "stat_3": {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Offsetting it requires <strong>3.3 million tree seedlings</strong></p>",
+            "number": "3.3",
+            "suffix": "M",
+            "decimals": 1
+          }
+        },
+        "stat_4": {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Over a period of <strong>10 years</strong> to absorb the emissions</p>",
+            "number": "10",
+            "suffix": "YRS",
+            "decimals": 0
+          }
+        }
+      },
+      "block_order": ["stat_1", "stat_2", "stat_3", "stat_4"],
+      "settings": {
+        "heading": "KEEP YOUR CO₂ WHERE IT BELONGS - IN YOUR DRINK",
+        "subheading": "Seltzer by the numbers :",
+        "anchor_id": "stats",
+        "background_asset": "nf-lifestyle-stats-bg.jpg",
+        "columns_desktop": 4,
+        "columns_tablet": 2,
+        "columns_mobile": 1,
+        "animate_numbers": true,
+        "count_duration": 1600,
+        "fill_height": true,
+        "stats_area_min_height": 280,
+        "glass_blur": 18,
+        "glass_opacity": 22,
+        "glass_tint": "#6a8a8c",
+        "text_color": "#ffffff",
+        "min_height": 520
+      }
+    },
+    "flavors": {
+      "type": "nf-flavors",
+      "blocks": {
+        "flavor_1": {
+          "type": "flavor",
+          "settings": {
+            "title": "Orange Tangerine",
+            "body": "<p>Sunny citrus with a soft finish.</p>",
+            "asset": "flavor-lifestyle-orange-tangerine.jpg",
+            "tint": "#f4ddc4"
+          }
+        },
+        "flavor_2": {
+          "type": "flavor",
+          "settings": {
+            "title": "Cherry Limeade",
+            "body": "<p>Bright cherry with a lime snap.</p>",
+            "asset": "flavor-lifestyle-cherry-limeade.jpg",
+            "tint": "#f0d0d4"
+          }
+        },
+        "flavor_3": {
+          "type": "flavor",
+          "settings": {
+            "title": "Mixed Berry",
+            "body": "<p>Raspberry and blueberry, cold and bold.</p>",
+            "asset": "flavor-lifestyle-mixed-berry.jpg",
+            "tint": "#e4d4e8"
+          }
+        }
+      },
+      "block_order": ["flavor_1", "flavor_2", "flavor_3"],
+      "settings": {
+        "eyebrow": "Flavors",
+        "heading": "Three packs. Zero sugar.",
+        "subheading": "Real fruit flavor drops made for sparkling water.",
+        "anchor_id": "flavors"
+      }
+    }
+  },
+  "order": ["hero", "marquee", "story", "bento", "how", "features", "stats", "flavors"]
+}
