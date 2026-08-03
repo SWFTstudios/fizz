@@ -1,0 +1,215 @@
+<section class="nf-flavors" id="{{ section.settings.anchor_id | default: 'flavors' }}">
+  <div class="nf-flavors__head">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="nf-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.heading != blank -%}
+      <h2 class="nf-heading nf-flavors__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="nf-flavors__sub">{{ section.settings.subheading | escape }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="nf-flavors__grid">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign flavor_product = block.settings.product
+        assign panel_url = block.settings.link
+        if panel_url == blank and flavor_product != blank
+          assign panel_url = flavor_product.url
+        endif
+        assign panel_title = block.settings.title
+        if panel_title == blank and flavor_product != blank
+          assign panel_title = flavor_product.title
+        endif
+      -%}
+      <article class="nf-flavor" {{ block.shopify_attributes }}>
+        <a class="nf-flavor__media-link" {% if panel_url != blank %}href="{{ panel_url }}"{% endif %}>
+          <div class="nf-flavor__media" style="--flavor-tint: {{ block.settings.tint | default: '#e9e7df' }};">
+            {%- liquid
+              assign panel_image = block.settings.image
+              if panel_image == blank and flavor_product != blank
+                assign panel_image = flavor_product.featured_media
+              endif
+            -%}
+            {%- render 'nf-media',
+              video: block.settings.video,
+              image: panel_image,
+              asset: block.settings.asset,
+              alt: panel_title,
+              class: 'nf-flavor__img',
+              sizes: '(min-width: 750px) 33vw, 84vw'
+            -%}
+          </div>
+        </a>
+        <div class="nf-flavor__info">
+          <h3 class="nf-flavor__title">{{ panel_title | default: 'Flavor pack' | escape }}</h3>
+          {%- if block.settings.body != blank -%}
+            <div class="nf-flavor__body">{{ block.settings.body }}</div>
+          {%- endif -%}
+          <p class="nf-flavor__price">
+            {%- if flavor_product != blank -%}
+              {{ flavor_product.price | money }}
+            {%- endif -%}
+          </p>
+          <div class="nf-flavor__actions">
+            {%- if panel_url != blank -%}
+              <a class="nf-btn" href="{{ panel_url }}">{{ block.settings.cta_label | default: 'Explore' | escape }}</a>
+            {%- endif -%}
+            {%- if block.settings.pair_url != blank or settings.bottle_product != blank -%}
+              <a
+                class="nf-btn nf-btn--ghost"
+                href="{{ block.settings.pair_url | default: settings.bottle_product.url }}"
+              >
+                {{- block.settings.pair_label | default: 'Pair with a bottle' | escape -}}
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+      </article>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "NF Flavors",
+  "tag": "section",
+  "class": "nf-flavors-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Flavors"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Three packs. Zero sugar."
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Real fruit flavor drops made for sparkling water."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "flavors"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "flavor",
+      "name": "Flavor pack",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product",
+          "info": "Provides the default title, image, price and link."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title override"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Description"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image override"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Overrides the image. Autoplays muted."
+        },
+        {
+          "type": "text",
+          "id": "asset",
+          "label": "Theme asset fallback",
+          "info": "Advanced: filename of a theme asset."
+        },
+        {
+          "type": "color",
+          "id": "tint",
+          "label": "Panel tint",
+          "default": "#e9e7df"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link override"
+        },
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "Button label",
+          "default": "Explore"
+        },
+        {
+          "type": "text",
+          "id": "pair_label",
+          "label": "Pairing button label",
+          "default": "Pair with a bottle"
+        },
+        {
+          "type": "url",
+          "id": "pair_url",
+          "label": "Pairing link",
+          "info": "Defaults to the theme's default bottle product."
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "NF Flavors",
+      "blocks": [
+        {
+          "type": "flavor",
+          "settings": {
+            "title": "Orange Tangerine",
+            "body": "<p>Sunny citrus with a soft finish.</p>",
+            "asset": "flavor-lifestyle-orange-tangerine.jpg",
+            "tint": "#f4ddc4"
+          }
+        },
+        {
+          "type": "flavor",
+          "settings": {
+            "title": "Cherry Limeade",
+            "body": "<p>Bright cherry with a lime snap.</p>",
+            "asset": "flavor-lifestyle-cherry-limeade.jpg",
+            "tint": "#f0d0d4"
+          }
+        },
+        {
+          "type": "flavor",
+          "settings": {
+            "title": "Mixed Berry",
+            "body": "<p>Raspberry and blueberry, cold and bold.</p>",
+            "asset": "flavor-lifestyle-mixed-berry.jpg",
+            "tint": "#e4d4e8"
+          }
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index", "page", "collection", "product"]
+  }
+}
+{% endschema %}

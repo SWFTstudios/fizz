@@ -1,0 +1,100 @@
+<section class="nf-about" id="{{ section.settings.anchor_id | default: 'about' }}">
+  <div class="nf-about__story">
+    <div class="nf-about__copy">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="nf-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="nf-heading nf-about__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.body != blank -%}
+        <div class="nf-about__body">{{ section.settings.body }}</div>
+      {%- endif -%}
+      {%- if section.settings.cta_label != blank -%}
+        <a class="nf-btn" href="{{ section.settings.cta_url | default: routes.root_url }}">
+          {{- section.settings.cta_label | escape -}}
+        </a>
+      {%- endif -%}
+    </div>
+    <div class="nf-about__media">
+      {%- render 'nf-media',
+        video: section.settings.video,
+        image: section.settings.image,
+        asset: section.settings.asset,
+        alt: section.settings.heading,
+        class: 'nf-about__img',
+        sizes: '(min-width: 750px) 45vw, 100vw'
+      -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "NF About",
+  "tag": "section",
+  "class": "nf-about-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "About us"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Bubbles without the baggage"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Body",
+      "default": "<p>We started Fizz because sparkling water should not need a truck, a fridge, or a mountain of cans. One bottle, one pod, endless sparkle.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video",
+      "info": "Overrides the image. Autoplays muted."
+    },
+    {
+      "type": "text",
+      "id": "asset",
+      "label": "Theme asset fallback",
+      "default": "fizz-bottle-hero.jpg",
+      "info": "Advanced: filename of a theme asset."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button link"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "about"
+    }
+  ],
+  "presets": [
+    {
+      "name": "NF About"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index", "page"]
+  }
+}
+{% endschema %}

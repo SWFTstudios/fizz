@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "nf-cart",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

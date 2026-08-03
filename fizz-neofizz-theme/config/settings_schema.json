@@ -1,0 +1,246 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "NeoFizz",
+    "theme_version": "1.0.0",
+    "theme_author": "Fizz",
+    "theme_documentation_url": "https://github.com/SWFTstudios/fizz/tree/main/fizz-neofizz-theme",
+    "theme_support_url": "https://github.com/SWFTstudios/fizz/blob/main/fizz-neofizz-theme/README.md"
+  },
+  {
+    "name": "Colorway",
+    "settings": [
+      {
+        "type": "select",
+        "id": "colorway_preset",
+        "label": "Colorway preset",
+        "options": [
+          { "value": "lime_fizz", "label": "Lime Fizz" },
+          { "value": "steel_navy", "label": "Steel Navy" },
+          { "value": "citrus_burst", "label": "Citrus Burst" },
+          { "value": "berry_night", "label": "Berry Night" },
+          { "value": "electric_pool", "label": "Electric Pool" }
+        ],
+        "default": "steel_navy",
+        "info": "Storefront colors apply from this preset on save. For matching color pickers below, also switch Theme style (top of the theme editor) to the same name. Shopify allows up to 5 Theme styles. NeoFizz defaults to Steel Navy."
+      },
+      {
+        "type": "checkbox",
+        "id": "colorway_custom_enabled",
+        "label": "Use custom colors",
+        "default": false,
+        "info": "Overrides the preset with the pickers below."
+      },
+      {
+        "type": "color",
+        "id": "color_paper",
+        "label": "Background (paper)",
+        "default": "#f4f3ee",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
+      },
+      {
+        "type": "color",
+        "id": "color_ink",
+        "label": "Text (ink)",
+        "default": "#111214",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Accent",
+        "default": "#c6f24e",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
+      },
+      {
+        "type": "color",
+        "id": "color_surface",
+        "label": "Cards and panels",
+        "default": "#e9e7df",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
+      },
+      {
+        "type": "color",
+        "id": "color_dark",
+        "label": "Dark sections background",
+        "default": "#0b0c0e",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
+      },
+      {
+        "type": "color",
+        "id": "color_dark_text",
+        "label": "Dark sections text",
+        "default": "#f2f1ea",
+        "visible_if": "{{ settings.colorway_custom_enabled }}"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Brand typeface is Helvetica Neue LT Std site-wide (headings + body). Shopify font pickers below are unused."
+      },
+      {
+        "type": "font_picker",
+        "id": "font_heading",
+        "label": "Headings (unused)",
+        "default": "anton_n4",
+        "info": "Kept for compatibility. Live site uses Helvetica Neue LT Std."
+      },
+      {
+        "type": "font_picker",
+        "id": "font_body",
+        "label": "Body (unused)",
+        "default": "work_sans_n4",
+        "info": "Kept for compatibility. Live site uses Helvetica Neue LT Std."
+      },
+      {
+        "type": "range",
+        "id": "heading_scale",
+        "label": "Heading size scale",
+        "min": 80,
+        "max": 130,
+        "step": 5,
+        "unit": "%",
+        "default": 100
+      },
+      {
+        "type": "checkbox",
+        "id": "heading_uppercase",
+        "label": "Uppercase headings",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "label": "Maximum page width",
+        "min": 1200,
+        "max": 1920,
+        "step": 40,
+        "unit": "px",
+        "default": 1600
+      },
+      {
+        "type": "range",
+        "id": "gutter",
+        "label": "Page gutter (mobile)",
+        "min": 12,
+        "max": 32,
+        "step": 2,
+        "unit": "px",
+        "default": 16
+      }
+    ]
+  },
+  {
+    "name": "Buttons",
+    "settings": [
+      {
+        "type": "range",
+        "id": "button_radius",
+        "label": "Button corner radius",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "default": 4
+      }
+    ]
+  },
+  {
+    "name": "Motion",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "motion_enabled",
+        "label": "Enable scroll animations",
+        "info": "Automatically disabled for visitors who prefer reduced motion.",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "page_transitions",
+        "label": "Enable page transitions",
+        "info": "Animated leave/enter on internal navigation. Prefetches the next page during the transition.",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "page_transition_style",
+        "label": "Transition style",
+        "options": [
+          { "value": "melt", "label": "Melt — micro-bubbles merge into liquid (recommended)" },
+          { "value": "classic", "label": "Classic — swipe cover + fizz burst" }
+        ],
+        "default": "melt"
+      },
+      {
+        "type": "range",
+        "id": "page_transition_intensity",
+        "min": 50,
+        "max": 150,
+        "step": 5,
+        "unit": "%",
+        "label": "Melt intensity",
+        "default": 100,
+        "info": "Blob count and size for the melt transition."
+      },
+      {
+        "type": "select",
+        "id": "page_transition_color_mode",
+        "label": "Bubble transition color",
+        "options": [
+          { "value": "theme_accent", "label": "Theme accent (follows colorway)" },
+          { "value": "custom", "label": "Custom color" }
+        ],
+        "default": "theme_accent",
+        "info": "Color of the melt/liquid bubble flood on page transitions."
+      },
+      {
+        "type": "color",
+        "id": "page_transition_color",
+        "label": "Custom bubble color",
+        "default": "#6b9fd4",
+        "visible_if": "{{ settings.page_transition_color_mode == 'custom' }}"
+      }
+    ]
+  },
+  {
+    "name": "Products",
+    "settings": [
+      {
+        "type": "product",
+        "id": "bottle_product",
+        "label": "Default bottle product",
+        "info": "Used by the colorways carousel and pairing links when a section does not set its own product."
+      }
+    ]
+  },
+  {
+    "name": "Social",
+    "settings": [
+      {
+        "type": "url",
+        "id": "social_instagram",
+        "label": "Instagram URL"
+      },
+      {
+        "type": "url",
+        "id": "social_tiktok",
+        "label": "TikTok URL"
+      },
+      {
+        "type": "url",
+        "id": "social_youtube",
+        "label": "YouTube URL"
+      }
+    ]
+  }
+]

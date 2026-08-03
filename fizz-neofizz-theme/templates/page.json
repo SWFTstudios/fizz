@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "nf-page",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

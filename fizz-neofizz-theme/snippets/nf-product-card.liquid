@@ -1,0 +1,124 @@
+{%- comment -%}
+  Product card — collection / related / search grids.
+  Washes and swatches stay legible on every Theme style via --nf-* tokens.
+{%- endcomment -%}
+
+{%- liquid
+  assign show_swatches = show_swatches | default: true
+  assign show_quick_add = show_quick_add | default: false
+  assign media_ratio = media_ratio | default: 'auto'
+  assign media_fit = media_fit | default: 'contain'
+  assign featured = product.featured_media
+  assign color_option = blank
+  for option in product.options_with_values
+    assign on = option.name | downcase
+    if on == 'color' or on == 'colour' or on == 'colorway'
+      assign color_option = option
+      break
+    endif
+  endfor
+
+  assign scene = 'lime'
+  if color_option != blank and color_option.values.size > 0
+    assign first_color = color_option.values.first | strip | downcase
+    case first_color
+      when 'black', 'onyx', 'charcoal', 'charcoal black', 'charcoal-black'
+        assign scene = 'steel'
+      when 'white', 'cloud', 'arctic', 'arctic white', 'arctic-white'
+        assign scene = 'pool'
+      when 'orange', 'citrus', 'coral', 'coral orange', 'coral-orange'
+        assign scene = 'citrus'
+      when 'sage', 'fern', 'green', 'sage green', 'sage-green', 'lime', 'lime fizz'
+        assign scene = 'lime'
+      when 'blue', 'ocean', 'electric', 'electric blue', 'electric-blue'
+        assign scene = 'pool'
+      when 'navy', 'steel', 'steel navy', 'steel-navy'
+        assign scene = 'steel'
+      when 'berry', 'berry night', 'berry-night', 'purple', 'violet'
+        assign scene = 'berry'
+      else
+        assign scene = first_color | handleize | split: '-' | first
+    endcase
+  elsif product.selected_or_first_available_variant
+    capture slug
+      render 'nf-color-slug', variant: product.selected_or_first_available_variant
+    endcapture
+    assign slug = slug | strip
+    case slug
+      when 'coral-orange'
+        assign scene = 'citrus'
+      when 'sage-green', 'lime', 'lime-fizz'
+        assign scene = 'lime'
+      when 'electric-blue'
+        assign scene = 'pool'
+      when 'berry', 'berry-night'
+        assign scene = 'berry'
+      else
+        assign scene = 'steel'
+    endcase
+  endif
+-%}
+
+<article class="nf-card nf-card--fit-{{ media_fit }}" data-nf-card>
+  <a class="nf-card__media-link" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+    <div
+      class="nf-card__media nf-card__media--{{ scene }}"
+      data-nf-card-media
+      style="--nf-card-ratio: {{ media_ratio }};"
+    >
+      <span class="nf-card__wash" aria-hidden="true"></span>
+      {%- if featured != blank -%}
+        {{
+          featured
+          | image_url: width: 900
+          | image_tag:
+            loading: 'lazy',
+            widths: '320, 480, 640, 900',
+            sizes: '(min-width: 900px) 30vw, 45vw',
+            class: 'nf-card__img',
+            alt: featured.alt | default: product.title | escape
+        }}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'nf-card__img nf-card__img--ph' }}
+      {%- endif -%}
+    </div>
+  </a>
+
+  <div class="nf-card__body">
+    <h3 class="nf-card__title">
+      <a href="{{ product.url }}">{{ product.title | escape }}</a>
+    </h3>
+
+    <p class="nf-card__price">
+      {%- if product.price_varies -%}
+        From {{ product.price_min | money }}
+      {%- else -%}
+        {{ product.price | money }}
+      {%- endif -%}
+    </p>
+
+    {%- if show_swatches and color_option != blank -%}
+      <ul class="nf-card__swatches" role="list" aria-label="Available colorways">
+        {%- for value in color_option.values -%}
+          {%- assign slug = value | handleize -%}
+          <li>
+            <span
+              class="nf-card__swatch nf-swatch-tone--{{ slug }}"
+              title="{{ value | escape }}"
+              aria-label="{{ value | escape }}"
+            ></span>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if show_quick_add and product.variants.size == 1 and product.available -%}
+      {%- form 'product', product, class: 'nf-card__quick' -%}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        <button type="submit" class="nf-card__quick-btn">Add</button>
+      {%- endform -%}
+    {%- elsif product.variants.size > 1 -%}
+      <a class="nf-card__choose" href="{{ product.url }}">Choose options</a>
+    {%- endif -%}
+  </div>
+</article>
