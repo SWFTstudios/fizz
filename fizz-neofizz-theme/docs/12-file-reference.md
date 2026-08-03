@@ -9,10 +9,14 @@
 | `config/settings_schema.json` | Theme settings UI |
 | `config/settings_data.json` | Saved values + 5 Theme styles |
 | `locales/en.default.json` | Translations |
+| `assets/nf-fonts.css` | Helvetica Neue LT Std `@font-face` stack |
+| `assets/helvetica-neue-lt-std-*.otf` | Brand typeface files (12 weights/styles) |
 | `assets/nf-base.css` | Global + section styles |
-| `assets/nf-intro.js` | Intro mask + auto-scroll |
-| `assets/nf-scroll.js` | Mosaic / how-to |
-| `assets/nf-carousel.js` | Colorways rail |
+| `assets/nf-neofizz.css` | NeoFizz-specific hero / preloader / layout |
+| `assets/nf-hero.js` | Glyph preloader + clip-path hero window |
+| `assets/nf-motion.js` | Scroll reveals / motion helpers |
+| `assets/nf-scroll.js` | Sticky how-to / scroll effects |
+| `assets/nf-carousel.js` | Carousel rails |
 | `assets/nf-stats.js` | Stats count-up |
 | `assets/nf-page-transition.js` | Page transitions |
 | `assets/nf-transition.js` | Transition helpers / colors |
@@ -23,14 +27,16 @@
 
 | File | Template use |
 | --- | --- |
-| `nf-intro.liquid` | Home |
-| `nf-mosaic.liquid` | Home |
-| `nf-colorways.liquid` | Home |
+| `nf-hero.liquid` | Home (preloader + hero slider) |
+| `nf-marquee.liquid` | Home |
+| `nf-story-split.liquid` | Home |
+| `nf-product-bento.liquid` | Home |
 | `nf-how-sticky.liquid` | Home |
-| `nf-flavors.liquid` | Home |
-| `nf-about.liquid` | Home |
-| `nf-sustainability.liquid` | Home |
+| `nf-features.liquid` | Home |
 | `nf-stats.liquid` | Home (+ any template) |
+| `nf-flavors.liquid` | Home |
+| `nf-about.liquid` | Optional / other templates |
+| `nf-sustainability.liquid` | Optional / other templates |
 | `nf-footer.liquid` | Footer group |
 | `nf-footer-2.liquid` | Footer group (glassmorphic) |
 | `nf-header.liquid` | Header group |
@@ -77,7 +83,7 @@
 | Path | Purpose |
 | --- | --- |
 | `docs/` | This book |
-| `design/JULY14-DESIGN-RESEARCH.md` | Shopify research |
+| `design/NEOFIZZ-DESIGN-RESEARCH.md` | Shopify research |
 | `preview/intro-mask-flythrough.html` | Isolated lab |
 | `scripts/setup-warp-metafields.sh` | Metafield bootstrap |
 | `README.md` | Package landing page |

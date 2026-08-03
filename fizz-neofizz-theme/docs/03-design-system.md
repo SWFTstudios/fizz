@@ -51,9 +51,31 @@ mirrored in Liquid case statements. See research report and
 
 ## Typography
 
-- Heading: `font_picker` (default Anton)
-- Body: `font_picker` (default Work Sans)
-- Optional uppercase headings via Theme settings
+Brand typeface is **Helvetica Neue LT Std** site-wide (headings + body), synced
+from the July 14 theme package:
+
+| Weight | File |
+| --- | --- |
+| 100 Thin | `helvetica-neue-lt-std-35-thin.otf` |
+| 200 Ultra Light | `helvetica-neue-lt-std-25-ultra-light.otf` |
+| 300 Light (+ italic) | `helvetica-neue-lt-std-45-light.otf` / `46-light-italic.otf` |
+| 400 Roman (+ italic) | `helvetica-neue-lt-std-55-roman.otf` / `56-italic.otf` |
+| 500 Medium (+ italic) | `helvetica-neue-lt-std-65-medium.otf` / `66-medium-italic.otf` |
+| 700 Bold (+ italic) | `helvetica-neue-lt-std-75-bold.otf` / `76-bold-italic.otf` |
+| 800 Heavy | `helvetica-neue-lt-std-85-heavy.otf` |
+| 900 Black | `helvetica-neue-lt-std-95-black.otf` |
+
+Wiring:
+
+1. `@font-face` rules → `assets/nf-fonts.css` (loaded in `layout/theme.liquid`
+   and `layout/password.liquid`)
+2. CSS vars `--nf-font-heading` / `--nf-font-body` →
+   `snippets/nf-theme-tokens.liquid` (hard-coded Helvetica stack)
+3. Components consume those vars via `assets/nf-base.css` / `nf-neofizz.css`
+
+Shopify `font_picker` settings remain in `settings_schema.json` for
+compatibility but are labeled unused — they do not drive the live stack.
+Optional uppercase headings still come from Theme settings.
 
 ## Spacing & layout
 
