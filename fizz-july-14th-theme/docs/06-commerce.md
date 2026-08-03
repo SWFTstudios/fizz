@@ -6,7 +6,8 @@
 
 1. `j14-product` — gallery + buy box  
 2. `j14-related` — recommendations  
-3. `j14-footer`
+
+Footer is global via `sections/footer-group.json` (not in the product template).
 
 ### Gallery modes
 

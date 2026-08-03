@@ -13,7 +13,7 @@ Template: [`templates/index.json`](../templates/index.json)
 | 5 | `sections/j14-flavors.liquid` | Flavor packs |
 | 6 | `sections/j14-about.liquid` | Brand story |
 | 7 | `sections/j14-sustainability.liquid` | Stats / claims |
-| 8 | `sections/j14-footer.liquid` | CTA + newsletter |
+| 8 | `sections/j14-footer.liquid` (via footer group) | Glass footer + media bg |
 
 About and sustainability are **separate sections** so merchants can reorder or
 remove either without schema coupling.
