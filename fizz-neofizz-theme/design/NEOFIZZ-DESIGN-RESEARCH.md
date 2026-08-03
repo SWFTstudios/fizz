@@ -16,19 +16,23 @@ transitions.
 
 | Pattern | Approach |
 | --- | --- |
-| Behind-logo water preloader | Solid FIZZ SVG over rising water plate (not NeoLeaf glyph-mask fill); timed rAF overlay, not scroll-scrubbed |
+| White→blue glyph preloader | Black shell; white plate + blue water; FIZZ SVG stencil via `mix-blend-mode: destination-in` (not CSS mask); I-stem zoom then fade |
 | Full-viewport hero slider | Section blocks + autoplay (same media priority as J14) |
 | Scroll section reveals | GSAP ScrollTrigger / IntersectionObserver |
 | Sticky how-it-works | Port of J14 sticky scrub; optional CTA buttons per step |
 | Melt / classic page transitions | Port of J14 canvas melt; CSS var for liquid color |
 | Theme styles | Max **5** presets; default Steel Navy |
 
-### Preloader vs NeoLeaf
+### Preloader vs NeoLeaf / J14
 
-NeoLeaf fills liquid **inside** letter shapes (glyph-as-mask). NeoFizz intentionally stacks a solid
-`Fizz_Logo_Intro.svg` / mobile mark **above** an unmasked water plate so progress reads **behind**
-the wordmark (Z slash gaps reveal the rising blue). Same timed `%` + I-stem zoom exit as before;
-not scroll-scrubbed. Intro SVGs are PNG-in-SVG with alpha outside the glyphs.
+**Polarity:** black outside the letters; white→blue **inside** the glyphs only.
+
+1. Fullscreen `#000` shell  
+2. White plate + timed blue water inside `.nf-preloader__logo`  
+3. FIZZ SVG `<img>` stencil with `mix-blend-mode: destination-in` + `isolation: isolate` — keeps plate pixels only where the logo’s **alpha** is opaque. (CSS `mask-image` on near-black PNG-in-SVG glyphs falls back to luminance in Safari and punches black letter holes on a white/blue field.)  
+4. Scale the logo wrapper from the I-stem, fade the preloader, hero underneath is revealed  
+
+Timed rAF `%` — not scroll-scrubbed. Status `%` stays in the DOM but is visually hidden.
 
 ## Limitations
 

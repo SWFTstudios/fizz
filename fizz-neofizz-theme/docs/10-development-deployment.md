@@ -2,19 +2,17 @@
 
 ## Golden rules
 
-1. **Only push** `fizz-july-14th-theme/` for July 14 production.  
-2. Prefer **targeted** `--only` pushes when iterating.  
-3. Run **Theme Check** before every push.  
-4. Never commit secrets or auth tokens.  
+1. **Only push** `fizz-neofizz-theme/` for NeoFizz.  
+2. Prefer **unpublished** themes — never overwrite live July 14.  
+3. Prefer **targeted** `--only` pushes when iterating.  
+4. Run **Theme Check** before every push.  
+5. Never commit secrets or auth tokens.  
 
 ## Local validation
 
 ```sh
 # From repo root
-shopify theme check --path fizz-july-14th-theme
-
-# Isolated intro lab
-cd fizz-july-14th-theme && python3 -m http.server 4173
+shopify theme check --path fizz-neofizz-theme
 ```
 
 ## Shopify CLI constraints
@@ -32,32 +30,40 @@ On some accounts `shopify theme dev` fails with missing `read_themes` /
 workaround:
 
 1. Theme Check locally  
-2. Isolated HTML preview for intro  
-3. `theme push --theme 188630794525 --allow-live`  
+2. `theme push --unpublished` (or `--theme <id>`) to an unpublished copy  
+3. Use the admin preview / editor links from the JSON push output  
 
 ## Push recipes
 
-### Full theme (careful)
+### New unpublished theme
 
 ```sh
 shopify theme push \
-  --path fizz-july-14th-theme \
+  --path fizz-neofizz-theme \
   --store g9rykd-jt.myshopify.com \
-  --theme 188630794525 \
-  --allow-live
+  --unpublished \
+  --theme "NeoFizz"
 ```
 
-### Intro-only iteration
+### Update existing unpublished NeoFizz
 
 ```sh
 shopify theme push \
-  --path fizz-july-14th-theme \
+  --path fizz-neofizz-theme \
   --store g9rykd-jt.myshopify.com \
-  --theme 188630794525 \
-  --allow-live \
-  --only sections/nf-intro.liquid \
-  --only assets/nf-base.css \
-  --only assets/nf-intro.js \
+  --theme 189109174557
+```
+
+### Hero / preloader-only iteration
+
+```sh
+shopify theme push \
+  --path fizz-neofizz-theme \
+  --store g9rykd-jt.myshopify.com \
+  --theme 189109174557 \
+  --only sections/nf-hero.liquid \
+  --only assets/nf-hero.js \
+  --only assets/nf-neofizz.css \
   --only assets/Fizz_Logo_Intro.svg \
   --only assets/Fizz_Logo_INTRO_SVG_Mobile.svg
 ```
@@ -65,16 +71,16 @@ shopify theme push \
 ## Git workflow
 
 ```sh
-git checkout july-14-custom-design
-# ...edit fizz-july-14th-theme only...
-git add fizz-july-14th-theme
+git checkout neofizz
+# ...edit fizz-neofizz-theme only...
+git add fizz-neofizz-theme
 git commit -m "Describe the change"
-git push -u origin july-14-custom-design
-gh pr create --base main --head july-14-custom-design
+git push -u origin neofizz
+gh pr create --base main --head neofizz
 ```
 
-Do **not** stage sibling `fizz/` experiment files in the same PR unless you
-intend to ship that alternate package.
+Do **not** stage sibling July 14 / Claude / `fizz/` experiment files in the
+same PR unless you intend to ship those packages.
 
 ## Rollback
 
@@ -82,13 +88,13 @@ intend to ship that alternate package.
 2. `git revert` / checkout previous commit and `theme push` again, **or**  
 3. Shopify admin → Themes → publish a prior duplicate  
 
-Keep a unpublished backup theme before risky full pushes.
+Keep an unpublished backup theme before risky full pushes.
 
 ## Environments
 
 | Target | ID | Use |
 | --- | --- | --- |
-| Live July 14 | `188630794525` | Production storefront |
-| Unpublished copy | (create as needed) | Risky experiments |
+| NeoFizz (unpublished) | `189109174557` | Theme library preview / editor |
+| Live July 14 | `188630794525` | **Do not push NeoFizz here** |
 
 Next: [Chapter 11 — Troubleshooting](11-troubleshooting.md)

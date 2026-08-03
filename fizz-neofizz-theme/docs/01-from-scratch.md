@@ -22,61 +22,59 @@ Confirm the active store:
 shopify theme list --store g9rykd-jt.myshopify.com
 ```
 
-You should see **July 14th Custom Design** (`188630794525`) among themes. If
-listing fails with permission errors, see
+You should see **NeoFizz** among unpublished themes (and **July 14th Custom
+Design** as live). If listing fails with permission errors, see
 [Chapter 11](11-troubleshooting.md).
 
 ## 2. Clone and enter the theme
 
 ```sh
 git clone https://github.com/SWFTstudios/fizz.git
-cd fizz/fizz-july-14th-theme
+cd fizz
+git checkout neofizz
 ```
 
 Shopify CLI theme commands require the standard theme directory shape
 (`assets/`, `config/`, `layout/`, `locales/`, `sections/`, `snippets/`,
-`templates/`). This package already matches that structure.
+`templates/`). NeoFizz lives at `fizz-neofizz-theme/` and already matches that
+structure.
 ([CLI docs](https://shopify.dev/docs/storefronts/themes/tools/cli))
 
 ## 3. Verify the theme locally
 
 ```sh
-shopify theme check --path .
+shopify theme check --path fizz-neofizz-theme
 ```
 
 Expect zero offenses. Theme Check is Shopify’s Liquid/JSON linter.
 ([Theme Check](https://shopify.dev/docs/storefronts/themes/tools/theme-check))
 
-## 4. Preview the intro without CLI
-
-```sh
-python3 -m http.server 4173
-```
-
-Open `http://localhost:4173/preview/intro-mask-flythrough.html`. This uses the
-real mask SVGs under `assets/` and a CDN build of GSAP. It is **not** the full
-theme — only the fly-through technique.
-
-## 5. Push a smoke change (optional)
-
-Prefer targeted pushes while learning:
+## 4. Push as unpublished (recommended)
 
 ```sh
 shopify theme push \
-  --path . \
+  --path fizz-neofizz-theme \
   --store g9rykd-jt.myshopify.com \
-  --theme 188630794525 \
-  --allow-live \
-  --only sections/nf-intro.liquid
+  --unpublished \
+  --theme "NeoFizz"
 ```
 
-`--allow-live` is required when the target theme is the published theme.
-([theme push](https://shopify.dev/docs/api/shopify-cli/theme/theme-push))
-
-## 6. Bootstrap metafields (once)
+Or update an existing unpublished NeoFizz theme by ID:
 
 ```sh
-./scripts/setup-warp-metafields.sh
+shopify theme push \
+  --path fizz-neofizz-theme \
+  --store g9rykd-jt.myshopify.com \
+  --theme 189109174557
+```
+
+Never push this path over the live July 14 theme.
+([theme push](https://shopify.dev/docs/api/shopify-cli/theme/theme-push))
+
+## 5. Bootstrap metafields (once)
+
+```sh
+./fizz-neofizz-theme/scripts/setup-warp-metafields.sh
 ```
 
 Creates Product + ProductVariant definitions for warp media and scene colors.
@@ -84,9 +82,9 @@ Safe to re-run; existing definitions report “already exists”.
 
 ## Checklist before Chapter 02
 
-- [ ] `theme check` passes
-- [ ] You can open the live storefront in a browser
-- [ ] You know the theme ID `188630794525`
-- [ ] Isolated preview loads masks without 404s
+- [ ] `theme check` passes on `fizz-neofizz-theme`
+- [ ] You can open a NeoFizz preview URL in a browser
+- [ ] You know the unpublished NeoFizz theme ID
+- [ ] You are on the `neofizz` git branch for edits
 
 Next: [Chapter 02 — Theme architecture](02-theme-architecture.md)

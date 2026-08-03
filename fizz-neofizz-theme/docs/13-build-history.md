@@ -1,79 +1,90 @@
 # Chapter 13 — Build history
 
-A chronological narrative of how the July 14 theme arrived at its current
-shape. Useful when a future change looks “obvious” but fights an earlier
-constraint.
+A chronological narrative of how NeoFizz arrived at its current shape. Useful
+when a future change looks “obvious” but fights an earlier constraint.
 
-## 1. Standalone theme package
+## 1. Fork from July 14
 
-July 14 began as research + sections. It became
-`fizz-july-14th-theme/` so the design could ship without modifying other
-themes in the monorepo. Research lived in
-`design/JULY14-DESIGN-RESEARCH.md` (media settings, block limits, five Theme
-styles, no JSON parse in Liquid).
+NeoFizz began as a standalone fork of `fizz-july-14th-theme/` so NeoLeaf-inspired
+motion could ship in the Theme Library **without** modifying the live July 14
+storefront. Shared DNA kept: Helvetica Neue LT Std, Steel Navy defaults, sticky
+how-to, flavor packs, colorway PDP pieces, melt / classic bubble transitions,
+and the five Theme-style hard limit.
 
-## 2. Parallel experiment in `fizz/`
+## 2. Package + branch boundaries
 
-An alternate `index.july14` template was prototyped inside the multi-design
-`fizz/` package (`july14-*` assets/sections). That experiment froze while the
-standalone package continued. **Do not treat it as production.**
+- Folder: `fizz-neofizz-theme/`  
+- Git branch: `neofizz`  
+- Deploy rule: unpublished theme only; never push over July 14 / Claude / `fizz/`  
 
-## 3. Homepage narrative v1
+Research notes live in `design/NEOFIZZ-DESIGN-RESEARCH.md` (Shopify limits,
+storefront vs editor, preloader feasibility).
 
-Intro used typographic F / gap / ZZ with a CSS `clip-path` expanding from an
-uppercase I. Mosaic, colorways, sticky how-to, flavors, combined
-about+sustainability, and footer completed the scroll story. Motion was
-mostly vanilla (`nf-scroll.js`) plus carousel snap.
+## 3. Homepage rebuild (NeoLeaf pipeline)
 
-## 4. Commerce + transitions
+The July 14 intro → mosaic → colorways sequence was replaced with a NeoLeaf-
+shaped scroll story:
 
-Product / collection / cart templates, colorway-aware PDP stage, related
-cards, melt page transitions, and five Theme styles landed as the theme
-became store-ready.
+1. **NF Hero** — preloader + clip-path grow hole + lifestyle slider  
+2. **NF Marquee**  
+3. **NF Story Split**  
+4. **NF Product Bento**  
+5. **NF How To Use** (sticky scrub; optional CTA per step)  
+6. **NF Key Features**  
+7. **NF Stats** (glass)  
+8. **NF Flavors**  
 
-## 5. Split logo crops
+Header nav (Colors, How it works, Flavors, About, Shop) stayed intentional.
 
-Merchants wanted the real FIZZ mark. Phase 1 cropped `nf-logo-mark.svg`
-into F and ZZ halves around a measured gap; GSAP still drove `clip-path` on
-the media stage. Autoscroll-on-load with cancel-on-input was added to the
-intro schema.
+## 4. Preloader polarity (current)
 
-## 6. Mask fly-through (current)
+Direction settled on **black outside the letters; white→blue inside glyphs**:
 
-Brand direction shifted to a die-cut paper mask:
+1. Fullscreen `#000` shell  
+2. White plate + rising blue water  
+3. FIZZ SVG `<img>` stencil with `mix-blend-mode: destination-in` +
+   `isolation: isolate` (CSS `mask-image` on near-black PNG-in-SVG glyphs falls
+   back to luminance in Safari and punches the wrong holes)  
+4. Scale from the I-stem, fade the preloader, reveal the hero  
 
-- Desktop `Fizz_Logo_Intro.svg`  
-- Mobile `Fizz_Logo_INTRO_SVG_Mobile.svg`  
-- CSS alpha mask + paper fill (`--nf-paper`)  
-- Scale from I stem instead of clipping the video  
-- Desktop `mask-size: cover` to eliminate side gutters  
-- Mobile metrics re-measured when the tall mobile SVG was replaced  
+Timed rAF progress — not scroll-scrubbed. Status `%` stays in the DOM but is
+visually hidden. Desktop / mobile transform-origins are measured separately.
 
-Isolated `preview/intro-mask-flythrough.html` became the fastest way to tune
-the effect when `theme dev` permissions were unavailable.
+## 5. Clip-path hero window
 
-## 7. Homepage / PDP polish in the same era
+After the loader, a sticky shell uses a growing clip-path “hole” so full-bleed
+media reveals copy once the window settles — the NeoLeaf “look through the
+brand” beat without WebGL.
 
-- Sustainability extracted into `nf-sustainability`  
-- Flavor lifestyle photography refreshed  
-- Header gradient / blur / mobile menu controls  
-- PDP slider/fade gallery with fit and chrome options  
-- Warp metafield bootstrap script for carousel media  
+## 6. Motion + a11y
+
+- Theme setting `motion_enabled` and `prefers-reduced-motion` skip loader,
+  marquees, and heavy scroll effects  
+- Theme editor design mode skips the intro loader  
+- Page transitions: melt or classic bubbles; liquid color = theme accent or
+  custom picker  
+
+## 7. Media discipline
+
+A ~254MB CoreHome lifestyle dump does **not** ship in the theme. Curated
+compressed `nf-lifestyle-*.jpg` assets cover defaults; merchants upload more
+in the editor.
 
 ## 8. Documentation book
 
-README + `docs/` chapters were written so a new developer or merchant partner
-can rebuild the mental model from scratch without replaying every
-conversation. Staging rules keep unused media dumps and the stale `fizz/`
-experiment out of the production PR.
+README + `docs/` chapters were rewritten for NeoFizz paths, homepage pipeline,
+and unpublished deploy IDs so a new developer can rebuild the mental model
+without replaying every conversation.
 
 ## Lessons worth keeping
 
-1. Measure mask geometry in the **same space** CSS uses (`cover` vs
-   `contain`).  
-2. Prefer alpha masks when the file’s RGB is not the brand paper color.  
+1. Prefer **alpha / destination-in** over luminance masks when SVG RGB is near
+   black.  
+2. Measure transform-origin in the **same space** the stencil uses (desktop vs
+   mobile SVGs).  
 3. Case-sensitive CDN + case-insensitive macOS = naming traps.  
-4. Editor mode must not inherit aggressive auto-scroll.  
-5. One source of truth beats two “almost the same” packages.
+4. Editor mode must not inherit aggressive preloaders.  
+5. One source of truth beats two “almost the same” packages — keep NeoFizz and
+   July 14 pushes strictly separate.
 
 Back to the index: [README](../README.md)

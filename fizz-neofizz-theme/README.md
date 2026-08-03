@@ -9,11 +9,19 @@ page transitions.
 
 ## Deploy
 
+Push as an **unpublished** Theme Library entry (never over live July 14):
+
 ```bash
-shopify theme push --path fizz-neofizz-theme
-# or development preview:
-shopify theme dev --path fizz-neofizz-theme
+shopify theme push \
+  --path fizz-neofizz-theme \
+  --unpublished \
+  --theme "NeoFizz"
+
+# Update existing unpublished NeoFizz (example ID):
+shopify theme push --path fizz-neofizz-theme --theme 189109174557
 ```
+
+Docs: [`docs/10-development-deployment.md`](docs/10-development-deployment.md).
 
 ## Branch
 

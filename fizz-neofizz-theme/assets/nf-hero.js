@@ -1,6 +1,6 @@
 /*
-  NeoFizz hero — water-fill loader, then NeoLeaf clip-path window.
-  Sticky shell + grow hole; absolute media (-z) clips into the hole on scroll.
+  NeoFizz hero — black shell + destination-in FIZZ stencil (white→blue fill),
+  I-stem zoom + fade, then NeoLeaf clip-path window.
 */
 (function () {
   'use strict';
@@ -365,8 +365,9 @@
       var z = (afterFill - holdMs) / zoomMs;
       if (z < 1) {
         var ze = z * z;
-        var scale = 1 + ze * 18;
-        var opacity = 1 - Math.max(0, (z - 0.35) / 0.65);
+        /* Scale high enough that the filled I covers the viewport before fade */
+        var scale = 1 + ze * 32;
+        var opacity = 1 - Math.max(0, (z - 0.4) / 0.6);
         if (self.logo) self.logo.style.transform = 'scale(' + scale + ')';
         if (self.preloader) self.preloader.style.opacity = String(Math.max(0, opacity));
         requestAnimationFrame(frame);

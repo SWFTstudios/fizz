@@ -190,87 +190,57 @@
   position: fixed;
   inset: 0;
   z-index: 999;
-  display: grid;
-  place-items: center;
   background: #000;
   color: var(--nf-dark-text);
   transition: opacity 0.35s ease;
 }
 .nf-preloader.is-done { pointer-events: none; }
+/*
+  White/blue plate knocked out to FIZZ glyph alpha via destination-in.
+  CSS mask-image treats near-black SVG glyphs as luminance holes in Safari;
+  blend-mode uses the PNG alpha channel instead → black outside, fill inside.
+*/
 .nf-preloader__logo {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  background: #000;
-  transform-origin: 50% 50%;
-  will-change: transform;
   overflow: hidden;
+  isolation: isolate;
+  transform-origin: 45.24% 49.76%;
+  will-change: transform;
+}
+@media (max-width: 749px) {
+  .nf-preloader__logo {
+    transform-origin: 43.15% 49.9%;
+  }
+}
+.nf-preloader__plate {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #fff;
 }
 .nf-preloader__water {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
-  height: 105%;
+  inset: 0;
   background: linear-gradient(180deg, #b7d4f0 0%, #9ec5eb 28%, #6b9fd4 62%, #3d6fa8 100%);
   transform: translateY(100%);
   will-change: transform;
-  /* Soft waterline so the rise reads as liquid, not a hard bar */
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    #000 2.5%,
-    #000 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    #000 2.5%,
-    #000 100%
-  );
 }
-.nf-preloader__water::before {
-  content: '';
+.nf-preloader__stencil {
   position: absolute;
-  left: -5%;
-  right: -5%;
-  top: 0;
-  height: 28px;
-  background: radial-gradient(
-    ellipse 50% 100% at 50% 0%,
-    rgba(183, 212, 240, 0.95) 0%,
-    transparent 70%
-  );
-  animation: nf-preloader-wave 2.8s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes nf-preloader-wave {
-  0%,
-  100% { transform: translateX(-2%) scaleX(1.02); }
-  50% { transform: translateX(2%) scaleX(0.98); }
-}
-.nf-preloader__mark {
-  position: absolute;
+  inset: 0;
   z-index: 1;
-  top: 50%;
-  left: 50%;
-  width: min(78vw, 640px);
-  height: auto;
-  aspect-ratio: 3038 / 1888;
-  object-fit: contain;
-  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   pointer-events: none;
+  mix-blend-mode: destination-in;
 }
-.nf-preloader__mark--mobile { display: none; }
+.nf-preloader__stencil--mobile { display: none; }
 @media (max-width: 749px) {
-  .nf-preloader__mark--desktop { display: none; }
-  .nf-preloader__mark--mobile {
-    display: block;
-    width: min(72vw, 320px);
-    aspect-ratio: 1926 / 4512;
-  }
+  .nf-preloader__stencil--desktop { display: none; }
+  .nf-preloader__stencil--mobile { display: block; }
 }
 .nf-preloader__status {
   position: absolute;
@@ -283,7 +253,7 @@
   font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: lowercase;
-  opacity: 0.85;
+  visibility: hidden;
 }
 .nf-no-motion .nf-preloader { display: none !important; }
 

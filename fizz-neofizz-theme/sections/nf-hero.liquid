@@ -12,6 +12,10 @@
   data-loader-duration="{{ section.settings.loader_duration | default: 5.6 }}"
   data-loader-enabled="{% if section.settings.loader_enabled %}true{% else %}false{% endif %}"
   data-scroll-length="{{ scroll_length }}"
+  style="
+    --nf-hero-mask: url('{{ 'Fizz_Logo_Intro.svg' | asset_url }}');
+    --nf-hero-mask-mobile: url('{{ 'Fizz_Logo_INTRO_SVG_Mobile.svg' | asset_url }}');
+  "
 >
   <h1 class="nf-visually-hidden">{{ section.settings.seo_heading | default: shop.name }}</h1>
 
@@ -106,9 +110,11 @@
   {%- if section.settings.loader_enabled -%}
     <div class="nf-preloader" data-nf-preloader aria-hidden="true">
       <div class="nf-preloader__logo" data-nf-preloader-logo>
-        <div class="nf-preloader__water" data-nf-preloader-water></div>
+        <div class="nf-preloader__plate">
+          <div class="nf-preloader__water" data-nf-preloader-water></div>
+        </div>
         <img
-          class="nf-preloader__mark nf-preloader__mark--desktop"
+          class="nf-preloader__stencil nf-preloader__stencil--desktop"
           src="{{ 'Fizz_Logo_Intro.svg' | asset_url }}"
           alt=""
           width="640"
@@ -116,7 +122,7 @@
           decoding="async"
         >
         <img
-          class="nf-preloader__mark nf-preloader__mark--mobile"
+          class="nf-preloader__stencil nf-preloader__stencil--mobile"
           src="{{ 'Fizz_Logo_INTRO_SVG_Mobile.svg' | asset_url }}"
           alt=""
           width="320"

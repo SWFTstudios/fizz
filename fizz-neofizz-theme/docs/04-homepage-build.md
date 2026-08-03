@@ -6,41 +6,40 @@ Template: [`templates/index.json`](../templates/index.json)
 
 | Order | Section file | Purpose |
 | --- | --- | --- |
-| 1 | `sections/nf-intro.liquid` | Mask fly-through + slides |
-| 2 | `sections/nf-mosaic.liquid` | Editable media grid |
-| 3 | `sections/nf-colorways.liquid` | Bottle variants / warp |
-| 4 | `sections/nf-how-sticky.liquid` | Sticky scrub how-to |
-| 5 | `sections/nf-flavors.liquid` | Flavor packs |
-| 6 | `sections/nf-about.liquid` | Brand story |
-| 7 | `sections/nf-sustainability.liquid` | Stats / claims |
-| 8 | `sections/nf-footer.liquid` (via footer group) | Glass footer + media bg |
+| 1 | `sections/nf-hero.liquid` | Glyph preloader + clip-path hero window + lifestyle slider |
+| 2 | `sections/nf-marquee.liquid` | Keyword strip |
+| 3 | `sections/nf-story-split.liquid` | Brand story + lifestyle |
+| 4 | `sections/nf-product-bento.liquid` | Dark rounded product cards |
+| 5 | `sections/nf-how-sticky.liquid` | Sticky scrub how-to (image / video / text / button) |
+| 6 | `sections/nf-features.liquid` | Accordion feature cards |
+| 7 | `sections/nf-stats.liquid` | Glass impact stats |
+| 8 | `sections/nf-flavors.liquid` | Flavor packs |
 
-About and sustainability are **separate sections** so merchants can reorder or
-remove either without schema coupling.
+Header / footer live in `header-group.json` / `footer-group.json` (NF Header,
+NF Footer 2). Nav anchors: Colors, How it works, Flavors, About, Shop.
 
-## Tutorial: add a mosaic tile
+## Tutorial: edit hero slides
 
-1. Theme editor → Homepage → **NF Media Mosaic**.
-2. Add block **Tile**.
-3. Set image / video / external video / theme asset fallback
-   (priority handled by `snippets/nf-media.liquid`).
-4. Choose span (desktop 12-col), optional tall / wide-mobile.
-5. Save → hard refresh storefront.
+1. Theme editor → Homepage → **NF Hero**.
+2. Add or reorder **Media** blocks.
+3. Prefer theme-editor uploads; curated fallbacks ship as
+   `nf-lifestyle-hero-0N.jpg` via the `asset` setting.
+4. Tune loader duration / enable in section settings.
+5. Save → hard refresh storefront (preloader skips in design mode).
 
-## Tutorial: wire colorways to a bottle product
+## Tutorial: wire the product bento
 
-1. Theme settings → **Products** → Default bottle product  
-   **or** section setting on NF Colorways.
-2. Ensure variants have readable color titles (slug heuristic) or set
-   `custom.color_slug` / scene metafields ([Chapter 07](07-colorways-metafields.md)).
-3. Optionally upload `custom.warp_media` per variant for carousel panels.
-4. Toggle **Sync scene** so background/CTA follow the active slide.
+1. Edit **NF Product Bento** blocks: product picker, label, media overrides.
+2. Ensure bottle products have colorway-friendly variant titles or metafields
+   ([Chapter 07](07-colorways-metafields.md)).
+3. Keep card copy short — the bento is a shoppable grid, not a PDP.
 
-## Tutorial: split about vs sustainability
+## Tutorial: sticky how-to steps
 
-1. Edit **NF About** for story + hero media only.
-2. Edit **NF Sustainability** for eyebrow, heading, body, claim blocks.
-3. Keep distinct `anchor_id` values (`about`, `sustainability`) for header nav.
+1. Edit **NF How To Use** blocks (media + text + optional CTA).
+2. Keep one job per step; scrub length is controlled by section settings.
+3. Confirm `prefers-reduced-motion` / Theme `motion_enabled` still shows static
+   steps ([Chapter 08](08-motion-accessibility.md)).
 
 ## Media priority (all media blocks)
 
@@ -48,21 +47,14 @@ Implemented in [`snippets/nf-media.liquid`](../snippets/nf-media.liquid):
 
 1. Shopify-hosted `video`  
 2. External `video_url` (YouTube / Vimeo)  
-3. `image` picker  
-4. Theme asset filename string  
-5. Placeholder SVG  
+3. Image setting  
+4. Theme asset filename fallback  
 
-Shopify’s `video` setting has **no default** — asset fallbacks are required.
-([Input settings](https://shopify.dev/docs/storefronts/themes/architecture/settings/input-settings))
+`video` settings have no Liquid default — always provide an asset fallback.
 
-## Flavors lineup (current defaults)
+## Theme styles
 
-| Title | Asset |
-| --- | --- |
-| Orange Tangerine | `flavor-lifestyle-orange-tangerine.jpg` |
-| Cherry Limeade | `flavor-lifestyle-cherry-limeade.jpg` |
-| Mixed Berry | `flavor-lifestyle-mixed-berry.jpg` |
+Max **5** presets (Shopify hard limit). Default: **Steel Navy**. Merchants can
+switch Theme style or enable custom colors in Theme settings.
 
-Deep intro mechanics: [Chapter 05](05-intro-flythrough.md)
-
-Next: [Chapter 05 — Intro fly-through](05-intro-flythrough.md)
+Next: [Chapter 05 — Intro / hero](05-intro-flythrough.md)
