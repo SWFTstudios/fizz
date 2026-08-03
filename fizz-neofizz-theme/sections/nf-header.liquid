@@ -5,6 +5,7 @@
   assign opacity_pct = section.settings.bg_opacity | default: 92
   assign opacity = opacity_pct | times: 1.0 | divided_by: 100.0
   assign text_color = section.settings.text_color | default: '#111214'
+  assign text_color_over = section.settings.text_color_over_hero | default: '#ffffff'
   assign blur_enabled = section.settings.blur_background
   if blur_enabled == nil
     assign blur_enabled = true
@@ -15,6 +16,7 @@
   assign bg_start_a = bg_start | color_modify: 'alpha', opacity
   assign bg_end_a = bg_end | color_modify: 'alpha', opacity
   assign text_rgb = text_color | color_to_rgb | remove: 'rgb(' | remove: ')'
+  assign text_over_rgb = text_color_over | color_to_rgb | remove: 'rgb(' | remove: ')'
 
   if blur_enabled
     assign blur_value = 'blur(' | append: blur_amount | append: 'px)'
@@ -57,10 +59,13 @@
 <header
   class="nf-header{% if section.settings.transparent_home and template.name == 'index' %} nf-header--transparent{% endif %}{% if blur_enabled %} nf-header--blur{% endif %}{% if menu_match %} nf-header--menu-match{% endif %}{% if menu_blur_on %} nf-header--menu-blur{% endif %}"
   data-nf-header
+  data-nf-transparent-home="{% if section.settings.transparent_home and template.name == 'index' %}true{% else %}false{% endif %}"
   style="
     --nf-hdr-bg: {{ hdr_bg }};
     --nf-hdr-text: {{ text_color }};
     --nf-hdr-text-rgb: {{ text_rgb }};
+    --nf-hdr-text-over: {{ text_color_over }};
+    --nf-hdr-text-over-rgb: {{ text_over_rgb }};
     --nf-hdr-blur: {{ blur_value }};
     --nf-hdr-opacity: {{ opacity }};
     --nf-menu-bg: {{ menu_bg }};
@@ -68,7 +73,7 @@
   "
 >
   <div class="nf-header__inner">
-    <a href="{{ routes.root_url }}" class="nf-header__logo" aria-label="{{ shop.name | escape }}">
+    <a href="{{ routes.root_url }}" class="nf-header__logo" data-nf-over-media aria-label="{{ shop.name | escape }}">
       {%- if section.settings.logo != blank -%}
         {{
           section.settings.logo
@@ -90,14 +95,14 @@
             endif
           -%}
           <li {{ block.shopify_attributes }}>
-            <a class="nf-header__link" href="{{ href | default: routes.root_url }}">{{ block.settings.label | escape }}</a>
+            <a class="nf-header__link" data-nf-over-media href="{{ href | default: routes.root_url }}">{{ block.settings.label | escape }}</a>
           </li>
         {%- endfor -%}
       </ul>
     </nav>
 
     <div class="nf-header__actions">
-      <a class="nf-header__cart" href="{{ routes.cart_url }}" aria-label="{{ 'cart.general.title' | t }}">
+      <a class="nf-header__cart" data-nf-over-media href="{{ routes.cart_url }}" aria-label="{{ 'cart.general.title' | t }}">
         <svg class="nf-header__cart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
           <path d="M6 7h12l-1.2 12.2a1.5 1.5 0 0 1-1.5 1.3H8.7a1.5 1.5 0 0 1-1.5-1.3L6 7Z"/>
           <path d="M9 9V6a3 3 0 1 1 6 0v3"/>
@@ -106,6 +111,7 @@
       </a>
       <button
         class="nf-header__toggle"
+        data-nf-over-media
         type="button"
         aria-expanded="false"
         aria-controls="nf-nav"
@@ -138,11 +144,149 @@
         });
       });
     }
-    var onScroll = function () {
-      header.classList.toggle('is-scrolled', window.scrollY > 24);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+
+    var transparentHome = header.getAttribute('data-nf-transparent-home') === 'true';
+    var heroPast = !transparentHome;
+    var heroIOPast = false;
+    var heardHeroEvent = false;
+    var overItems = header.querySelectorAll('[data-nf-over-media]');
+    var raf = 0;
+
+    function syncScrolled() {
+      var solid = !transparentHome || heroPast || heroIOPast;
+      header.classList.toggle('is-scrolled', solid);
+      syncOverMedia();
+    }
+
+    function rectsOverlap(a, b) {
+      return !(
+        a.right < b.left ||
+        a.left > b.right ||
+        a.bottom < b.top ||
+        a.top > b.bottom
+      );
+    }
+
+    function parseInset(clip, stageRect) {
+      if (!clip || clip === 'none') return null;
+      var match = String(clip).match(/inset\(\s*([^)]+)\)/i);
+      if (!match) return null;
+      var raw = match[1].split(/round/i)[0].trim().split(/\s+/);
+      var vals = raw.map(function (part) {
+        if (part.indexOf('%') !== -1) {
+          return (parseFloat(part) / 100) * stageRect.height;
+        }
+        return parseFloat(part) || 0;
+      });
+      var top;
+      var right;
+      var bottom;
+      var left;
+      if (vals.length === 1) {
+        top = right = bottom = left = vals[0];
+      } else if (vals.length === 2) {
+        top = bottom = vals[0];
+        right = left = vals[1];
+      } else if (vals.length === 3) {
+        top = vals[0];
+        right = left = vals[1];
+        bottom = vals[2];
+      } else {
+        top = vals[0];
+        right = vals[1];
+        bottom = vals[2];
+        left = vals[3];
+      }
+      return {
+        top: stageRect.top + top,
+        right: stageRect.right - right,
+        bottom: stageRect.bottom - bottom,
+        left: stageRect.left + left
+      };
+    }
+
+    function getVisibleMediaRect() {
+      var stage = document.querySelector('[data-nf-hero-stage]');
+      var media = document.querySelector('[data-nf-hero-media]');
+      var frame = document.querySelector('[data-nf-hero-frame]');
+      if (!stage || !media) return null;
+      var stageRect = stage.getBoundingClientRect();
+      var clip =
+        getComputedStyle(media).clipPath ||
+        getComputedStyle(media).webkitClipPath;
+      var insetRect = parseInset(clip, stageRect);
+      if (insetRect) return insetRect;
+      var hero = document.querySelector('[data-nf-hero]');
+      if (hero && (hero.classList.contains('is-shrunk') || hero.classList.contains('is-static-inset')) && frame) {
+        return frame.getBoundingClientRect();
+      }
+      return media.getBoundingClientRect();
+    }
+
+    function syncOverMedia() {
+      if (!overItems.length) return;
+      var solid =
+        !transparentHome ||
+        header.classList.contains('is-scrolled') ||
+        header.classList.contains('is-open');
+      var mediaRect = solid ? null : getVisibleMediaRect();
+      overItems.forEach(function (el) {
+        if (!mediaRect) {
+          el.classList.remove('is-over-media');
+          return;
+        }
+        el.classList.toggle('is-over-media', rectsOverlap(el.getBoundingClientRect(), mediaRect));
+      });
+      header.classList.add('is-media-aware');
+    }
+
+    function scheduleOverMedia() {
+      if (raf) return;
+      raf = requestAnimationFrame(function () {
+        raf = 0;
+        syncOverMedia();
+      });
+    }
+
+    if (!transparentHome) {
+      syncScrolled();
+      return;
+    }
+
+    document.addEventListener('nf:hero-chrome', function (e) {
+      heardHeroEvent = true;
+      heroPast = !(e.detail && e.detail.overHero);
+      syncScrolled();
+    });
+
+    var hero = document.querySelector('[data-nf-hero]');
+    if (hero) {
+      if (hero.classList.contains('is-shrunk')) {
+        heroPast = true;
+      }
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(
+          function (entries) {
+            var entry = entries[0];
+            if (!entry) return;
+            heroIOPast = entry.boundingClientRect.bottom <= 0;
+            if (!heardHeroEvent) {
+              heroPast = hero.classList.contains('is-shrunk') || heroIOPast;
+            }
+            syncScrolled();
+          },
+          { root: null, threshold: 0, rootMargin: '0px' }
+        );
+        io.observe(hero);
+      }
+    } else {
+      heroPast = true;
+    }
+
+    window.addEventListener('scroll', scheduleOverMedia, { passive: true });
+    window.addEventListener('resize', scheduleOverMedia);
+    syncScrolled();
+    scheduleOverMedia();
   })();
 </script>
 
@@ -172,9 +316,16 @@
     {
       "type": "checkbox",
       "id": "transparent_home",
-      "label": "Transparent over homepage intro",
+      "label": "Transparent over homepage hero",
       "default": true,
-      "info": "Header starts clear on the homepage until you scroll or open the mobile menu."
+      "info": "Header stays clear with over-hero text color while the hero media is fullscreen. After the hero shrinks or scrolls away, the sticky bar uses the colors below."
+    },
+    {
+      "type": "color",
+      "id": "text_color_over_hero",
+      "label": "Text & icon color over hero",
+      "default": "#ffffff",
+      "info": "Used while the homepage hero media is fullscreen."
     },
     {
       "type": "header",
@@ -182,7 +333,7 @@
     },
     {
       "type": "paragraph",
-      "content": "Styles the fixed top nav bar on mobile and desktop."
+      "content": "Styles the fixed top nav bar after scrolling past the hero (and on non-homepage templates)."
     },
     {
       "type": "color",

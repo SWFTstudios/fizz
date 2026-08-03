@@ -38,6 +38,28 @@
     endif
   endif
 
+  assign btn_fill_bg = accent
+  assign btn_fill_text = '#0b0c0e'
+  assign btn_outline_border = ink
+  assign btn_outline_text = ink
+  assign btn_link_text = ink
+
+  if settings.button_fill_bg != blank
+    assign btn_fill_bg = settings.button_fill_bg
+  endif
+  if settings.button_fill_text != blank
+    assign btn_fill_text = settings.button_fill_text
+  endif
+  if settings.button_outline_border != blank
+    assign btn_outline_border = settings.button_outline_border
+  endif
+  if settings.button_outline_text != blank
+    assign btn_outline_text = settings.button_outline_text
+  endif
+  if settings.button_link_text != blank
+    assign btn_link_text = settings.button_link_text
+  endif
+
   assign transition_liquid = accent
   if settings.page_transition_color_mode == 'custom' and settings.page_transition_color != blank
     assign transition_liquid = settings.page_transition_color
@@ -54,6 +76,12 @@
     --nf-transition-liquid: {{ transition_liquid }};
     --nf-ink-rgb: {{ ink | color_to_rgb | remove: 'rgb(' | remove: ')' }};
     --nf-paper-rgb: {{ paper | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+
+    --nf-btn-fill-bg: {{ btn_fill_bg }};
+    --nf-btn-fill-text: {{ btn_fill_text }};
+    --nf-btn-outline-border: {{ btn_outline_border }};
+    --nf-btn-outline-text: {{ btn_outline_text }};
+    --nf-btn-link: {{ btn_link_text }};
 
     --nf-font-heading: "Helvetica Neue LT Std", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --nf-font-heading-weight: 700;

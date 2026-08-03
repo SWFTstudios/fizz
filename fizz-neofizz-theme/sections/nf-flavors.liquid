@@ -54,16 +54,27 @@
             {%- endif -%}
           </p>
           <div class="nf-flavor__actions">
+            {%- liquid
+              assign flavor_cta = block.settings.cta_label | default: 'Explore'
+              assign pair_cta = block.settings.pair_label | default: 'Pair with a bottle'
+              assign pair_href = block.settings.pair_url
+              if pair_href == blank and settings.bottle_product != blank
+                assign pair_href = settings.bottle_product.url
+              endif
+            -%}
             {%- if panel_url != blank -%}
-              <a class="nf-btn" href="{{ panel_url }}">{{ block.settings.cta_label | default: 'Explore' | escape }}</a>
+              {% render 'nf-button',
+                label: flavor_cta,
+                url: panel_url,
+                style: block.settings.button_style
+              %}
             {%- endif -%}
-            {%- if block.settings.pair_url != blank or settings.bottle_product != blank -%}
-              <a
-                class="nf-btn nf-btn--ghost"
-                href="{{ block.settings.pair_url | default: settings.bottle_product.url }}"
-              >
-                {{- block.settings.pair_label | default: 'Pair with a bottle' | escape -}}
-              </a>
+            {%- if pair_href != blank -%}
+              {% render 'nf-button',
+                label: pair_cta,
+                url: pair_href,
+                style: block.settings.pair_button_style
+              %}
             {%- endif -%}
           </div>
         </div>
@@ -159,10 +170,32 @@
           "default": "Explore"
         },
         {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            { "value": "fill", "label": "Fill" },
+            { "value": "outline", "label": "Outline" },
+            { "value": "link", "label": "Linked text underline" }
+          ],
+          "default": "fill"
+        },
+        {
           "type": "text",
           "id": "pair_label",
           "label": "Pairing button label",
           "default": "Pair with a bottle"
+        },
+        {
+          "type": "select",
+          "id": "pair_button_style",
+          "label": "Pairing button style",
+          "options": [
+            { "value": "fill", "label": "Fill" },
+            { "value": "outline", "label": "Outline" },
+            { "value": "link", "label": "Linked text underline" }
+          ],
+          "default": "outline"
         },
         {
           "type": "url",

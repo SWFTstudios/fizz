@@ -143,6 +143,49 @@
     "name": "Buttons",
     "settings": [
       {
+        "type": "select",
+        "id": "button_style_default",
+        "label": "Default button style",
+        "options": [
+          { "value": "fill", "label": "Fill" },
+          { "value": "outline", "label": "Outline" },
+          { "value": "link", "label": "Linked text underline" }
+        ],
+        "default": "fill",
+        "info": "Used when a section does not set its own button style."
+      },
+      {
+        "type": "color",
+        "id": "button_fill_bg",
+        "label": "Fill background",
+        "default": "#6b9fd4",
+        "info": "Defaults follow the active colorway accent until you change them."
+      },
+      {
+        "type": "color",
+        "id": "button_fill_text",
+        "label": "Fill text",
+        "default": "#0b0c0e"
+      },
+      {
+        "type": "color",
+        "id": "button_outline_border",
+        "label": "Outline border",
+        "default": "#0f1a2e"
+      },
+      {
+        "type": "color",
+        "id": "button_outline_text",
+        "label": "Outline text",
+        "default": "#0f1a2e"
+      },
+      {
+        "type": "color",
+        "id": "button_link_text",
+        "label": "Link text",
+        "default": "#0f1a2e"
+      },
+      {
         "type": "range",
         "id": "button_radius",
         "label": "Button corner radius",

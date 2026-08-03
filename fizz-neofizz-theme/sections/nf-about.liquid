@@ -11,9 +11,12 @@
         <div class="nf-about__body">{{ section.settings.body }}</div>
       {%- endif -%}
       {%- if section.settings.cta_label != blank -%}
-        <a class="nf-btn" href="{{ section.settings.cta_url | default: routes.root_url }}">
-          {{- section.settings.cta_label | escape -}}
-        </a>
+        {%- assign about_cta_url = section.settings.cta_url | default: routes.root_url -%}
+        {% render 'nf-button',
+          label: section.settings.cta_label,
+          url: about_cta_url,
+          style: section.settings.button_style
+        %}
       {%- endif -%}
     </div>
     <div class="nf-about__media">
@@ -80,6 +83,17 @@
       "type": "url",
       "id": "cta_url",
       "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "fill", "label": "Fill" },
+        { "value": "outline", "label": "Outline" },
+        { "value": "link", "label": "Linked text underline" }
+      ],
+      "default": "fill"
     },
     {
       "type": "text",

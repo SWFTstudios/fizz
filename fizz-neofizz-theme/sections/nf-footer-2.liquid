@@ -49,12 +49,13 @@
       {%- endif -%}
 
       {%- if section.settings.cta_label != blank -%}
-        <a
-          class="nf-btn nf-btn--accent nf-footer-2__cta"
-          href="{{ section.settings.cta_url | default: routes.all_products_collection_url }}"
-        >
-          {{- section.settings.cta_label | escape -}}
-        </a>
+        {%- assign footer2_cta_url = section.settings.cta_url | default: routes.all_products_collection_url -%}
+        {% render 'nf-button',
+          label: section.settings.cta_label,
+          url: footer2_cta_url,
+          style: section.settings.button_style,
+          class: 'nf-footer-2__cta'
+        %}
       {%- endif -%}
 
       {%- if section.settings.show_newsletter -%}
@@ -200,6 +201,17 @@
       "type": "url",
       "id": "cta_url",
       "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "fill", "label": "Fill" },
+        { "value": "outline", "label": "Outline" },
+        { "value": "link", "label": "Linked text underline" }
+      ],
+      "default": "fill"
     },
     {
       "type": "checkbox",

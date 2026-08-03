@@ -36,9 +36,12 @@
               <div class="nf-rte nf-bento__text">{{ block.settings.body }}</div>
             {%- endif -%}
             {%- if block.settings.button_label != blank and card_url != blank -%}
-              <a class="nf-btn nf-btn--accent nf-btn--pill nf-bento__cta" href="{{ card_url }}">
-                {{- block.settings.button_label | escape -}}
-              </a>
+              {% render 'nf-button',
+                label: block.settings.button_label,
+                url: card_url,
+                style: block.settings.button_style,
+                class: 'nf-btn--pill nf-bento__cta'
+              %}
             {%- endif -%}
           </div>
           <div class="nf-bento__card-media">
@@ -130,6 +133,17 @@
           "type": "url",
           "id": "link",
           "label": "Link"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            { "value": "fill", "label": "Fill" },
+            { "value": "outline", "label": "Outline" },
+            { "value": "link", "label": "Linked text underline" }
+          ],
+          "default": "fill"
         },
         {
           "type": "image_picker",

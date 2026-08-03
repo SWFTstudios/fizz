@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "type": "header",
   "name": "Header group",
@@ -9,6 +18,7 @@
           "type": "nav_link",
           "settings": {
             "label": "Colors",
+            "url": "",
             "anchor_id": "colors"
           }
         },
@@ -16,6 +26,7 @@
           "type": "nav_link",
           "settings": {
             "label": "How it works",
+            "url": "",
             "anchor_id": "how"
           }
         },
@@ -23,6 +34,7 @@
           "type": "nav_link",
           "settings": {
             "label": "Flavors",
+            "url": "",
             "anchor_id": "flavors"
           }
         },
@@ -30,6 +42,7 @@
           "type": "nav_link",
           "settings": {
             "label": "About",
+            "url": "",
             "anchor_id": "about"
           }
         },
@@ -37,6 +50,7 @@
           "type": "nav_link",
           "settings": {
             "label": "Key features",
+            "url": "",
             "anchor_id": "features"
           }
         },
@@ -44,16 +58,42 @@
           "type": "nav_link",
           "settings": {
             "label": "Shop",
-            "url": "/collections/all"
+            "url": "/collections/all",
+            "anchor_id": ""
           }
         }
       },
-      "block_order": ["colors", "how", "flavors", "about", "features", "shop"],
+      "block_order": [
+        "colors",
+        "how",
+        "flavors",
+        "about",
+        "features",
+        "shop"
+      ],
       "settings": {
+        "logo": "shopify://shop_images/Fizz_Logo_Black-p-1600.png",
+        "logo_text": "",
         "menu_label": "Menu",
-        "transparent_home": true
+        "transparent_home": true,
+        "bg_start": "#E7EDF7",
+        "bg_end": "#719ECD",
+        "gradient_angle": 240,
+        "bg_opacity": 92,
+        "text_color": "#111214",
+        "blur_background": true,
+        "blur_amount": 12,
+        "menu_match_header": true,
+        "menu_bg_start": "#f4f3ee",
+        "menu_bg_end": "#e9e7df",
+        "menu_gradient_angle": 180,
+        "menu_bg_opacity": 92,
+        "menu_blur_background": true,
+        "menu_blur_amount": 12
       }
     }
   },
-  "order": ["nf_header"]
+  "order": [
+    "nf_header"
+  ]
 }

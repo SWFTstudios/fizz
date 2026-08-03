@@ -52,9 +52,12 @@
                 <div class="nf-how__step-body">{{ block.settings.body }}</div>
               {%- endif -%}
               {%- if block.settings.button_label != blank and block.settings.button_link != blank -%}
-                <a class="nf-btn nf-btn--accent nf-btn--pill nf-how__step-cta" href="{{ block.settings.button_link }}">
-                  {{- block.settings.button_label | escape -}}
-                </a>
+                {% render 'nf-button',
+                  label: block.settings.button_label,
+                  url: block.settings.button_link,
+                  style: block.settings.button_style,
+                  class: 'nf-btn--pill nf-how__step-cta'
+                %}
               {%- endif -%}
             </li>
           {%- endfor -%}
@@ -133,6 +136,17 @@
           "type": "url",
           "id": "button_link",
           "label": "Button link"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            { "value": "fill", "label": "Fill" },
+            { "value": "outline", "label": "Outline" },
+            { "value": "link", "label": "Linked text underline" }
+          ],
+          "default": "fill"
         }
       ]
     }
