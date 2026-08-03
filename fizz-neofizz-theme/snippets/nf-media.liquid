@@ -9,13 +9,17 @@
   Params:
     video, video_url, image, asset (string), alt (string),
     sizes (string), widths (string), class (string),
-    loading ('lazy' default), autoplay (bool, default true for videos), controls (bool)
+    loading ('lazy' default), autoplay (bool, default true for videos), controls (bool),
+    max_width (number, default 1920 — used for image_url width),
+    poster_size (string, default '1080x' — Shopify video_tag poster)
 {% endcomment %}
 {%- liquid
   assign media_class = class | default: 'nf-media'
   assign media_loading = loading | default: 'lazy'
   assign media_sizes = sizes | default: '100vw'
   assign media_widths = widths | default: '360, 540, 720, 900, 1080, 1440, 1920'
+  assign media_max_width = max_width | default: 1920
+  assign media_poster_size = poster_size | default: '1080x'
   assign media_autoplay = true
   if autoplay == false
     assign media_autoplay = false
@@ -23,9 +27,9 @@
 -%}
 {%- if video != blank -%}
   {%- if media_autoplay -%}
-    {{ video | video_tag: image_size: '1080x', autoplay: true, loop: true, muted: true, controls: false, playsinline: true, class: media_class, preload: 'metadata' }}
+    {{ video | video_tag: image_size: media_poster_size, autoplay: true, loop: true, muted: true, controls: false, playsinline: true, class: media_class, preload: 'metadata' }}
   {%- else -%}
-    {{ video | video_tag: image_size: '1080x', controls: true, playsinline: true, class: media_class, preload: 'metadata' }}
+    {{ video | video_tag: image_size: media_poster_size, controls: true, playsinline: true, class: media_class, preload: 'metadata' }}
   {%- endif -%}
 {%- elsif video_url != blank -%}
   <div class="{{ media_class }} nf-media--embed">
@@ -50,7 +54,7 @@
 {%- elsif image != blank -%}
   {{
     image
-    | image_url: width: 1920
+    | image_url: width: media_max_width
     | image_tag:
       class: media_class,
       loading: media_loading,

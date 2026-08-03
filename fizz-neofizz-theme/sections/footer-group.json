@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "type": "footer",
   "name": "Footer group",
@@ -20,36 +29,21 @@
           }
         }
       },
-      "block_order": ["link_shop", "link_search"],
+      "block_order": [
+        "link_shop",
+        "link_search"
+      ],
       "settings": {
         "headline": "Sparkling water, anywhere.",
         "cta_label": "Shop bottles",
+        "cta_url": "",
         "show_newsletter": true,
         "newsletter_placeholder": "Your email",
         "copyright_note": "All rights reserved"
       }
-    },
-    "nf_footer_2": {
-      "type": "nf-footer-2",
-      "settings": {
-        "headline": "Sparkling water, anywhere.",
-        "cta_label": "Shop bottles",
-        "show_newsletter": true,
-        "newsletter_placeholder": "Your email",
-        "copyright_note": "All rights reserved",
-        "menu_1_heading": "Shop",
-        "menu_1": "footer",
-        "min_height": 480,
-        "overlay_opacity": 20,
-        "glass_blur": 20,
-        "glass_opacity": 28,
-        "glass_tint": "#0a3d3f",
-        "text_color": "#ffffff",
-        "glass_padding": 40,
-        "glass_inset": 24,
-        "content_max_width": 1100
-      }
     }
   },
-  "order": ["nf_footer", "nf_footer_2"]
+  "order": [
+    "nf_footer"
+  ]
 }

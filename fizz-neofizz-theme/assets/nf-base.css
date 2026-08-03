@@ -130,9 +130,9 @@ fieldset {
   gap: 8px;
   padding: 13px 24px;
   min-height: 44px;
-  background: var(--nf-ink);
-  color: var(--nf-paper);
-  border: 1px solid var(--nf-ink);
+  background: var(--nf-btn-fill-bg, var(--nf-ink));
+  color: var(--nf-btn-fill-text, var(--nf-paper));
+  border: 1px solid var(--nf-btn-fill-bg, var(--nf-ink));
   border-radius: var(--nf-btn-radius);
   font-size: 0.82rem;
   font-weight: 600;
@@ -149,15 +149,32 @@ fieldset {
   cursor: not-allowed;
   transform: none;
 }
+.nf-btn--fill,
 .nf-btn--accent {
-  background: var(--nf-accent);
-  border-color: var(--nf-accent);
-  color: #0b0c0e;
+  background: var(--nf-btn-fill-bg, var(--nf-accent));
+  border-color: var(--nf-btn-fill-bg, var(--nf-accent));
+  color: var(--nf-btn-fill-text, #0b0c0e);
 }
+.nf-btn--outline,
 .nf-btn--ghost {
   background: transparent;
-  color: inherit;
-  border-color: currentColor;
+  color: var(--nf-btn-outline-text, inherit);
+  border-color: var(--nf-btn-outline-border, currentColor);
+}
+.nf-btn--link {
+  background: transparent;
+  border-color: transparent;
+  border-radius: 0;
+  min-height: 0;
+  padding: 0;
+  color: var(--nf-btn-link, var(--nf-ink));
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  letter-spacing: 0.08em;
+}
+.nf-btn--link:hover {
+  transform: none;
+  opacity: 0.7;
 }
 
 .nf-input {
@@ -228,6 +245,8 @@ fieldset {
   --nf-hdr-bg: linear-gradient(180deg, rgba(244, 243, 238, 0.92), rgba(233, 231, 223, 0.92));
   --nf-hdr-text: var(--nf-ink);
   --nf-hdr-text-rgb: var(--nf-ink-rgb);
+  --nf-hdr-text-over: #ffffff;
+  --nf-hdr-text-over-rgb: 255, 255, 255;
   --nf-hdr-blur: blur(12px);
   --nf-menu-bg: var(--nf-hdr-bg);
   --nf-menu-blur: var(--nf-hdr-blur);
@@ -244,6 +263,7 @@ fieldset {
 .nf-header.is-scrolled,
 .nf-header.is-open {
   background: var(--nf-hdr-bg);
+  color: var(--nf-hdr-text);
   box-shadow: 0 1px 0 rgba(var(--nf-hdr-text-rgb), 0.08);
 }
 .nf-header--menu-match.is-open {
@@ -257,9 +277,25 @@ fieldset {
 }
 .nf-header--transparent:not(.is-scrolled):not(.is-open) {
   background: transparent;
+  color: var(--nf-hdr-text-over, #ffffff);
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+}
+.nf-header--transparent:not(.is-scrolled):not(.is-open) .nf-header__logo,
+.nf-header--transparent:not(.is-scrolled):not(.is-open) .nf-header__logo-text,
+.nf-header--transparent:not(.is-scrolled):not(.is-open) .nf-header__link,
+.nf-header--transparent:not(.is-scrolled):not(.is-open) .nf-header__cart,
+.nf-header--transparent:not(.is-scrolled):not(.is-open) .nf-header__toggle,
+.nf-header--transparent:not(.is-scrolled):not(.is-open) .nf-header__nav {
+  color: inherit;
+}
+.nf-header--transparent.is-media-aware:not(.is-scrolled):not(.is-open) {
+  color: var(--nf-hdr-text);
+}
+.nf-header--transparent.is-media-aware:not(.is-scrolled):not(.is-open) [data-nf-over-media].is-over-media,
+.nf-header--transparent.is-media-aware:not(.is-scrolled):not(.is-open) [data-nf-over-media].is-over-media .nf-header__logo-text {
+  color: var(--nf-hdr-text-over, #ffffff);
 }
 .nf-header__inner {
   display: flex;
@@ -311,7 +347,7 @@ fieldset {
   transition: opacity 0.2s ease, transform 0.2s ease, background 0.25s ease, backdrop-filter 0.25s ease;
   color: var(--nf-hdr-text);
 }
-.nf-header--menu-blur .nf-header__nav {
+.nf-header--menu-blur.is-open .nf-header__nav {
   backdrop-filter: var(--nf-menu-blur);
   -webkit-backdrop-filter: var(--nf-menu-blur);
 }
@@ -323,6 +359,7 @@ fieldset {
 .nf-header__list {
   display: grid;
   gap: 6px;
+  background: transparent;
 }
 .nf-header__link {
   display: block;
@@ -332,6 +369,7 @@ fieldset {
   text-transform: var(--nf-heading-transform);
   text-decoration: none;
   color: inherit;
+  background: transparent;
   border-bottom: 1px solid rgba(var(--nf-hdr-text-rgb), 0.1);
 }
 .nf-header__actions {
@@ -418,7 +456,7 @@ fieldset {
     height: auto;
     min-height: 0;
     overflow: visible;
-    background: none;
+    background: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     padding: 0;
@@ -426,9 +464,16 @@ fieldset {
     transform: none;
     pointer-events: auto;
   }
+  .nf-header--menu-blur.is-open .nf-header__nav,
+  .nf-header--menu-blur .nf-header__nav {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
   .nf-header__list {
     display: flex;
     gap: 26px;
+    background: transparent;
   }
   .nf-header__link {
     font-family: var(--nf-font-body);
@@ -438,6 +483,7 @@ fieldset {
     text-transform: uppercase;
     border-bottom: 0;
     padding: 8px 0;
+    background: transparent;
   }
   .nf-header__link:hover {
     opacity: 0.6;

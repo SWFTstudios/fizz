@@ -24,6 +24,11 @@
     this.copySide = section.querySelector('[data-nf-hero-copy-side]');
     this.dotsWrap = section.querySelector('[data-nf-hero-dots]');
     this.ctas = section.querySelector('[data-nf-hero-ctas]');
+    this.overMediaEls = Array.prototype.slice.call(
+      section.querySelectorAll('[data-nf-hero-over-media]')
+    );
+    this._overMediaRaf = 0;
+    this._onResizeOverMedia = null;
     this.slides = Array.prototype.slice.call(
       section.querySelectorAll('[data-nf-hero-slide]')
     );
@@ -49,6 +54,7 @@
       section.getAttribute('data-loader-enabled') !== 'false' && this.preloader;
 
     this.bindDots();
+    this.bindOverMedia();
 
     if (motionOff || designMode) {
       this.applyStaticInset();
@@ -148,9 +154,141 @@
     );
   };
 
+  Hero.prototype.rectsOverlap = function (a, b) {
+    return !(
+      a.right < b.left ||
+      a.left > b.right ||
+      a.bottom < b.top ||
+      a.top > b.bottom
+    );
+  };
+
+  Hero.prototype.parseInsetClip = function (clip, stageRect) {
+    if (!clip || clip === 'none') return null;
+    var match = String(clip).match(/inset\(\s*([^)]+)\)/i);
+    if (!match) return null;
+    var raw = match[1].split(/round/i)[0].trim().split(/\s+/);
+    var vals = raw.map(function (part) {
+      if (part.indexOf('%') !== -1) {
+        return (parseFloat(part) / 100) * stageRect.height;
+      }
+      return parseFloat(part) || 0;
+    });
+    var top;
+    var right;
+    var bottom;
+    var left;
+    if (vals.length === 1) {
+      top = right = bottom = left = vals[0];
+    } else if (vals.length === 2) {
+      top = bottom = vals[0];
+      right = left = vals[1];
+    } else if (vals.length === 3) {
+      top = vals[0];
+      right = left = vals[1];
+      bottom = vals[2];
+    } else {
+      top = vals[0];
+      right = vals[1];
+      bottom = vals[2];
+      left = vals[3];
+    }
+    return {
+      top: stageRect.top + top,
+      right: stageRect.right - right,
+      bottom: stageRect.bottom - bottom,
+      left: stageRect.left + left
+    };
+  };
+
+  Hero.prototype.getVisibleMediaRect = function () {
+    if (!this.stage || !this.media) return null;
+    var stageRect = this.stage.getBoundingClientRect();
+    var clip =
+      getComputedStyle(this.media).clipPath ||
+      getComputedStyle(this.media).webkitClipPath;
+    var insetRect = this.parseInsetClip(clip, stageRect);
+    if (insetRect) return insetRect;
+    if (
+      (this.section.classList.contains('is-shrunk') ||
+        this.section.classList.contains('is-static-inset')) &&
+      this.frame
+    ) {
+      return this.frame.getBoundingClientRect();
+    }
+    return this.media.getBoundingClientRect();
+  };
+
+  Hero.prototype.syncCopyOverMedia = function () {
+    if (!this.overMediaEls || !this.overMediaEls.length) return;
+    var mediaRect = this.getVisibleMediaRect();
+    var self = this;
+    this.overMediaEls.forEach(function (el) {
+      if (!mediaRect) {
+        el.classList.remove('is-over-media');
+        return;
+      }
+      el.classList.toggle(
+        'is-over-media',
+        self.rectsOverlap(el.getBoundingClientRect(), mediaRect)
+      );
+    });
+  };
+
+  Hero.prototype.scheduleCopyOverMedia = function () {
+    var self = this;
+    if (this._overMediaRaf) return;
+    this._overMediaRaf = requestAnimationFrame(function () {
+      self._overMediaRaf = 0;
+      self.syncCopyOverMedia();
+    });
+  };
+
+  Hero.prototype.bindOverMedia = function () {
+    var self = this;
+    this._onResizeOverMedia = function () {
+      self.scheduleCopyOverMedia();
+    };
+    window.addEventListener('resize', this._onResizeOverMedia);
+    this.syncCopyOverMedia();
+  };
+
+  Hero.prototype.unbindOverMedia = function () {
+    if (this._onResizeOverMedia) {
+      window.removeEventListener('resize', this._onResizeOverMedia);
+      this._onResizeOverMedia = null;
+    }
+    if (this._overMediaRaf) {
+      cancelAnimationFrame(this._overMediaRaf);
+      this._overMediaRaf = 0;
+    }
+  };
+
+  Hero.prototype.emitChrome = function () {
+    var overHero = !this.section.classList.contains('is-shrunk');
+    document.dispatchEvent(
+      new CustomEvent('nf:hero-chrome', {
+        detail: { overHero: overHero, section: this.section }
+      })
+    );
+  };
+
+  Hero.prototype.setShrunk = function (shrunk) {
+    var was = this.section.classList.contains('is-shrunk');
+    this.section.classList.toggle('is-shrunk', !!shrunk);
+    if (was === !!shrunk) return;
+    this.emitChrome();
+    /* Layout may shift with stacked frame; remasure clip once */
+    if (typeof ScrollTrigger !== 'undefined' && !this._refreshingShrink) {
+      this._refreshingShrink = true;
+      ScrollTrigger.refresh();
+      this._refreshingShrink = false;
+    }
+  };
+
   Hero.prototype.applyStaticInset = function () {
     this.section.classList.add('is-static-inset');
-    this.section.classList.add('is-shrunk');
+    this.setShrunk(true);
     this.clearRunway();
     if (!this.media || !this.frame) return;
     var self = this;
@@ -158,6 +296,7 @@
       var m = self.measureClip();
       self.section.style.setProperty(CP_BRS, m.borderRadius + 'px');
       self.media.style.clipPath = self.clipPathValue(m);
+      self.syncCopyOverMedia();
     });
   };
 
@@ -221,15 +360,10 @@
       clipPath: 'inset(0px round var(' + CP_BRS + ', 0px))'
     });
 
-    if (this.copySide) gsap.set(this.copySide, { autoAlpha: 0, y: 24 });
+    /* Opacity only — do not animate transform (conflicts with CSS position centering) */
+    if (this.copySide) gsap.set(this.copySide, { autoAlpha: 0 });
     if (this.dotsWrap) gsap.set(this.dotsWrap, { autoAlpha: 0 });
     if (this.ctas) gsap.set(this.ctas, { scale: 1.08 });
-    if (this.heading && window.innerWidth < 990) {
-      var hRect = this.heading.getBoundingClientRect();
-      var sRect = this.stage.getBoundingClientRect();
-      var yFrom = Math.max(24, Math.min(sRect.bottom - hRect.bottom, 100));
-      gsap.set(this.heading, { y: yFrom * 0.4 });
-    }
 
     this.tl = gsap.timeline({
       defaults: { ease: 'none' },
@@ -249,16 +383,15 @@
           self.setRunway();
         },
         onUpdate: function (selfSt) {
-          if (selfSt.progress > 0.55) {
-            self.section.classList.add('is-shrunk');
-          } else {
-            self.section.classList.remove('is-shrunk');
-          }
+          /* Header chrome only — copy ink uses visible-media overlap */
+          self.setShrunk(selfSt.progress >= 0.99);
+          self.scheduleCopyOverMedia();
         }
       }
     });
 
     this.st = this.tl.scrollTrigger;
+    this.emitChrome();
 
     /*
       Clip finishes mid-timeline, then hold the finished window so the page
@@ -286,12 +419,8 @@
       0
     );
 
-    if (this.heading && window.innerWidth < 990) {
-      this.tl.to(this.heading, { y: 0, duration: 0.28 }, 0.35);
-    }
-
     if (this.copySide) {
-      this.tl.to(this.copySide, { autoAlpha: 1, y: 0, duration: 0.22 }, 0.4);
+      this.tl.to(this.copySide, { autoAlpha: 1, duration: 0.22 }, 0.4);
     }
     if (this.ctas) {
       this.tl.to(this.ctas, { scale: 1, duration: 0.22 }, 0.4);
@@ -326,8 +455,11 @@
     this.startAutoplay();
     if (staticInset) {
       this.applyStaticInset();
+      this.emitChrome();
       return;
     }
+    this.setShrunk(false);
+    this.emitChrome();
     requestAnimationFrame(function () {
       self.initScrollShrink();
     });
@@ -392,6 +524,8 @@
       }, 400);
     }
     this.startAutoplay();
+    this.setShrunk(false);
+    this.emitChrome();
     requestAnimationFrame(function () {
       self.initScrollShrink();
     });
@@ -400,6 +534,7 @@
   Hero.prototype.destroy = function () {
     this.stopAutoplay();
     this.killScroll();
+    this.unbindOverMedia();
     this.clearRunway();
   };
 

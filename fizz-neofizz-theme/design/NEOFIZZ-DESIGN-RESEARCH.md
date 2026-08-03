@@ -66,3 +66,40 @@ Timed rAF `%` — not scroll-scrubbed. Status `%` stays in the DOM but is visual
 
 `--nf-transition-liquid` resolves to theme accent **or** a custom color
 setting (`page_transition_color_mode` = `theme_accent` | `custom`).
+
+## Nav scroll chrome + button styles (2026-08)
+
+### Research
+
+| Topic | Source |
+| --- | --- |
+| Theme setting persistence | [settings_data.json](https://shopify.dev/docs/storefronts/themes/architecture/config/settings-data-json) — merchant **Save** writes theme + section values |
+| Input types | [Input settings](https://shopify.dev/docs/storefronts/themes/architecture/settings/input-settings) (`color`, `select`) |
+| Section schema | [Section schema](https://shopify.dev/docs/storefronts/themes/architecture/sections/section-schema) |
+
+### Behavior
+
+| State | Header |
+| --- | --- |
+| Homepage + `transparent_home` + hero media fullscreen | Transparent bar; text/icons use `text_color_over_hero` (default `#ffffff`) |
+| Hero `is-shrunk` (ScrollTrigger progress > 0.55) or hero fully above viewport | Solid sticky bar: `bg_*` gradient + `text_color` |
+| Mobile menu open / non-index | Solid admin chrome |
+| Reduced motion / design mode | Hero starts `is-shrunk` → solid chrome immediately |
+
+Chrome sync: `nf-hero.js` dispatches `nf:hero-chrome` `{ overHero }`; header listens and falls back to IntersectionObserver on `[data-nf-hero]`.
+
+### Buttons
+
+- Theme settings: `button_style_default` (`fill` \| `outline` \| `link`), fill/outline/link color pickers, `button_radius`
+- Tokens: `--nf-btn-fill-bg`, `--nf-btn-fill-text`, `--nf-btn-outline-*`, `--nf-btn-link` in `nf-theme-tokens`
+- Snippet: `snippets/nf-button.liquid`
+- Per-CTA `button_style` on hero, story, bento, how, features, flavors, about, footers, colorways
+
+### Limitations
+
+| Limit | Note |
+| --- | --- |
+| Persistence requires theme editor **Save** | No custom storage; schema settings only |
+| Max 5 Theme styles | Unchanged |
+| Color pickers keep last saved value when switching colorway | Admins re-tune Buttons group if needed |
+| Hero circle arrow is shape, not a style option | Still uses fill color tokens |

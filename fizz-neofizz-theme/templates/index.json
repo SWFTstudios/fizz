@@ -1,12 +1,31 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero": {
       "type": "nf-hero",
       "blocks": {
+        "media_7x8RbP": {
+          "type": "media",
+          "settings": {
+            "label": "Lifestyle",
+            "video": "shopify://files/videos/sparkling-blue-bokeh-light-abstract-background-2025-12-17-06-46-25-utc_v1 (1080p).mp4",
+            "video_url": "",
+            "asset": "nf-lifestyle-hero-01.jpg"
+          }
+        },
         "slide_1": {
           "type": "media",
           "settings": {
             "label": "On the go",
+            "video_url": "",
             "asset": "nf-lifestyle-hero-01.jpg"
           }
         },
@@ -14,6 +33,7 @@
           "type": "media",
           "settings": {
             "label": "Drive",
+            "video_url": "",
             "asset": "nf-lifestyle-hero-02.jpg"
           }
         },
@@ -21,6 +41,7 @@
           "type": "media",
           "settings": {
             "label": "Active",
+            "video_url": "",
             "asset": "nf-lifestyle-hero-03.jpg"
           }
         },
@@ -28,6 +49,7 @@
           "type": "media",
           "settings": {
             "label": "Field",
+            "video_url": "",
             "asset": "nf-lifestyle-hero-04.jpg"
           }
         },
@@ -35,17 +57,29 @@
           "type": "media",
           "settings": {
             "label": "Court",
+            "video_url": "",
             "asset": "nf-lifestyle-hero-05.jpg"
           }
         }
       },
-      "block_order": ["slide_1", "slide_2", "slide_3", "slide_4", "slide_5"],
+      "block_order": [
+        "media_7x8RbP",
+        "slide_1",
+        "slide_2",
+        "slide_3",
+        "slide_4",
+        "slide_5"
+      ],
       "settings": {
+        "seo_heading": "",
+        "anchor_id": "top",
         "hero_eyebrow": "Fast, secure and portable",
         "hero_heading": "Sparkling water, anywhere.",
         "hero_subheading": "Fill. Twist. Fizz. Cold bubbles in under ten seconds — no machine, no cans.",
         "cta_label": "Shop bottles",
+        "cta_url": "",
         "cta2_label": "Shop",
+        "cta2_url": "",
         "autoplay_interval": 5,
         "scroll_length": 180,
         "loader_enabled": true,
@@ -55,15 +89,53 @@
     "marquee": {
       "type": "nf-marquee",
       "blocks": {
-        "w1": { "type": "word", "settings": { "text": "FIZZ ANYWHERE" } },
-        "w2": { "type": "word", "settings": { "text": "ZERO SUGAR" } },
-        "w3": { "type": "word", "settings": { "text": "REAL FRUIT" } },
-        "w4": { "type": "word", "settings": { "text": "60 FIZZES PER POD" } },
-        "w5": { "type": "word", "settings": { "text": "PORTABLE" } },
-        "w6": { "type": "word", "settings": { "text": "COLD BUBBLES" } }
+        "w1": {
+          "type": "word",
+          "settings": {
+            "text": "FIZZ ANYWHERE"
+          }
+        },
+        "w2": {
+          "type": "word",
+          "settings": {
+            "text": "ZERO SUGAR"
+          }
+        },
+        "w3": {
+          "type": "word",
+          "settings": {
+            "text": "REAL FRUIT"
+          }
+        },
+        "w4": {
+          "type": "word",
+          "settings": {
+            "text": "60 FIZZES PER POD"
+          }
+        },
+        "w5": {
+          "type": "word",
+          "settings": {
+            "text": "PORTABLE"
+          }
+        },
+        "w6": {
+          "type": "word",
+          "settings": {
+            "text": "COLD BUBBLES"
+          }
+        }
       },
-      "block_order": ["w1", "w2", "w3", "w4", "w5", "w6"],
+      "block_order": [
+        "w1",
+        "w2",
+        "w3",
+        "w4",
+        "w5",
+        "w6"
+      ],
       "settings": {
+        "anchor_id": "marquee",
         "show_glyph": true
       }
     },
@@ -74,50 +146,24 @@
         "heading": "Bubbles without the baggage",
         "body": "<p>We started Fizz because sparkling water should not need a truck, a fridge, or a mountain of cans. One bottle, one pod, endless sparkle.</p>",
         "cta_label": "Learn more",
+        "cta_url": "",
         "asset": "nf-lifestyle-story-01.jpg",
         "anchor_id": "about"
       }
     },
-    "bento": {
-      "type": "nf-product-bento",
-      "blocks": {
-        "c1": {
-          "type": "card",
-          "settings": {
-            "span": "full",
-            "icon_label": "01",
-            "title": "Portable fizz",
-            "body": "<p>Carbonate anywhere. Cold bubbles in under ten seconds — no machine, no cans.</p>",
-            "button_label": "Shop bottles",
-            "asset": "nf-lifestyle-hero-03.jpg"
-          }
-        },
-        "c2": {
-          "type": "card",
-          "settings": {
-            "span": "half",
-            "icon_label": "02",
-            "title": "Real flavor packs",
-            "body": "<p>Zero sugar. Real fruit. Drop a pack and sip.</p>",
-            "asset": "nf-lifestyle-feature-01.jpg"
-          }
-        },
-        "c3": {
-          "type": "card",
-          "settings": {
-            "span": "half",
-            "icon_label": "03",
-            "title": "60 fizzes per pod",
-            "body": "<p>Recyclable CO₂ pods that keep the sparkle coming.</p>",
-            "asset": "nf-lifestyle-feature-02.jpg"
-          }
-        }
-      },
-      "block_order": ["c1", "c2", "c3"],
+    "nf_colorways_XWNqCy": {
+      "type": "nf-colorways",
+      "name": "NF Colorways Carousel",
       "settings": {
-        "eyebrow": "Products",
-        "heading": "What's possible with Fizz",
-        "anchor_id": "colors"
+        "eyebrow": "The bottle",
+        "heading": "Pick your color",
+        "anchor_id": "colors",
+        "product": "fizz-bottle",
+        "cta_label": "Shop this color",
+        "sync_scene": true,
+        "section_height": 70,
+        "media_height": 30,
+        "scroll_height_per_colorway": 50
       }
     },
     "how": {
@@ -128,8 +174,10 @@
           "settings": {
             "title": "Fill with cold water",
             "body": "<p>Cold water carbonates best. Fill to the line, no further.</p>",
+            "image": "shopify://shop_images/CoreHome_FIZZ_Lifestyles_51.jpg",
             "asset": "nf-lifestyle-how-01.jpg",
-            "button_label": "Shop bottles"
+            "button_label": "Shop bottles",
+            "button_link": ""
           }
         },
         "step_2": {
@@ -137,7 +185,10 @@
           "settings": {
             "title": "Twist the pod",
             "body": "<p>Lock a CO2 pod into the base and give it a quarter turn.</p>",
-            "asset": "nf-lifestyle-how-02.jpg"
+            "image": "shopify://shop_images/CoreHome_FIZZ_Lifestyles_20.jpg",
+            "asset": "nf-lifestyle-how-02.jpg",
+            "button_label": "",
+            "button_link": ""
           }
         },
         "step_3": {
@@ -145,16 +196,102 @@
           "settings": {
             "title": "Sip the sparkle",
             "body": "<p>Add a flavor pack if you like. Bubbles in under ten seconds.</p>",
+            "image": "shopify://shop_images/CoreHome_FIZZ_Lifestyles_25.jpg",
             "asset": "nf-lifestyle-how-03.jpg",
-            "button_label": "Shop flavors"
+            "button_label": "Shop flavors",
+            "button_link": ""
           }
         }
       },
-      "block_order": ["step_1", "step_2", "step_3"],
+      "block_order": [
+        "step_1",
+        "step_2",
+        "step_3"
+      ],
       "settings": {
         "eyebrow": "How it works",
         "heading": "Fizz in three moves",
         "anchor_id": "how"
+      }
+    },
+    "stats": {
+      "type": "nf-stats",
+      "blocks": {
+        "stat_1": {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Americans consume <strong>30 billion seltzer cans</strong> daily</p>",
+            "number": "30",
+            "suffix": "B",
+            "decimals": 0,
+            "number_size": "inherit"
+          }
+        },
+        "stat_2": {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Generating over <strong>200k metric tons of CO2e</strong> from aluminum processing</p>",
+            "number": "200",
+            "suffix": "K",
+            "decimals": 0,
+            "number_size": "inherit"
+          }
+        },
+        "stat_3": {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Offsetting it requires <strong>3.3 million tree seedlings</strong></p>",
+            "number": "3.3",
+            "suffix": "M",
+            "decimals": 1,
+            "number_size": "inherit"
+          }
+        },
+        "stat_4": {
+          "type": "stat",
+          "settings": {
+            "body": "<p>Over a period of <strong>10 years</strong> to absorb the emissions</p>",
+            "number": "10",
+            "suffix": "YRS",
+            "decimals": 0,
+            "number_size": "inherit"
+          }
+        }
+      },
+      "block_order": [
+        "stat_1",
+        "stat_2",
+        "stat_3",
+        "stat_4"
+      ],
+      "settings": {
+        "heading": "KEEP YOUR CO₂ WHERE IT BELONGS - IN YOUR DRINK",
+        "subheading": "Seltzer by the numbers :",
+        "anchor_id": "stats",
+        "background_video": "shopify://files/videos/sparkling-blue-bokeh-light-abstract-background-2025-12-17-06-46-25-utc_v1 (1080p).mp4",
+        "background_asset": "nf-lifestyle-stats-bg.jpg",
+        "min_height": 570,
+        "overlay_opacity": 15,
+        "glass_blur": 18,
+        "glass_opacity": 22,
+        "glass_tint": "#6a8a8c",
+        "text_color": "#ffffff",
+        "glass_padding": 48,
+        "glass_inset": 28,
+        "columns_desktop": 4,
+        "columns_tablet": 2,
+        "columns_mobile": 1,
+        "column_gap": 0,
+        "row_gap": 32,
+        "fill_height": true,
+        "stats_area_min_height": 210,
+        "heading_size": 48,
+        "subheading_size": 28,
+        "body_size": 22,
+        "number_size": 160,
+        "suffix_size": 40,
+        "animate_numbers": true,
+        "count_duration": 1600
       }
     },
     "features": {
@@ -167,6 +304,8 @@
             "title": "Customizable product",
             "body": "<p>Pick your colorway and make every sip feel like yours.</p>",
             "dot_count": 3,
+            "button_label": "",
+            "button_link": "",
             "asset": "nf-lifestyle-story-02.jpg"
           }
         },
@@ -176,7 +315,9 @@
             "tag": "flex",
             "title": "Flexibility and flavor",
             "body": "<p>Water, iced tea, or juice — carbonate what you already drink.</p>",
-            "dot_count": 5,
+            "dot_count": 6,
+            "button_label": "",
+            "button_link": "",
             "asset": "nf-lifestyle-feature-01.jpg"
           }
         },
@@ -186,76 +327,76 @@
             "tag": "performance",
             "title": "Scalability",
             "body": "<p>60 fizzes per pod. Scale up for the week, or down for the commute.</p>",
-            "dot_count": 7,
+            "dot_count": 9,
+            "button_label": "",
+            "button_link": "",
             "asset": "nf-lifestyle-feature-02.jpg"
           }
         }
       },
-      "block_order": ["f1", "f2", "f3"],
+      "block_order": [
+        "f1",
+        "f2",
+        "f3"
+      ],
       "settings": {
         "eyebrow": "Key features",
         "heading": "The best in the business",
         "anchor_id": "features"
       }
     },
-    "stats": {
-      "type": "nf-stats",
+    "bento": {
+      "type": "nf-product-bento",
       "blocks": {
-        "stat_1": {
-          "type": "stat",
+        "c1": {
+          "type": "card",
           "settings": {
-            "body": "<p>Americans consume <strong>30 billion seltzer cans</strong> daily</p>",
-            "number": "30",
-            "suffix": "B",
-            "decimals": 0
+            "span": "full",
+            "reversed": false,
+            "icon_label": "01",
+            "title": "Portable fizz",
+            "body": "<p>Carbonate anywhere. Cold bubbles in under ten seconds — no machine, no cans.</p>",
+            "button_label": "Shop bottles",
+            "link": "",
+            "asset": "nf-lifestyle-hero-03.jpg"
           }
         },
-        "stat_2": {
-          "type": "stat",
+        "c2": {
+          "type": "card",
           "settings": {
-            "body": "<p>Generating over <strong>200k metric tons of CO2e</strong> from aluminum processing</p>",
-            "number": "200",
-            "suffix": "K",
-            "decimals": 0
+            "span": "half",
+            "reversed": false,
+            "icon_label": "02",
+            "title": "Real flavor packs",
+            "body": "<p>Zero sugar. Real fruit. Drop a pack and sip.</p>",
+            "button_label": "",
+            "link": "",
+            "asset": "nf-lifestyle-feature-01.jpg"
           }
         },
-        "stat_3": {
-          "type": "stat",
+        "c3": {
+          "type": "card",
           "settings": {
-            "body": "<p>Offsetting it requires <strong>3.3 million tree seedlings</strong></p>",
-            "number": "3.3",
-            "suffix": "M",
-            "decimals": 1
-          }
-        },
-        "stat_4": {
-          "type": "stat",
-          "settings": {
-            "body": "<p>Over a period of <strong>10 years</strong> to absorb the emissions</p>",
-            "number": "10",
-            "suffix": "YRS",
-            "decimals": 0
+            "span": "half",
+            "reversed": false,
+            "icon_label": "03",
+            "title": "60 fizzes per pod",
+            "body": "<p>Recyclable CO₂ pods that keep the sparkle coming.</p>",
+            "button_label": "",
+            "link": "",
+            "asset": "nf-lifestyle-feature-02.jpg"
           }
         }
       },
-      "block_order": ["stat_1", "stat_2", "stat_3", "stat_4"],
+      "block_order": [
+        "c1",
+        "c2",
+        "c3"
+      ],
       "settings": {
-        "heading": "KEEP YOUR CO₂ WHERE IT BELONGS - IN YOUR DRINK",
-        "subheading": "Seltzer by the numbers :",
-        "anchor_id": "stats",
-        "background_asset": "nf-lifestyle-stats-bg.jpg",
-        "columns_desktop": 4,
-        "columns_tablet": 2,
-        "columns_mobile": 1,
-        "animate_numbers": true,
-        "count_duration": 1600,
-        "fill_height": true,
-        "stats_area_min_height": 280,
-        "glass_blur": 18,
-        "glass_opacity": 22,
-        "glass_tint": "#6a8a8c",
-        "text_color": "#ffffff",
-        "min_height": 520
+        "eyebrow": "Products",
+        "heading": "What's possible with Fizz",
+        "anchor_id": "colors"
       }
     },
     "flavors": {
@@ -264,32 +405,51 @@
         "flavor_1": {
           "type": "flavor",
           "settings": {
+            "product": "",
             "title": "Orange Tangerine",
             "body": "<p>Sunny citrus with a soft finish.</p>",
             "asset": "flavor-lifestyle-orange-tangerine.jpg",
-            "tint": "#f4ddc4"
+            "tint": "#f4ddc4",
+            "link": "",
+            "cta_label": "Explore",
+            "pair_label": "Pair with a bottle",
+            "pair_url": ""
           }
         },
         "flavor_2": {
           "type": "flavor",
           "settings": {
+            "product": "",
             "title": "Cherry Limeade",
             "body": "<p>Bright cherry with a lime snap.</p>",
             "asset": "flavor-lifestyle-cherry-limeade.jpg",
-            "tint": "#f0d0d4"
+            "tint": "#f0d0d4",
+            "link": "",
+            "cta_label": "Explore",
+            "pair_label": "Pair with a bottle",
+            "pair_url": ""
           }
         },
         "flavor_3": {
           "type": "flavor",
           "settings": {
+            "product": "",
             "title": "Mixed Berry",
             "body": "<p>Raspberry and blueberry, cold and bold.</p>",
             "asset": "flavor-lifestyle-mixed-berry.jpg",
-            "tint": "#e4d4e8"
+            "tint": "#e4d4e8",
+            "link": "",
+            "cta_label": "Explore",
+            "pair_label": "Pair with a bottle",
+            "pair_url": ""
           }
         }
       },
-      "block_order": ["flavor_1", "flavor_2", "flavor_3"],
+      "block_order": [
+        "flavor_1",
+        "flavor_2",
+        "flavor_3"
+      ],
       "settings": {
         "eyebrow": "Flavors",
         "heading": "Three packs. Zero sugar.",
@@ -298,5 +458,15 @@
       }
     }
   },
-  "order": ["hero", "marquee", "story", "bento", "how", "features", "stats", "flavors"]
+  "order": [
+    "hero",
+    "marquee",
+    "story",
+    "nf_colorways_XWNqCy",
+    "how",
+    "stats",
+    "features",
+    "bento",
+    "flavors"
+  ]
 }

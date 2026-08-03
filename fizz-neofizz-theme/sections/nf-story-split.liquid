@@ -19,7 +19,11 @@
         <div class="nf-rte nf-story__body">{{ section.settings.body }}</div>
       {%- endif -%}
       {%- if section.settings.cta_label != blank -%}
-        <a class="nf-btn nf-btn--ghost" href="{{ cta_url }}">{{ section.settings.cta_label | escape }}</a>
+        {% render 'nf-button',
+          label: section.settings.cta_label,
+          url: cta_url,
+          style: section.settings.button_style
+        %}
       {%- endif -%}
     </div>
     <div class="nf-story__media" data-nf-parallax>
@@ -71,6 +75,17 @@
       "type": "url",
       "id": "cta_url",
       "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "fill", "label": "Fill" },
+        { "value": "outline", "label": "Outline" },
+        { "value": "link", "label": "Linked text underline" }
+      ],
+      "default": "fill"
     },
     {
       "type": "image_picker",

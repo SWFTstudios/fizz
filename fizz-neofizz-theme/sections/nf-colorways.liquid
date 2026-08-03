@@ -1,6 +1,7 @@
 {%- liquid
   assign bottle = section.settings.product | default: settings.bottle_product
   assign cta_label = section.settings.cta_label | default: 'Shop this color'
+  assign cta_style = section.settings.button_style | default: settings.button_style_default | default: 'fill'
   assign demo_slugs = 'steel-navy,electric-blue,coral-orange,sage-green,charcoal-black,arctic-white' | split: ','
   assign section_height = section.settings.section_height | default: 100
   assign media_height = section.settings.media_height | default: 52
@@ -80,9 +81,15 @@
             <div class="nf-way__info">
               <h3 class="nf-way__name">{{ variant.title | escape }}</h3>
               <p class="nf-way__price">{{ variant.price | money }}</p>
-              <a class="nf-btn nf-way__cta" href="{{ bottle.url }}?variant={{ variant.id }}">
-                {{- cta_label | escape -}}
-              </a>
+              {% liquid
+                assign way_href = bottle.url | append: '?variant=' | append: variant.id
+              %}
+              {% render 'nf-button',
+                label: cta_label,
+                url: way_href,
+                style: cta_style,
+                class: 'nf-way__cta'
+              %}
             </div>
           </li>
         {%- endfor -%}
@@ -105,7 +112,12 @@
             </div>
             <div class="nf-way__info">
               <h3 class="nf-way__name">{{ slug | replace: '-', ' ' | capitalize }}</h3>
-              <a class="nf-btn nf-way__cta" href="{{ routes.all_products_collection_url }}">{{ cta_label | escape }}</a>
+              {% render 'nf-button',
+                label: cta_label,
+                url: routes.all_products_collection_url,
+                style: cta_style,
+                class: 'nf-way__cta'
+              %}
             </div>
           </li>
         {%- endfor -%}
@@ -155,6 +167,17 @@
       "id": "cta_label",
       "label": "Button label",
       "default": "Shop this color"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "fill", "label": "Fill" },
+        { "value": "outline", "label": "Outline" },
+        { "value": "link", "label": "Linked text underline" }
+      ],
+      "default": "fill"
     },
     {
       "type": "checkbox",

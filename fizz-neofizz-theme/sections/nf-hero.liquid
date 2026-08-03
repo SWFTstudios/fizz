@@ -3,6 +3,66 @@
   assign cta_url = section.settings.cta_url | default: routes.all_products_collection_url
   assign cta2_url = section.settings.cta2_url
   assign scroll_length = section.settings.scroll_length | default: 180
+
+  assign main_x = section.settings.heading_x | default: 'left'
+  assign main_y = section.settings.heading_y | default: 'bottom'
+  assign side_x = section.settings.side_x | default: 'right'
+  assign side_y = section.settings.side_y | default: 'bottom'
+
+  assign main_mx = section.settings.heading_x_mobile | default: 'inherit'
+  assign main_my = section.settings.heading_y_mobile | default: 'inherit'
+  assign side_mx = section.settings.side_x_mobile | default: 'inherit'
+  assign side_my = section.settings.side_y_mobile | default: 'inherit'
+
+  if main_mx == blank or main_mx == 'inherit'
+    assign main_mx = main_x
+  endif
+  if main_my == blank or main_my == 'inherit'
+    assign main_my = main_y
+  endif
+  if side_mx == blank or side_mx == 'inherit'
+    assign side_mx = side_x
+  endif
+  if side_my == blank or side_my == 'inherit'
+    assign side_my = side_y
+  endif
+
+  assign heading_size = section.settings.heading_font_size | default: 56
+  assign heading_size_m = section.settings.heading_font_size_mobile | default: 0
+  assign heading_width = section.settings.heading_max_width | default: 14
+  assign heading_width_m = section.settings.heading_max_width_mobile | default: 0
+  assign sub_size = section.settings.sub_font_size | default: 18
+  assign sub_size_m = section.settings.sub_font_size_mobile | default: 0
+  assign sub_width = section.settings.sub_max_width | default: 36
+  assign sub_width_m = section.settings.sub_max_width_mobile | default: 0
+
+  if heading_size_m == 0
+    assign heading_size_m = heading_size
+  endif
+  if heading_width_m == 0
+    assign heading_width_m = heading_width
+  endif
+  if sub_size_m == 0
+    assign sub_size_m = sub_size
+  endif
+  if sub_width_m == 0
+    assign sub_width_m = sub_width
+  endif
+
+  assign pad_x = section.settings.copy_padding_x | default: 40
+  assign pad_y = section.settings.copy_padding_y | default: 40
+  assign pad_x_m = section.settings.copy_padding_x_mobile | default: 0
+  assign pad_y_m = section.settings.copy_padding_y_mobile | default: 0
+  assign media_end_h = section.settings.media_end_height | default: 45
+  if pad_x_m == 0
+    assign pad_x_m = pad_x
+  endif
+  if pad_y_m == 0
+    assign pad_y_m = pad_y
+  endif
+
+  assign main_classes = 'nf-hero__copy-main nf-hero__copy-main--x-' | append: main_x | append: ' nf-hero__copy-main--y-' | append: main_y | append: ' nf-hero__copy-main--mx-' | append: main_mx | append: ' nf-hero__copy-main--my-' | append: main_my
+  assign side_classes = 'nf-hero__copy-side nf-hero__copy-side--x-' | append: side_x | append: ' nf-hero__copy-side--y-' | append: side_y | append: ' nf-hero__copy-side--mx-' | append: side_mx | append: ' nf-hero__copy-side--my-' | append: side_my
 -%}
 <section
   class="nf-hero"
@@ -15,6 +75,19 @@
   style="
     --nf-hero-mask: url('{{ 'Fizz_Logo_Intro.svg' | asset_url }}');
     --nf-hero-mask-mobile: url('{{ 'Fizz_Logo_INTRO_SVG_Mobile.svg' | asset_url }}');
+    --nf-hero-heading-size: {{ heading_size }}px;
+    --nf-hero-heading-size-m: {{ heading_size_m }}px;
+    --nf-hero-heading-width: {{ heading_width }}ch;
+    --nf-hero-heading-width-m: {{ heading_width_m }}ch;
+    --nf-hero-sub-size: {{ sub_size }}px;
+    --nf-hero-sub-size-m: {{ sub_size_m }}px;
+    --nf-hero-sub-width: {{ sub_width }}ch;
+    --nf-hero-sub-width-m: {{ sub_width_m }}ch;
+    --nf-hero-pad-x: {{ pad_x }}px;
+    --nf-hero-pad-y: {{ pad_y }}px;
+    --nf-hero-pad-x-m: {{ pad_x_m }}px;
+    --nf-hero-pad-y-m: {{ pad_y_m }}px;
+    --nf-hero-media-end-h: {{ media_end_h }}vh;
   "
 >
   <h1 class="nf-visually-hidden">{{ section.settings.seo_heading | default: shop.name }}</h1>
@@ -22,8 +95,8 @@
   <div class="nf-hero__track" data-nf-hero-track>
     <div class="nf-hero__stage" data-nf-hero-stage>
       {%- comment -%}
-        Grow spacer = final window hole (no position:relative).
-        Absolute media layer lives inside it so inset-0 resolves to the sticky stage.
+        Media-frame = end-state clip hole (height from --nf-hero-media-end-h).
+        Absolute media layer fills the stage; copy sits in-flow below the frame.
       {%- endcomment -%}
       <div class="nf-hero__media-frame" data-nf-hero-frame>
         <div class="nf-hero__media-layer" data-nf-hero-media>
@@ -44,49 +117,60 @@
                     alt: block.settings.label,
                     class: 'nf-hero__media',
                     sizes: '100vw',
+                    widths: '1080, 1440, 1920, 2560, 2880',
+                    max_width: 2880,
+                    poster_size: '1920x',
                     loading: 'eager'
                   -%}
                 </div>
               {%- endfor -%}
             {%- else -%}
               <div class="nf-hero__slide is-active" data-nf-hero-slide data-index="0">
-                {%- render 'nf-media', asset: 'nf-lifestyle-hero-01.jpg', class: 'nf-hero__media', loading: 'eager' -%}
+                {%- render 'nf-media',
+                  asset: 'nf-lifestyle-hero-01.jpg',
+                  class: 'nf-hero__media',
+                  sizes: '100vw',
+                  widths: '1080, 1440, 1920, 2560, 2880',
+                  max_width: 2880,
+                  loading: 'eager'
+                -%}
               </div>
             {%- endif -%}
           </div>
         </div>
       </div>
 
-      <div class="nf-hero__copy" data-nf-hero-copy>
-        <div class="nf-hero__copy-grid">
-          <div class="nf-hero__copy-main">
-            {%- if section.settings.hero_eyebrow != blank -%}
-              <p class="nf-eyebrow nf-hero__eyebrow" data-nf-hero-eyebrow>{{ section.settings.hero_eyebrow | escape }}</p>
+      <div class="nf-hero__copy nf-hero__copy--stack-y-{{ main_my }}" data-nf-hero-copy>
+        <div class="{{ main_classes }}" data-nf-hero-over-media>
+          {%- if section.settings.hero_eyebrow != blank -%}
+            <p class="nf-eyebrow nf-hero__eyebrow" data-nf-hero-eyebrow>{{ section.settings.hero_eyebrow | escape }}</p>
+          {%- endif -%}
+          {%- if section.settings.hero_heading != blank -%}
+            <h2 class="nf-hero__heading" data-nf-hero-heading>{{ section.settings.hero_heading | escape | newline_to_br }}</h2>
+          {%- endif -%}
+        </div>
+        <div class="{{ side_classes }}" data-nf-hero-copy-side data-nf-hero-over-media>
+          {%- if section.settings.hero_subheading != blank -%}
+            <p class="nf-hero__sub">{{ section.settings.hero_subheading | escape | newline_to_br }}</p>
+          {%- endif -%}
+          <div class="nf-hero__ctas" data-nf-hero-ctas>
+            {%- if section.settings.cta_label != blank -%}
+              {% render 'nf-button',
+                label: section.settings.cta_label,
+                url: cta_url,
+                style: section.settings.button_style,
+                class: 'nf-btn--pill'
+              %}
             {%- endif -%}
-            {%- if section.settings.hero_heading != blank -%}
-              <h2 class="nf-hero__heading" data-nf-hero-heading>{{ section.settings.hero_heading | escape }}</h2>
+            {%- if section.settings.cta2_label != blank and cta2_url != blank -%}
+              <a class="nf-btn nf-btn--circle" href="{{ cta2_url }}" aria-label="{{ section.settings.cta2_label | escape }}">
+                <span aria-hidden="true">→</span>
+              </a>
+            {%- elsif section.settings.cta_label != blank -%}
+              <a class="nf-btn nf-btn--circle" href="{{ cta_url }}" aria-label="{{ section.settings.cta_label | escape }}">
+                <span aria-hidden="true">→</span>
+              </a>
             {%- endif -%}
-          </div>
-          <div class="nf-hero__copy-side" data-nf-hero-copy-side>
-            {%- if section.settings.hero_subheading != blank -%}
-              <p class="nf-hero__sub">{{ section.settings.hero_subheading | escape }}</p>
-            {%- endif -%}
-            <div class="nf-hero__ctas" data-nf-hero-ctas>
-              {%- if section.settings.cta_label != blank -%}
-                <a class="nf-btn nf-btn--accent nf-btn--pill" href="{{ cta_url }}">
-                  {{- section.settings.cta_label | escape -}}
-                </a>
-              {%- endif -%}
-              {%- if section.settings.cta2_label != blank and cta2_url != blank -%}
-                <a class="nf-btn nf-btn--circle" href="{{ cta2_url }}" aria-label="{{ section.settings.cta2_label | escape }}">
-                  <span aria-hidden="true">→</span>
-                </a>
-              {%- elsif section.settings.cta_label != blank -%}
-                <a class="nf-btn nf-btn--circle" href="{{ cta_url }}" aria-label="{{ section.settings.cta_label | escape }}">
-                  <span aria-hidden="true">→</span>
-                </a>
-              {%- endif -%}
-            </div>
           </div>
         </div>
 
@@ -167,10 +251,11 @@
       "default": "Fast, secure and portable"
     },
     {
-      "type": "text",
+      "type": "textarea",
       "id": "hero_heading",
       "label": "Heading",
-      "default": "Sparkling water, anywhere."
+      "default": "Sparkling water, anywhere.",
+      "info": "Use line breaks to control which words sit on each line."
     },
     {
       "type": "textarea",
@@ -190,6 +275,17 @@
       "label": "Primary button link"
     },
     {
+      "type": "select",
+      "id": "button_style",
+      "label": "Primary button style",
+      "options": [
+        { "value": "fill", "label": "Fill" },
+        { "value": "outline", "label": "Outline" },
+        { "value": "link", "label": "Linked text underline" }
+      ],
+      "default": "fill"
+    },
+    {
       "type": "text",
       "id": "cta2_label",
       "label": "Arrow button label",
@@ -199,6 +295,246 @@
       "type": "url",
       "id": "cta2_url",
       "label": "Arrow button link"
+    },
+    {
+      "type": "header",
+      "content": "Copy padding"
+    },
+    {
+      "type": "paragraph",
+      "content": "Insets heading, subheading, buttons, and slide dots from the media edges. Does not change the media window."
+    },
+    {
+      "type": "range",
+      "id": "copy_padding_x",
+      "label": "Horizontal padding",
+      "min": 12,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "copy_padding_y",
+      "label": "Vertical padding",
+      "min": 12,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "copy_padding_x_mobile",
+      "label": "Horizontal padding (mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "range",
+      "id": "copy_padding_y_mobile",
+      "label": "Vertical padding (mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "header",
+      "content": "Heading layout"
+    },
+    {
+      "type": "select",
+      "id": "heading_x",
+      "label": "Desktop horizontal",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "heading_y",
+      "label": "Desktop vertical",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "middle", "label": "Middle" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "select",
+      "id": "heading_x_mobile",
+      "label": "Mobile horizontal",
+      "options": [
+        { "value": "inherit", "label": "Same as desktop" },
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "inherit"
+    },
+    {
+      "type": "select",
+      "id": "heading_y_mobile",
+      "label": "Mobile vertical",
+      "options": [
+        { "value": "inherit", "label": "Same as desktop" },
+        { "value": "top", "label": "Top" },
+        { "value": "middle", "label": "Middle" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "inherit",
+      "info": "On mobile, heading, subheading, and buttons stack as one group. This sets where that group sits."
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading font size",
+      "min": 28,
+      "max": 96,
+      "step": 2,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size_mobile",
+      "label": "Heading font size (mobile)",
+      "min": 0,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "range",
+      "id": "heading_max_width",
+      "label": "Heading max width",
+      "min": 8,
+      "max": 40,
+      "step": 1,
+      "unit": "ch",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "heading_max_width_mobile",
+      "label": "Heading max width (mobile)",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "ch",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "header",
+      "content": "Subheading / CTA layout"
+    },
+    {
+      "type": "paragraph",
+      "content": "Subheading and buttons share one positioned block."
+    },
+    {
+      "type": "select",
+      "id": "side_x",
+      "label": "Desktop horizontal",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "select",
+      "id": "side_y",
+      "label": "Desktop vertical",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "middle", "label": "Middle" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "select",
+      "id": "side_x_mobile",
+      "label": "Mobile horizontal",
+      "options": [
+        { "value": "inherit", "label": "Same as desktop" },
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "inherit"
+    },
+    {
+      "type": "select",
+      "id": "side_y_mobile",
+      "label": "Mobile vertical",
+      "options": [
+        { "value": "inherit", "label": "Same as desktop" },
+        { "value": "top", "label": "Top" },
+        { "value": "middle", "label": "Middle" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "inherit",
+      "info": "Desktop only. On mobile, blocks stack; group vertical follows the heading’s mobile vertical."
+    },
+    {
+      "type": "range",
+      "id": "sub_font_size",
+      "label": "Subheading font size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "sub_font_size_mobile",
+      "label": "Subheading font size (mobile)",
+      "min": 0,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "range",
+      "id": "sub_max_width",
+      "label": "Subheading max width",
+      "min": 16,
+      "max": 60,
+      "step": 1,
+      "unit": "ch",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "sub_max_width_mobile",
+      "label": "Subheading max width (mobile)",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "ch",
+      "default": 0,
+      "info": "0 = same as desktop."
     },
     {
       "type": "header",
@@ -228,6 +564,17 @@
       "step": 10,
       "unit": "vh",
       "default": 180
+    },
+    {
+      "type": "range",
+      "id": "media_end_height",
+      "label": "Media height after scroll",
+      "info": "How tall the media band is once the window finishes scaling down.",
+      "min": 25,
+      "max": 70,
+      "step": 5,
+      "unit": "vh",
+      "default": 45
     },
     {
       "type": "header",
