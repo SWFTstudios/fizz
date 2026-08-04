@@ -147,17 +147,27 @@ body.fizz-ss.fizz-ss--cream {
 }
 
 /* —— Marquee —— */
+.ss-section--marquee {
+  width: 100%;
+  max-width: none;
+  padding-inline: 0;
+}
+
 .ss-marquee {
   overflow: hidden;
   width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: 0;
   border-block: 1px solid var(--ss-border);
   background: transparent;
+  color: var(--ss-marquee-color, currentColor);
 }
 
 .ss-marquee__track {
   display: flex;
   width: max-content;
-  gap: 2.5rem;
+  gap: var(--ss-marquee-gap, 2.5rem);
   align-items: center;
   will-change: transform;
 }
@@ -168,28 +178,27 @@ body.fizz-ss.fizz-ss--cream {
   align-items: center;
   gap: 0.75rem;
   white-space: nowrap;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.75rem;
+  font-family: var(--ss-marquee-font, "JetBrains Mono", monospace);
+  font-weight: var(--ss-marquee-font-weight, 400);
+  font-style: var(--ss-marquee-font-style, normal);
+  font-size: var(--ss-marquee-font-size, 0.75rem);
   letter-spacing: 0.12em;
-  text-transform: uppercase;
-  opacity: 0.7;
+  text-transform: var(--ss-marquee-transform, uppercase);
+  color: var(--ss-marquee-color, currentColor);
 }
 
 .ss-marquee__item img {
-  height: 1.5rem;
+  height: var(--ss-marquee-logo-h, 1.5rem);
   width: auto;
   object-fit: contain;
   filter: grayscale(1) brightness(1.2);
   opacity: 0.85;
 }
 
-.ss-marquee--lg .ss-marquee__item {
-  font-family: "Hanken Grotesk", system-ui, sans-serif;
-  font-size: clamp(1.5rem, 4vw, 3rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  text-transform: none;
-  opacity: 0.9;
+@media (max-width: 749px) {
+  .ss-marquee__item {
+    font-size: var(--ss-marquee-font-size-mobile, var(--ss-marquee-font-size, 0.75rem));
+  }
 }
 
 /* —— Product cards —— */

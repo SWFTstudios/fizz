@@ -1,18 +1,49 @@
 {% render 'fizz-section-spacing', section: section %}
 
-<section class="ss-section" aria-label="{{ section.settings.label | escape }}">
+{%- liquid
+  assign logo_h = section.settings.logo_height | default: 24
+  assign logo_img_w = logo_h | times: 4 | at_least: 80
+  assign text_color = section.settings.text_color
+  if text_color == blank
+    assign text_color = 'currentColor'
+  endif
+-%}
+
+{% style %}
+  {{ section.settings.marquee_font | font_face: font_display: 'swap' }}
+  #shopify-section-{{ section.id }} .ss-marquee {
+    --ss-marquee-font: {{ section.settings.marquee_font.family }}, {{ section.settings.marquee_font.fallback_families }};
+    --ss-marquee-font-weight: {{ section.settings.marquee_font.weight }};
+    --ss-marquee-font-style: {{ section.settings.marquee_font.style }};
+    --ss-marquee-font-size: {{ section.settings.font_size }}px;
+    --ss-marquee-font-size-mobile: {{ section.settings.font_size_mobile }}px;
+    --ss-marquee-transform: {{ section.settings.text_transform }};
+    --ss-marquee-color: {{ text_color }};
+    --ss-marquee-logo-h: {{ logo_h }}px;
+    --ss-marquee-gap: {{ section.settings.item_gap }}px;
+  }
+{% endstyle %}
+
+<section class="ss-section ss-section--marquee" aria-label="{{ section.settings.label | default: 'Marquee' | escape }}">
   {% if section.settings.label != blank %}
     <div class="ss-container" style="margin-bottom: 1rem;">
       <p class="ss-eyebrow">{{ section.settings.label }}</p>
     </div>
   {% endif %}
-  <div class="ss-marquee{% if section.settings.size == 'lg' %} ss-marquee--lg{% endif %}" data-ss-marquee data-ss-speed="{{ section.settings.speed }}">
+  <div class="ss-marquee" data-ss-marquee data-ss-speed="{{ section.settings.speed }}">
     <div class="ss-marquee__track" data-ss-marquee-track>
       {% if section.blocks.size > 0 %}
         {% for block in section.blocks %}
           <span class="ss-marquee__item" {{ block.shopify_attributes }}>
             {% if block.settings.logo != blank %}
-              {{ block.settings.logo | image_url: width: 200 | image_tag: loading: 'lazy', alt: block.settings.text }}
+              {{
+                block.settings.logo
+                | image_url: width: logo_img_w
+                | image_tag:
+                  loading: 'lazy',
+                  alt: block.settings.text,
+                  height: logo_h
+              }}
             {% endif %}
             {% if block.settings.text != blank %}
               {{ block.settings.text }}
@@ -37,14 +68,67 @@
   "settings": [
     { "type": "text", "id": "label", "label": "Label", "default": "As seen in" },
     {
+      "type": "font_picker",
+      "id": "marquee_font",
+      "label": "Font",
+      "default": "jetbrains_mono_n4"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size (desktop)",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "font_size_mobile",
+      "min": 10,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size (mobile)",
+      "default": 11
+    },
+    {
       "type": "select",
-      "id": "size",
-      "label": "Size",
+      "id": "text_transform",
+      "label": "Text case",
       "options": [
-        { "value": "sm", "label": "Logo strip" },
-        { "value": "lg", "label": "Large text" }
+        { "value": "none", "label": "As typed" },
+        { "value": "capitalize", "label": "Capitalize" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "lowercase", "label": "Lowercase" }
       ],
-      "default": "sm"
+      "default": "uppercase"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "min": 12,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Logo height",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "item_gap",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Item spacing",
+      "default": 40
     },
     {
       "type": "range",
@@ -72,6 +156,17 @@
         { "value": "default", "label": "Default" }
       ],
       "default": "compact"
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "full"
     },
     { "type": "color", "id": "background_color", "label": "Background color" }
   ],

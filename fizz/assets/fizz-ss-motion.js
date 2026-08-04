@@ -88,33 +88,122 @@
     return lenis;
   }
 
+  function killMarquee(root) {
+    if (root._ssMarqueeTween && window.gsap) {
+      root._ssMarqueeTween.kill();
+      root._ssMarqueeTween = null;
+    }
+    if (root._ssMarqueeEnter) {
+      root.removeEventListener('mouseenter', root._ssMarqueeEnter);
+      root._ssMarqueeEnter = null;
+    }
+    if (root._ssMarqueeLeave) {
+      root.removeEventListener('mouseleave', root._ssMarqueeLeave);
+      root._ssMarqueeLeave = null;
+    }
+  }
+
+  function rebuildMarqueeTrack(root, track) {
+    var sourceHtml = root._ssMarqueeSourceHtml;
+    if (!sourceHtml) {
+      sourceHtml = track.innerHTML;
+      root._ssMarqueeSourceHtml = sourceHtml;
+    }
+
+    track.innerHTML = sourceHtml;
+    if (window.gsap) {
+      gsap.set(track, { x: 0, xPercent: 0, clearProps: 'transform' });
+    } else {
+      track.style.transform = '';
+    }
+
+    Array.prototype.forEach.call(track.children, function (child) {
+      child.setAttribute('data-ss-marquee-original', 'true');
+    });
+
+    var safety = 0;
+    while (track.scrollWidth < root.clientWidth && safety < 40) {
+      var base = track.querySelectorAll('[data-ss-marquee-original]');
+      var frag = document.createDocumentFragment();
+      Array.prototype.forEach.call(base, function (child) {
+        var clone = child.cloneNode(true);
+        clone.removeAttribute('data-ss-marquee-original');
+        clone.setAttribute('aria-hidden', 'true');
+        frag.appendChild(clone);
+      });
+      track.appendChild(frag);
+      safety += 1;
+    }
+
+    /* Exact double of the filled segment for seamless xPercent: -50 */
+    var filledCount = track.children.length;
+    var segmentHtml = track.innerHTML;
+    track.insertAdjacentHTML('beforeend', segmentHtml);
+    Array.prototype.forEach.call(track.children, function (child, i) {
+      if (i >= filledCount) {
+        child.setAttribute('aria-hidden', 'true');
+      }
+    });
+  }
+
+  function initMarqueeRoot(root) {
+    var track = root.querySelector('[data-ss-marquee-track]');
+    if (!track) return;
+
+    killMarquee(root);
+    rebuildMarqueeTrack(root, track);
+    track.dataset.ssMarqueeInit = 'true';
+
+    if (reduced || !window.gsap) {
+      return;
+    }
+
+    var speed = parseFloat(root.getAttribute('data-ss-speed') || '35');
+    var tween = gsap.to(track, {
+      xPercent: -50,
+      ease: 'none',
+      duration: speed,
+      repeat: -1
+    });
+    root._ssMarqueeTween = tween;
+
+    root._ssMarqueeEnter = function () {
+      tween.pause();
+    };
+    root._ssMarqueeLeave = function () {
+      tween.resume();
+    };
+    root.addEventListener('mouseenter', root._ssMarqueeEnter);
+    root.addEventListener('mouseleave', root._ssMarqueeLeave);
+  }
+
   function initMarquees() {
     document.querySelectorAll('[data-ss-marquee]').forEach(function (root) {
       var track = root.querySelector('[data-ss-marquee-track]');
       if (!track || track.dataset.ssMarqueeInit === 'true') return;
-      track.dataset.ssMarqueeInit = 'true';
-      var speed = parseFloat(root.getAttribute('data-ss-speed') || '35');
-      var html = track.innerHTML;
-      track.innerHTML = html + html;
-
-      if (reduced || !window.gsap) {
-        return;
-      }
-
-      var tween = gsap.to(track, {
-        xPercent: -50,
-        ease: 'none',
-        duration: speed,
-        repeat: -1
-      });
-
-      root.addEventListener('mouseenter', function () {
-        tween.pause();
-      });
-      root.addEventListener('mouseleave', function () {
-        tween.resume();
-      });
+      initMarqueeRoot(root);
     });
+  }
+
+  function reinitAllMarquees(resetSource) {
+    document.querySelectorAll('[data-ss-marquee]').forEach(function (root) {
+      var track = root.querySelector('[data-ss-marquee-track]');
+      if (track) {
+        track.dataset.ssMarqueeInit = 'false';
+        if (resetSource) {
+          delete root._ssMarqueeSourceHtml;
+        }
+      }
+      initMarqueeRoot(root);
+    });
+  }
+
+  var marqueeResizeTimer;
+  function onMarqueeResize() {
+    clearTimeout(marqueeResizeTimer);
+    marqueeResizeTimer = setTimeout(function () {
+      reinitAllMarquees(false);
+    }, 200);
   }
 
   function animateSplit(el) {
@@ -257,6 +346,22 @@
       initScrollAnimations();
       initQtySteppers();
       ScrollTrigger.refresh();
+
+      window.addEventListener('resize', onMarqueeResize);
+      document.addEventListener('shopify:section:load', function (event) {
+        var root = event.target && event.target.querySelector('[data-ss-marquee]');
+        if (!root) return;
+        var track = root.querySelector('[data-ss-marquee-track]');
+        if (track) {
+          track.dataset.ssMarqueeInit = 'false';
+          delete root._ssMarqueeSourceHtml;
+        }
+        initMarqueeRoot(root);
+      });
+      document.addEventListener('shopify:section:unload', function (event) {
+        var root = event.target && event.target.querySelector('[data-ss-marquee]');
+        if (root) killMarquee(root);
+      });
     });
   });
 })();
