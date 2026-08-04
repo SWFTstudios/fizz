@@ -28,9 +28,14 @@
       "block_order": ["m1", "m2", "m3", "m4", "m5", "m6"],
       "settings": {
         "label": "As seen in",
-        "size": "sm",
+        "font_size": 12,
+        "font_size_mobile": 11,
+        "text_transform": "uppercase",
+        "logo_height": 24,
+        "item_gap": 40,
         "speed": 28,
-        "padding_vertical": "compact"
+        "padding_vertical": "compact",
+        "padding_horizontal": "full"
       }
     },
     "intro": {
@@ -164,10 +169,15 @@
       "type": "fizz-ss-marquee",
       "settings": {
         "label": "",
-        "size": "lg",
+        "font_size": 48,
+        "font_size_mobile": 28,
+        "text_transform": "none",
+        "logo_height": 40,
+        "item_gap": 48,
         "speed": 36,
         "fallback_text": "Bottles | Flavor Packs | Fizz Charge | Coral Orange | Sage Green | Arctic White | Electric Blue | Charcoal Black",
-        "padding_vertical": "compact"
+        "padding_vertical": "compact",
+        "padding_horizontal": "full"
       }
     }
   },

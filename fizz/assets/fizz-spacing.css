@@ -89,7 +89,9 @@
     .fizz-intro-inner,
     .fizz-lifestyle-mosaic__header,
     .fizz-lifestyle-mosaic__grid,
-    .fizz-edge-media
+    .fizz-edge-media,
+    .ss-marquee,
+    .ss-section--marquee
   ) {
   padding-inline: 0;
   max-width: none;

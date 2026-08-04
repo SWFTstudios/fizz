@@ -136,7 +136,16 @@
       ],
       "settings": {
         "anchor_id": "marquee",
-        "show_glyph": true
+        "font_size": 16,
+        "font_size_mobile": 14,
+        "text_transform": "lowercase",
+        "logo_height": 24,
+        "item_gap": 28,
+        "speed": 32,
+        "show_glyph": true,
+        "padding_unit": "rem",
+        "padding_top": 2,
+        "padding_bottom": 1
       }
     },
     "story": {
