@@ -48,28 +48,38 @@
   <div class="nf-marquee__track" data-nf-marquee-track>
     {%- for block in section.blocks -%}
       <span class="nf-marquee__item" data-nf-marquee-item {{ block.shopify_attributes }}>
-        {%- if block.settings.logo != blank -%}
-          {{
-            block.settings.logo
-            | image_url: width: logo_img_w
-            | image_tag:
-              loading: 'lazy',
-              alt: block.settings.text,
-              height: logo_h,
-              class: 'nf-marquee__logo'
-          }}
-        {%- endif -%}
         {%- if section.settings.show_glyph -%}
           <span class="nf-marquee__glyph" aria-hidden="true">●</span>
         {%- endif -%}
-        {%- if block.settings.text != blank -%}
+        {%- if block.type == 'image' -%}
+          {%- if block.settings.image != blank -%}
+            {{
+              block.settings.image
+              | image_url: width: logo_img_w
+              | image_tag:
+                loading: 'lazy',
+                alt: block.settings.alt,
+                height: logo_h,
+                class: 'nf-marquee__logo'
+            }}
+          {%- endif -%}
+        {%- elsif block.settings.text != blank -%}
           <span class="nf-marquee__text">{{ block.settings.text | escape }}</span>
         {%- endif -%}
       </span>
     {%- endfor -%}
   </div>
   <span class="nf-visually-hidden">
-    {%- for block in section.blocks -%}{{ block.settings.text | escape }}{% unless forloop.last %}, {% endunless %}{%- endfor -%}
+    {%- assign nf_marquee_labels = '' -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'word' and block.settings.text != blank -%}
+        {%- if nf_marquee_labels != blank -%}
+          {%- assign nf_marquee_labels = nf_marquee_labels | append: ', ' -%}
+        {%- endif -%}
+        {%- assign nf_marquee_labels = nf_marquee_labels | append: block.settings.text -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {{ nf_marquee_labels | escape }}
   </span>
 </section>
 
@@ -222,16 +232,28 @@
           "id": "text",
           "label": "Text",
           "default": "FIZZ ANYWHERE"
-        },
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
         {
           "type": "image_picker",
-          "id": "logo",
-          "label": "Logo"
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text",
+          "default": "Logo"
         }
       ]
     }
   ],
-  "max_blocks": 16,
+  "max_blocks": 24,
   "presets": [
     {
       "name": "NF Marquee",
