@@ -1,0 +1,16 @@
+<section class="nf-page">
+  <h1 class="nf-heading nf-page__title">{{ page.title | escape }}</h1>
+  <div class="nf-page__content nf-rte">{{ page.content }}</div>
+</section>
+
+{% schema %}
+{
+  "name": "NF Page",
+  "tag": "section",
+  "class": "nf-page-section",
+  "settings": [],
+  "enabled_on": {
+    "templates": ["page"]
+  }
+}
+{% endschema %}

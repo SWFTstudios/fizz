@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "nf-list-collections",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

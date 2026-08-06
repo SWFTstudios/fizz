@@ -1,0 +1,833 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  capture color_slug
+    render 'nf-color-slug', variant: current_variant
+  endcapture
+  assign color_slug = color_slug | strip
+  capture scene_raw
+    render 'nf-colorway-scene', slug: color_slug, variant: current_variant
+  endcapture
+  assign scene_parts = scene_raw | strip | split: '|'
+  assign stage_bg = scene_parts[0] | default: settings.color_surface
+  assign stage_bg_end = scene_parts[1] | default: settings.color_dark
+  assign stage_text = scene_parts[3] | default: settings.color_dark_text
+
+  assign media_fit = section.settings.media_fit | default: 'cover'
+  assign gallery_mode = section.settings.gallery_mode | default: 'slider'
+  assign desktop_layout = section.settings.desktop_layout | default: 'side'
+  assign mobile_ratio = section.settings.mobile_media_ratio | default: '4 / 5'
+  assign show_thumbs = section.settings.show_thumbnails
+  if show_thumbs == nil
+    assign show_thumbs = true
+  endif
+  assign thumbs_mobile = section.settings.thumbnails_on_mobile
+  if thumbs_mobile == nil
+    assign thumbs_mobile = false
+  endif
+  assign show_arrows = section.settings.show_arrows
+  if show_arrows == nil
+    assign show_arrows = true
+  endif
+  assign media_count = product.media.size
+  assign badge_label = section.settings.badge_label
+  if badge_label == blank and product.tags contains 'bestseller'
+    assign badge_label = 'Bestseller'
+  endif
+-%}
+<section
+  class="nf-product nf-product--soft nf-product--fit-{{ media_fit }} nf-product--gallery-{{ gallery_mode }} nf-product--layout-{{ desktop_layout }}{% if show_thumbs %} nf-product--thumbs nf-product--thumbs-grid{% endif %}{% if thumbs_mobile %} nf-product--thumbs-mobile{% endif %}"
+  data-nf-product
+  data-gallery-mode="{{ gallery_mode }}"
+  data-stage-mode="{{ section.settings.stage_mode }}"
+  style="
+    --pdp-stage-bg: {{ stage_bg }};
+    --pdp-stage-bg-end: {{ stage_bg_end }};
+    --pdp-stage-text: {{ stage_text }};
+    --nf-pdp-media-ratio: {{ mobile_ratio }};
+  "
+>
+  <div class="nf-product__layout">
+    <div class="nf-product__gallery">
+      <div
+        class="nf-product__stage nf-product__stage--{{ section.settings.stage_mode }}"
+        data-nf-pdp-stage
+      >
+        <div class="nf-product__media-rail" data-nf-media-rail>
+          {%- if media_count > 0 -%}
+            {%- for media in product.media -%}
+              <div
+                class="nf-product__media{% if forloop.first %} is-active{% endif %}"
+                data-media-id="{{ media.id }}"
+                data-media-index="{{ forloop.index0 }}"
+              >
+                {%- case media.media_type -%}
+                  {%- when 'video' -%}
+                    {{ media | video_tag: image_size: '1080x', controls: true, playsinline: true, class: 'nf-product__media-el' }}
+                  {%- when 'external_video' -%}
+                    {{ media | external_video_tag: class: 'nf-product__media-el' }}
+                  {%- when 'model' -%}
+                    {{ media | model_viewer_tag: class: 'nf-product__media-el' }}
+                  {%- else -%}
+                    {%- liquid
+                      assign media_loading = 'lazy'
+                      if forloop.first
+                        assign media_loading = 'eager'
+                      endif
+                      assign focal = media.preview_image.presentation.focal_point | default: 'center'
+                      assign media_style = 'object-position: ' | append: focal
+                    -%}
+                    {{
+                      media
+                      | image_url: width: 1400
+                      | image_tag:
+                        class: 'nf-product__media-el',
+                        loading: media_loading,
+                        sizes: '(min-width: 750px) 55vw, 100vw',
+                        widths: '540, 720, 1080, 1400',
+                        alt: media.alt,
+                        style: media_style
+                    }}
+                  {%- endcase -%}
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            <div class="nf-product__media is-active" data-media-id="fallback" data-media-index="0">
+              <img
+                src="{{ 'fizz-bottle-product-' | append: color_slug | append: '.png' | asset_url }}"
+                class="nf-product__media-el nf-product__media-el--contain"
+                width="504"
+                height="1400"
+                alt="{{ product.title | escape }}"
+                data-nf-fallback-bottle
+              >
+            </div>
+          {%- endif -%}
+        </div>
+
+        {%- if gallery_mode == 'slider' and show_arrows and media_count > 1 -%}
+          <button type="button" class="nf-product__arrow nf-product__arrow--prev" data-nf-gallery-prev aria-label="Previous image">
+            <span aria-hidden="true">&larr;</span>
+          </button>
+          <button type="button" class="nf-product__arrow nf-product__arrow--next" data-nf-gallery-next aria-label="Next image">
+            <span aria-hidden="true">&rarr;</span>
+          </button>
+        {%- endif -%}
+      </div>
+
+      {%- if media_count > 1 -%}
+        {%- if show_thumbs -%}
+          <div class="nf-product__thumbs" data-nf-thumbs>
+            {%- for media in product.media -%}
+              <button
+                type="button"
+                class="nf-product__thumb{% if forloop.first %} is-active{% endif %}"
+                data-nf-thumb
+                data-media-id="{{ media.id }}"
+                data-media-index="{{ forloop.index0 }}"
+                aria-label="{{ 'products.product.media_label' | t: index: forloop.index }}"
+                aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+              >
+                {{ media.preview_image | image_url: width: 180 | image_tag: loading: 'lazy', alt: '' }}
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        <div class="nf-product__dots" data-nf-gallery-dots role="tablist" aria-label="Gallery slides">
+          {%- for media in product.media -%}
+            <button
+              type="button"
+              class="nf-product__dot{% if forloop.first %} is-active{% endif %}"
+              data-nf-dot
+              data-media-id="{{ media.id }}"
+              data-media-index="{{ forloop.index0 }}"
+              aria-label="Go to image {{ forloop.index }}"
+              aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+            ></button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="nf-product__panel">
+      <nav class="nf-product__crumb" aria-label="Breadcrumb">
+        <a href="{{ routes.root_url }}">{{ shop.name }}</a>
+        {%- if collection -%}
+          <span aria-hidden="true">/</span>
+          <a href="{{ collection.url }}">{{ collection.title | escape }}</a>
+        {%- endif -%}
+        <span aria-hidden="true">/</span>
+        <span>{{ product.title | escape }}</span>
+      </nav>
+
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="nf-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- elsif section.settings.show_vendor and product.vendor != blank -%}
+        <p class="nf-eyebrow">{{ product.vendor | escape }}</p>
+      {%- endif -%}
+
+      <div class="nf-product__heading-row">
+        <div class="nf-product__heading-main">
+          <h1 class="nf-heading nf-product__title">{{ section.settings.heading | default: product.title | escape }}</h1>
+          {%- if badge_label != blank -%}
+            <span class="nf-product__badge">{{ badge_label | escape }}</span>
+          {%- endif -%}
+        </div>
+        <p class="nf-product__price" data-nf-price>
+          <span data-nf-price-current>{{ current_variant.price | money }}</span>
+          {%- if current_variant.compare_at_price > current_variant.price -%}
+            <s data-nf-price-compare>{{ current_variant.compare_at_price | money }}</s>
+          {%- else -%}
+            <s data-nf-price-compare hidden></s>
+          {%- endif -%}
+        </p>
+      </div>
+
+      {%- if section.settings.tagline != blank -%}
+        <p class="nf-product__tagline">{{ section.settings.tagline | escape }}</p>
+      {%- endif -%}
+
+      {% form 'product', product, class: 'nf-product__form', novalidate: 'novalidate' %}
+        <input type="hidden" name="id" value="{{ current_variant.id }}" data-nf-variant-id>
+
+        {%- if product.variants.size > 1 and section.settings.show_colorway_swatches -%}
+          <div class="nf-product__ways" data-nf-ways>
+            <p class="nf-product__option-name">
+              {{ section.settings.colorway_label | default: 'Colorway' | escape }}
+              — <span data-nf-way-label>{{ current_variant.title | escape }}</span>
+            </p>
+            <div class="nf-product__swatches" role="list">
+              {%- for variant in product.variants -%}
+                {%- capture slug -%}{% render 'nf-color-slug', variant: variant %}{%- endcapture -%}
+                {%- assign slug = slug | strip -%}
+                {%- capture scene -%}{% render 'nf-colorway-scene', slug: slug, variant: variant %}{%- endcapture -%}
+                {%- assign swatch_parts = scene | strip | split: '|' -%}
+                {%- assign swatch_hex = swatch_parts[4] -%}
+                <button
+                  type="button"
+                  class="nf-swatch{% if variant.id == current_variant.id %} is-active{% endif %}"
+                  data-nf-swatch
+                  data-variant-id="{{ variant.id }}"
+                  data-options="{{ variant.options | json | escape }}"
+                  data-name="{{ variant.title | escape }}"
+                  data-bg="{{ swatch_parts[0] }}"
+                  data-bg-end="{{ swatch_parts[1] }}"
+                  data-text="{{ swatch_parts[3] }}"
+                  data-available="{{ variant.available }}"
+                  data-price="{{ variant.price }}"
+                  data-compare="{{ variant.compare_at_price | default: 0 }}"
+                  data-media-id="{{ variant.featured_media.id }}"
+                  data-fallback-src="{{ 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url }}"
+                  style="--swatch: {{ swatch_hex }};"
+                  aria-label="{{ variant.title | escape }}"
+                  title="{{ variant.title | escape }}"
+                ></button>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- unless product.has_only_default_variant -%}
+          {%- unless section.settings.show_colorway_swatches and product.options.size == 1 -%}
+            {%- for option in product.options_with_values -%}
+              <fieldset class="nf-product__option" data-nf-option data-option-index="{{ forloop.index0 }}">
+                <legend class="nf-product__option-name">{{ option.name | escape }}</legend>
+                <div class="nf-product__pills">
+                  {%- for value in option.values -%}
+                    <label class="nf-pill">
+                      <input
+                        type="radio"
+                        name="option-{{ section.id }}-{{ forloop.parentloop.index0 }}"
+                        value="{{ value | escape }}"
+                        {% if option.selected_value == value %}checked{% endif %}
+                        data-nf-option-input
+                      >
+                      <span>{{ value | escape }}</span>
+                    </label>
+                  {%- endfor -%}
+                </div>
+              </fieldset>
+            {%- endfor -%}
+          {%- endunless -%}
+        {%- endunless -%}
+
+        {%- if section.settings.show_quantity -%}
+          <div class="nf-product__qty-wrap">
+            <label class="nf-product__qty-label" for="Quantity-{{ section.id }}">{{ 'products.product.quantity' | t }}</label>
+            <div class="nf-stepper" data-nf-stepper>
+              <button
+                type="button"
+                class="nf-stepper__btn"
+                data-nf-stepper-dec
+                aria-label="{{ 'products.product.quantity_decrease' | t }}"
+              >
+                −
+              </button>
+              <input
+                id="Quantity-{{ section.id }}"
+                class="nf-input nf-product__qty nf-stepper__input"
+                type="number"
+                name="quantity"
+                value="1"
+                min="1"
+                data-nf-qty
+              >
+              <button
+                type="button"
+                class="nf-stepper__btn"
+                data-nf-stepper-inc
+                aria-label="{{ 'products.product.quantity_increase' | t }}"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        {%- endif -%}
+
+        <button
+          type="submit"
+          name="add"
+          class="nf-btn nf-btn--accent nf-product__atc"
+          data-nf-atc
+          {% unless current_variant.available %}disabled{% endunless %}
+        >
+          <span data-nf-atc-label>
+            {%- if current_variant.available -%}
+              {{ section.settings.atc_label | default: 'Add to cart' | escape }}
+            {%- else -%}
+              {{ 'products.product.sold_out' | t }}
+            {%- endif -%}
+          </span>
+        </button>
+        {%- if section.settings.show_dynamic_checkout -%}
+          {{ form | payment_button }}
+        {%- endif -%}
+      {% endform %}
+
+      {%- assign has_feature = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'feature' -%}{%- assign has_feature = true -%}{%- endif -%}
+      {%- endfor -%}
+      {%- if has_feature -%}
+        <ul class="nf-product__features">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'feature' -%}
+              <li class="nf-product__feature" {{ block.shopify_attributes }}>
+                {%- if block.settings.icon != blank -%}
+                  <span class="nf-product__feature-icon">
+                    {{
+                      block.settings.icon
+                      | image_url: width: 96
+                      | image_tag: loading: 'lazy', widths: '48, 96', sizes: '40px', alt: ''
+                    }}
+                  </span>
+                {%- else -%}
+                  <span class="nf-product__feature-icon nf-product__feature-icon--mark" aria-hidden="true"></span>
+                {%- endif -%}
+                <span class="nf-product__feature-label">{{ block.settings.label | escape }}</span>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      {%- assign has_trust = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'trust' -%}{%- assign has_trust = true -%}{%- endif -%}
+      {%- endfor -%}
+      {%- if has_trust -%}
+        <ul class="nf-product__trust">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'trust' -%}
+              <li {{ block.shopify_attributes }}>{{ block.settings.label | escape }}</li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      {%- if section.settings.show_description and product.description != blank -%}
+        <div class="nf-product__description nf-rte">{{ product.description }}</div>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <div class="nf-product__accordions">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'accordion' -%}
+              <details class="nf-accordion" {{ block.shopify_attributes }}>
+                <summary class="nf-accordion__summary">{{ block.settings.title | escape }}</summary>
+                <div class="nf-accordion__body nf-rte">{{ block.settings.body }}</div>
+              </details>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script type="application/json" data-nf-product-json>
+  {{ product.variants | json }}
+</script>
+<script>
+  (function () {
+    var section = document.querySelector('[data-nf-product]');
+    if (!section) return;
+    var jsonEl = document.querySelector('[data-nf-product-json]');
+    var variants = jsonEl ? JSON.parse(jsonEl.textContent) : [];
+    var idInput = section.querySelector('[data-nf-variant-id]');
+    var priceCurrent = section.querySelector('[data-nf-price-current]');
+    var priceCompare = section.querySelector('[data-nf-price-compare]');
+    var atc = section.querySelector('[data-nf-atc]');
+    var atcLabel = section.querySelector('[data-nf-atc-label]');
+    var wayLabel = section.querySelector('[data-nf-way-label]');
+    var stage = section.querySelector('[data-nf-pdp-stage]');
+    var rail = section.querySelector('[data-nf-media-rail]');
+    var fallback = section.querySelector('[data-nf-fallback-bottle]');
+    var slides = Array.prototype.slice.call(section.querySelectorAll('.nf-product__media'));
+    var galleryMode = section.dataset.galleryMode || 'slider';
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var moneyFormat = {{ shop.money_format | json }};
+    var soldOutText = {{ 'products.product.sold_out' | t | json }};
+    var addText = {{ section.settings.atc_label | default: 'Add to cart' | json }};
+    var unavailableText = {{ 'products.product.unavailable' | t | json }};
+    var index = 0;
+
+    function formatMoney(cents) {
+      var value = (cents / 100).toFixed(2);
+      return moneyFormat.replace(/\{\{\s*amount[^}]*\}\}/, value);
+    }
+
+    function selectedOptions() {
+      return Array.prototype.map.call(section.querySelectorAll('[data-nf-option]'), function (fieldset) {
+        var checked = fieldset.querySelector('input:checked');
+        return checked ? checked.value : null;
+      });
+    }
+
+    function setIndex(next) {
+      if (!slides.length) return;
+      index = ((next % slides.length) + slides.length) % slides.length;
+      var mediaId = slides[index].dataset.mediaId;
+      showMedia(mediaId, true);
+    }
+
+    function syncSliderTransform() {
+      if (!rail || galleryMode !== 'slider') return;
+      rail.style.transition = reduceMotion ? 'none' : 'transform 0.35s ease';
+      rail.style.transform = 'translateX(-' + index * 100 + '%)';
+    }
+
+    function showMedia(mediaId, fromIndex) {
+      if (!mediaId && mediaId !== 0) return;
+      var found = -1;
+      slides.forEach(function (media, i) {
+        var active = media.dataset.mediaId === String(mediaId);
+        media.classList.toggle('is-active', active);
+        if (active) found = i;
+      });
+      if (found > -1) index = found;
+
+      section.querySelectorAll('[data-nf-thumb]').forEach(function (thumb) {
+        var on = thumb.dataset.mediaId === String(mediaId);
+        thumb.classList.toggle('is-active', on);
+        thumb.setAttribute('aria-current', on ? 'true' : 'false');
+      });
+      section.querySelectorAll('[data-nf-dot]').forEach(function (dot) {
+        var on = dot.dataset.mediaId === String(mediaId);
+        dot.classList.toggle('is-active', on);
+        dot.setAttribute('aria-current', on ? 'true' : 'false');
+      });
+
+      if (!fromIndex && found > -1) {
+        /* keep index in sync when colorway jumps to a media id */
+      }
+      syncSliderTransform();
+    }
+
+    function stageFromSwatch(id) {
+      var swatch = section.querySelector('[data-nf-swatch][data-variant-id="' + id + '"]');
+      if (!swatch || !stage) return;
+      if (swatch.dataset.bg) stage.style.setProperty('--pdp-stage-bg', swatch.dataset.bg);
+      if (swatch.dataset.bgEnd) stage.style.setProperty('--pdp-stage-bg-end', swatch.dataset.bgEnd);
+      if (swatch.dataset.text) stage.style.setProperty('--pdp-stage-text', swatch.dataset.text);
+      if (fallback && swatch.dataset.fallbackSrc) fallback.src = swatch.dataset.fallbackSrc;
+      if (wayLabel && swatch.dataset.name) wayLabel.textContent = swatch.dataset.name;
+      section.querySelectorAll('[data-nf-swatch]').forEach(function (btn) {
+        btn.classList.toggle('is-active', btn.dataset.variantId === String(id));
+      });
+    }
+
+    function applyVariant(match, meta) {
+      if (!match && !meta) return;
+      var id = match ? match.id : meta.variantId;
+      var price = match ? match.price : meta.price;
+      var compare = match ? match.compare_at_price : meta.compare;
+      var available = match ? match.available : meta.available === true || meta.available === 'true';
+      var mediaId = match && match.featured_media ? match.featured_media.id : meta && meta.mediaId;
+
+      if (idInput) idInput.value = id;
+      if (priceCurrent) priceCurrent.textContent = formatMoney(price);
+      if (priceCompare) {
+        if (compare && compare > price) {
+          priceCompare.textContent = formatMoney(compare);
+          priceCompare.hidden = false;
+        } else {
+          priceCompare.hidden = true;
+        }
+      }
+      if (atc) atc.disabled = !available;
+      if (atcLabel) atcLabel.textContent = available ? addText : soldOutText;
+      if (mediaId) showMedia(mediaId);
+      if (meta) {
+        if (wayLabel && meta.name) wayLabel.textContent = meta.name;
+        if (stage) {
+          if (meta.bg) stage.style.setProperty('--pdp-stage-bg', meta.bg);
+          if (meta.bgEnd) stage.style.setProperty('--pdp-stage-bg-end', meta.bgEnd);
+          if (meta.text) stage.style.setProperty('--pdp-stage-text', meta.text);
+        }
+        if (fallback && meta.fallbackSrc) fallback.src = meta.fallbackSrc;
+        section.querySelectorAll('[data-nf-swatch]').forEach(function (btn) {
+          btn.classList.toggle('is-active', btn.dataset.variantId === String(id));
+        });
+      } else {
+        stageFromSwatch(id);
+      }
+      var url = new URL(window.location.href);
+      url.searchParams.set('variant', id);
+      window.history.replaceState({}, '', url);
+    }
+
+    function onOptionChange() {
+      var opts = selectedOptions();
+      if (!opts.length) return;
+      var match = variants.find(function (variant) {
+        return variant.options.every(function (value, i) {
+          return value === opts[i];
+        });
+      });
+      if (!match) {
+        if (atc) atc.disabled = true;
+        if (atcLabel) atcLabel.textContent = unavailableText;
+        return;
+      }
+      applyVariant(match, null);
+    }
+
+    section.querySelectorAll('[data-nf-option-input]').forEach(function (input) {
+      input.addEventListener('change', onOptionChange);
+    });
+    section.querySelectorAll('[data-nf-thumb]').forEach(function (thumb) {
+      thumb.addEventListener('click', function () {
+        showMedia(thumb.dataset.mediaId);
+      });
+    });
+    section.querySelectorAll('[data-nf-dot]').forEach(function (dot) {
+      dot.addEventListener('click', function () {
+        showMedia(dot.dataset.mediaId);
+      });
+    });
+    var prevBtn = section.querySelector('[data-nf-gallery-prev]');
+    var nextBtn = section.querySelector('[data-nf-gallery-next]');
+    if (prevBtn) prevBtn.addEventListener('click', function () { setIndex(index - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { setIndex(index + 1); });
+
+    section.querySelectorAll('[data-nf-swatch]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var options;
+        try {
+          options = JSON.parse(btn.dataset.options || '[]');
+        } catch (err) {
+          options = [];
+        }
+        section.querySelectorAll('[data-nf-option]').forEach(function (fieldset, i) {
+          var input = fieldset.querySelector('input[value="' + CSS.escape(options[i] || '') + '"]');
+          if (input) input.checked = true;
+        });
+        applyVariant(null, {
+          variantId: btn.dataset.variantId,
+          price: parseInt(btn.dataset.price, 10),
+          compare: parseInt(btn.dataset.compare, 10),
+          available: btn.dataset.available,
+          mediaId: btn.dataset.mediaId,
+          name: btn.dataset.name,
+          bg: btn.dataset.bg,
+          bgEnd: btn.dataset.bgEnd,
+          text: btn.dataset.text,
+          fallbackSrc: btn.dataset.fallbackSrc
+        });
+      });
+    });
+
+    /* Touch / pointer swipe for slider */
+    if (galleryMode === 'slider' && stage && slides.length > 1) {
+      var startX = 0;
+      var deltaX = 0;
+      var dragging = false;
+      stage.addEventListener('pointerdown', function (e) {
+        if (e.target.closest('button, a, video, model-viewer')) return;
+        dragging = true;
+        startX = e.clientX;
+        deltaX = 0;
+        stage.setPointerCapture(e.pointerId);
+        if (rail) rail.style.transition = 'none';
+      });
+      stage.addEventListener('pointermove', function (e) {
+        if (!dragging || !rail) return;
+        deltaX = e.clientX - startX;
+        var pct = (deltaX / stage.offsetWidth) * 100;
+        rail.style.transform = 'translateX(calc(-' + index * 100 + '% + ' + pct + '%))';
+      });
+      function endDrag() {
+        if (!dragging) return;
+        dragging = false;
+        if (Math.abs(deltaX) > 48) {
+          setIndex(index + (deltaX < 0 ? 1 : -1));
+        } else {
+          syncSliderTransform();
+        }
+        deltaX = 0;
+      }
+      stage.addEventListener('pointerup', endDrag);
+      stage.addEventListener('pointercancel', endDrag);
+    }
+
+    syncSliderTransform();
+
+    section.querySelectorAll('[data-nf-stepper]').forEach(function (stepper) {
+      var input = stepper.querySelector('[data-nf-qty], .nf-stepper__input');
+      var dec = stepper.querySelector('[data-nf-stepper-dec]');
+      var inc = stepper.querySelector('[data-nf-stepper-inc]');
+      if (!input) return;
+      function clampQty(value) {
+        var min = parseInt(input.getAttribute('min') || '1', 10);
+        var next = parseInt(value, 10);
+        if (isNaN(next) || next < min) next = min;
+        input.value = String(next);
+      }
+      if (dec) {
+        dec.addEventListener('click', function () {
+          clampQty((parseInt(input.value, 10) || 1) - 1);
+        });
+      }
+      if (inc) {
+        inc.addEventListener('click', function () {
+          clampQty((parseInt(input.value, 10) || 1) + 1);
+        });
+      }
+      input.addEventListener('change', function () {
+        clampQty(input.value);
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "NF Product",
+  "tag": "section",
+  "class": "nf-product-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading override"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Sparkling water, anywhere."
+    },
+    {
+      "type": "text",
+      "id": "badge_label",
+      "label": "Badge label",
+      "default": "Bestseller",
+      "info": "Shown next to the title. Leave blank to hide (or use a product tag named bestseller)."
+    },
+    {
+      "type": "header",
+      "content": "Gallery"
+    },
+    {
+      "type": "select",
+      "id": "media_fit",
+      "label": "Media fit",
+      "options": [
+        { "value": "cover", "label": "Cover (fill stage)" },
+        { "value": "contain", "label": "Contain (packshot)" }
+      ],
+      "default": "cover",
+      "info": "Cover fills lifestyle photos. Use Contain for studio bottle cutouts that must not crop."
+    },
+    {
+      "type": "select",
+      "id": "gallery_mode",
+      "label": "Gallery mode",
+      "options": [
+        { "value": "slider", "label": "Slider (swipe)" },
+        { "value": "fade", "label": "Fade" }
+      ],
+      "default": "slider"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_thumbnails",
+      "label": "Show thumbnails",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "thumbnails_on_mobile",
+      "label": "Show thumbnails on mobile",
+      "default": false,
+      "info": "When off, mobile uses swipe + dots instead of thumbnails."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show previous / next arrows",
+      "default": true,
+      "visible_if": "{{ section.settings.gallery_mode == 'slider' }}"
+    },
+    {
+      "type": "select",
+      "id": "desktop_layout",
+      "label": "Desktop layout",
+      "options": [
+        { "value": "side", "label": "Gallery beside buy box" },
+        { "value": "stack", "label": "Gallery above buy box" }
+      ],
+      "default": "side"
+    },
+    {
+      "type": "select",
+      "id": "mobile_media_ratio",
+      "label": "Mobile media ratio",
+      "options": [
+        { "value": "4 / 5", "label": "4:5" },
+        { "value": "1 / 1", "label": "1:1" },
+        { "value": "3 / 4", "label": "3:4" },
+        { "value": "auto", "label": "Auto height" }
+      ],
+      "default": "4 / 5"
+    },
+    {
+      "type": "select",
+      "id": "stage_mode",
+      "label": "Media stage style",
+      "options": [
+        { "value": "surface", "label": "Theme surface" },
+        { "value": "colorway", "label": "Colorway scene gradient" },
+        { "value": "dark", "label": "Theme dark" }
+      ],
+      "default": "colorway",
+      "info": "Colorway scene syncs with the selected bottle variant and every theme colorway preset."
+    },
+    {
+      "type": "header",
+      "content": "Buy box"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_colorway_swatches",
+      "label": "Show colorway swatches",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "colorway_label",
+      "label": "Colorway label",
+      "default": "Colorway"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor when eyebrow empty",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quantity",
+      "label": "Show quantity selector",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "atc_label",
+      "label": "Add to cart label",
+      "default": "Add to cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "Show dynamic checkout button",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature highlight",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Feature"
+        }
+      ]
+    },
+    {
+      "type": "accordion",
+      "name": "Accordion",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Details"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Body",
+          "default": "<p>Add product details here.</p>"
+        }
+      ]
+    },
+    {
+      "type": "trust",
+      "name": "Trust point",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Free shipping over $50"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "enabled_on": {
+    "templates": ["product"]
+  }
+}
+{% endschema %}

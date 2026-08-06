@@ -1,0 +1,207 @@
+<section
+  class="nf-bento"
+  id="{{ section.settings.anchor_id | default: 'colors' | handle }}"
+  data-nf-bento
+  data-nf-reveal
+>
+  <div class="nf-bento__shell">
+    <div class="nf-container nf-bento__head">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="nf-eyebrow nf-bento__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="nf-heading nf-bento__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+    </div>
+
+    <div class="nf-container nf-bento__grid">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign span = block.settings.span | default: 'half'
+          assign card_url = block.settings.link
+        -%}
+        <article
+          class="nf-bento__card nf-bento__card--{{ span }}{% if block.settings.reversed %} nf-bento__card--rev{% endif %}"
+          data-nf-bento-card
+          {{ block.shopify_attributes }}
+        >
+          <div class="nf-bento__card-body">
+            {%- if block.settings.icon_label != blank -%}
+              <span class="nf-bento__icon" aria-hidden="true">{{ block.settings.icon_label | escape }}</span>
+            {%- endif -%}
+            {%- if block.settings.title != blank -%}
+              <h3 class="nf-bento__title">{{ block.settings.title | escape }}</h3>
+            {%- endif -%}
+            {%- if block.settings.body != blank -%}
+              <div class="nf-rte nf-bento__text">{{ block.settings.body }}</div>
+            {%- endif -%}
+            {%- if block.settings.button_label != blank and card_url != blank -%}
+              {% render 'nf-button',
+                label: block.settings.button_label,
+                url: card_url,
+                style: block.settings.button_style,
+                class: 'nf-btn--pill nf-bento__cta'
+              %}
+            {%- endif -%}
+          </div>
+          <div class="nf-bento__card-media">
+            {%- render 'nf-media',
+              video: block.settings.video,
+              image: block.settings.image,
+              asset: block.settings.asset,
+              alt: block.settings.title,
+              class: 'nf-bento__img',
+              sizes: '(min-width: 990px) 50vw, 100vw'
+            -%}
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "NF Product Bento",
+  "tag": "section",
+  "class": "nf-bento-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Products"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "What's possible with Fizz"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "colors"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        {
+          "type": "select",
+          "id": "span",
+          "label": "Width",
+          "options": [
+            { "value": "full", "label": "Full width" },
+            { "value": "half", "label": "Half" }
+          ],
+          "default": "half"
+        },
+        {
+          "type": "checkbox",
+          "id": "reversed",
+          "label": "Media on left",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "icon_label",
+          "label": "Icon label",
+          "default": "01"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "The bottle"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Body",
+          "default": "<p>Portable sparkling water with a CO₂ pod in the cap.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            { "value": "fill", "label": "Fill" },
+            { "value": "outline", "label": "Outline" },
+            { "value": "link", "label": "Linked text underline" }
+          ],
+          "default": "fill"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "text",
+          "id": "asset",
+          "label": "Theme asset fallback",
+          "default": "nf-lifestyle-feature-01.jpg"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "NF Product Bento",
+      "blocks": [
+        {
+          "type": "card",
+          "settings": {
+            "span": "full",
+            "icon_label": "01",
+            "title": "Portable fizz",
+            "body": "<p>Carbonate anywhere. Cold bubbles in under ten seconds — no machine, no cans.</p>",
+            "button_label": "Shop bottles",
+            "asset": "nf-lifestyle-hero-03.jpg"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "span": "half",
+            "icon_label": "02",
+            "title": "Real flavor packs",
+            "body": "<p>Zero sugar. Real fruit. Drop a pack and sip.</p>",
+            "asset": "nf-lifestyle-feature-01.jpg"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "span": "half",
+            "icon_label": "03",
+            "title": "60 fizzes per pod",
+            "body": "<p>Recyclable CO₂ pods that keep the sparkle coming.</p>",
+            "asset": "nf-lifestyle-feature-02.jpg"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

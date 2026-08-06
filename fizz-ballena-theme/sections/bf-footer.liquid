@@ -1,0 +1,356 @@
+{{ 'bf-footer.css' | asset_url | stylesheet_tag }}
+
+<footer
+  class="bf-section bf-footer"
+  id="{{ section.settings.anchor_id | default: 'footer' | handle }}"
+>
+  {% render 'bf-section-chrome', section: section %}
+  <div class="bf-section__inner">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="bf-section__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="bf-section__body">{{ section.settings.subheading | escape }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.cta_label != blank -%}
+      {%- assign footer_cta = section.settings.cta_url | default: routes.all_products_collection_url -%}
+      <a class="bf-btn" href="{{ footer_cta }}">{{ section.settings.cta_label | escape }}</a>
+    {%- endif -%}
+
+    {%- if section.settings.show_newsletter -%}
+      <div class="bf-footer__newsletter">
+        {% form 'customer', class: 'bf-newsletter' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          {%- if form.posted_successfully? -%}
+            <p>{{ 'footer.newsletter.success' | t }}</p>
+          {%- else -%}
+            <label class="nf-visually-hidden" for="BFNewsletterEmail">{{ 'footer.newsletter.label' | t }}</label>
+            <input
+              id="BFNewsletterEmail"
+              type="email"
+              name="contact[email]"
+              class="bf-footer__input"
+              placeholder="{{ section.settings.newsletter_placeholder | default: 'Your email' | escape }}"
+              required
+            >
+            <button type="submit" class="bf-btn bf-btn--ghost">{{ 'footer.newsletter.submit' | t }}</button>
+          {%- endif -%}
+        {% endform %}
+      </div>
+    {%- endif -%}
+
+    <nav class="bf-footer__links" aria-label="Footer">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'link' -%}
+          <a href="{{ block.settings.url }}" {{ block.shopify_attributes }}>{{ block.settings.label | escape }}</a>
+        {%- endif -%}
+      {%- endfor -%}
+    </nav>
+
+    <div class="bf-footer__social">
+      {%- if settings.social_instagram != blank -%}
+        <a href="{{ settings.social_instagram }}" target="_blank" rel="noopener">Instagram</a>
+      {%- endif -%}
+      {%- if settings.social_tiktok != blank -%}
+        <a href="{{ settings.social_tiktok }}" target="_blank" rel="noopener">TikTok</a>
+      {%- endif -%}
+    </div>
+
+    <p class="bf-footer__meta">
+      {{ section.settings.copyright_note | default: 'All rights reserved' | escape }}
+      &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
+    </p>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "BF Footer",
+  "tag": "section",
+  "class": "bf-footer-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "footer"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Sparkling water, anywhere."
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Hospitality that feels natural \u2014 for the trail, the desk, the night out."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Shop bottles"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Show newsletter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Newsletter placeholder",
+      "default": "Your email"
+    },
+    {
+      "type": "text",
+      "id": "copyright_note",
+      "label": "Copyright note",
+      "default": "All rights reserved"
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margin top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Margin bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading font size",
+      "min": 16,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "body_font_size",
+      "label": "Body font size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "heading_font_weight",
+      "label": "Heading font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "body_font_weight",
+      "label": "Body font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#0e1412"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body color",
+      "default": "#3a423e"
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 background"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f7f5f0"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background video",
+      "info": "Shopify Files MP4. Autoplay is muted and looped."
+    },
+    {
+      "type": "video_url",
+      "id": "background_video_url",
+      "label": "Background video URL",
+      "accept": [
+        "youtube",
+        "vimeo"
+      ],
+      "info": "Used when no Shopify-hosted video is set."
+    },
+    {
+      "type": "range",
+      "id": "background_image_opacity",
+      "label": "Background image opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "background_video_opacity",
+      "label": "Background video opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link",
+      "name": "Link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Shop all"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "BF Footer",
+      "blocks": [
+        {
+          "type": "link",
+          "settings": {
+            "label": "Shop all",
+            "url": "/collections/all"
+          }
+        },
+        {
+          "type": "link",
+          "settings": {
+            "label": "Search",
+            "url": "/search"
+          }
+        }
+      ],
+      "settings": {
+        "padding_top": 96,
+        "padding_bottom": 64,
+        "background_color": "#0e1412",
+        "heading_color": "#FFFEFD",
+        "body_color": "#c8cbc6"
+      }
+    }
+  ]
+}
+{% endschema %}

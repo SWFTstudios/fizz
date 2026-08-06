@@ -1,0 +1,145 @@
+/* Eight Sleep–style feature tabs: labels left, media right */
+
+.bf-tabs-section .bf-section {
+  padding: 0;
+  overflow: hidden;
+}
+
+.bf-tabs {
+  --bf-tabs-outline: #6b9fd4;
+  --bf-tabs-ink: #111214;
+  --bf-tabs-muted: rgba(17, 18, 20, 0.28);
+  --bf-tabs-desc: rgba(17, 18, 20, 0.72);
+}
+
+.bf-tabs__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: min(88vh, 820px);
+}
+
+@media (min-width: 900px) {
+  .bf-tabs__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.bf-tabs__panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 3rem;
+  padding: clamp(2rem, 5vw, 4.5rem);
+  background: #fff;
+  min-height: 420px;
+}
+
+.bf-tabs__labels {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.bf-tabs__label {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  margin: 0;
+  padding: 0.15em 0.35em;
+  cursor: pointer;
+  text-align: left;
+  color: var(--bf-tabs-muted);
+  font-size: clamp(2.4rem, 5.5vw, 4.75rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  transition: color 0.35s ease, border-color 0.35s ease;
+}
+
+.bf-tabs__label.is-active {
+  color: var(--bf-tabs-ink);
+  font-weight: 600;
+  border-color: var(--bf-tabs-outline);
+}
+
+.bf-tabs__label:hover:not(.is-active) {
+  color: rgba(17, 18, 20, 0.5);
+}
+
+.bf-tabs__label-text {
+  display: block;
+}
+
+.bf-tabs__copy {
+  max-width: 28rem;
+  min-height: 4.5rem;
+}
+
+.bf-tabs__desc {
+  margin: 0;
+}
+
+.bf-tabs__desc p {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.15vw, 1.1rem);
+  line-height: 1.55;
+  color: var(--bf-tabs-desc);
+  font-weight: 400;
+}
+
+.bf-tabs__desc:not(.is-active) {
+  display: none;
+}
+
+.bf-tabs__media {
+  position: relative;
+  background: #0e1412;
+  min-height: 360px;
+}
+
+@media (min-width: 900px) {
+  .bf-tabs__media {
+    min-height: 100%;
+  }
+}
+
+.bf-tabs__figure {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 0.55s ease;
+  pointer-events: none;
+}
+
+.bf-tabs__figure.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.bf-tabs__img,
+.bf-tabs__figure img,
+.bf-tabs__figure video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 899px) {
+  .bf-tabs__grid {
+    min-height: 0;
+  }
+
+  .bf-tabs__media {
+    aspect-ratio: 4 / 5;
+    order: -1;
+  }
+
+  .bf-tabs__label {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+}

@@ -1,0 +1,96 @@
+{%- if recommendations.performed? -%}
+  {%- assign related_products = recommendations.products -%}
+{%- else -%}
+  {%- assign related_products = collections.all.products | slice: 0, section.settings.limit -%}
+{%- endif -%}
+
+{%- liquid
+  assign media_fit = section.settings.media_fit | default: 'cover'
+  assign media_ratio = section.settings.media_ratio | default: '4 / 5'
+-%}
+
+<section class="nf-related nf-related--fit-{{ media_fit }}">
+  <h2 class="nf-heading nf-related__heading">{{ section.settings.heading | escape }}</h2>
+  <div
+    class="nf-related__rail"
+    data-recommendations
+    data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ section.settings.limit }}"
+  >
+    {%- for related in related_products limit: section.settings.limit -%}
+      {%- unless related.id == product.id -%}
+        {% render 'nf-product-card',
+          product: related,
+          show_swatches: true,
+          show_quick_add: false,
+          media_ratio: media_ratio,
+          media_fit: media_fit
+        %}
+      {%- endunless -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+<script>
+  (function () {
+    var wrap = document.querySelector('[data-recommendations]');
+    if (!wrap || !wrap.dataset.url) return;
+    fetch(wrap.dataset.url)
+      .then(function (res) { return res.text(); })
+      .then(function (html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var fresh = doc.querySelector('[data-recommendations]');
+        if (fresh && fresh.children.length) wrap.innerHTML = fresh.innerHTML;
+      })
+      .catch(function () {});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "NF Related Products",
+  "tag": "section",
+  "class": "nf-related-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Pairs well with"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Products",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "media_fit",
+      "label": "Card media fit",
+      "options": [
+        { "value": "cover", "label": "Cover (fill frame)" },
+        { "value": "contain", "label": "Contain (packshot)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Card media ratio",
+      "options": [
+        { "value": "4 / 5", "label": "4:5" },
+        { "value": "1 / 1", "label": "1:1" },
+        { "value": "3 / 4", "label": "3:4" },
+        { "value": "auto", "label": "Auto" }
+      ],
+      "default": "4 / 5"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  }
+}
+{% endschema %}

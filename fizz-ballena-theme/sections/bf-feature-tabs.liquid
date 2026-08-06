@@ -1,0 +1,370 @@
+{{ 'bf-feature-tabs.css' | asset_url | stylesheet_tag }}
+<section
+  class="bf-section bf-tabs"
+  id="{{ section.settings.anchor_id | default: 'how' | handle }}"
+  data-bf-tabs
+  data-autoplay="{{ section.settings.autoplay_seconds | default: 5 }}"
+  data-autoplay-enabled="{% if section.settings.autoplay %}true{% else %}false{% endif %}"
+  style="--bf-tabs-outline: {{ section.settings.active_outline | default: '#6b9fd4' }};"
+>
+  {% render 'bf-section-chrome', section: section %}
+
+  <div class="bf-tabs__grid">
+    <div class="bf-tabs__panel">
+      <div class="bf-tabs__labels" role="tablist" aria-label="{{ section.settings.heading | default: 'Features' | escape }}">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'tab' -%}
+            <button
+              type="button"
+              class="bf-tabs__label{% if forloop.first %} is-active{% endif %}"
+              role="tab"
+              id="bf-tab-{{ section.id }}-{{ forloop.index0 }}"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              aria-controls="bf-tabpanel-{{ section.id }}-{{ forloop.index0 }}"
+              data-bf-tab
+              data-index="{{ forloop.index0 }}"
+              {{ block.shopify_attributes }}
+            >
+              <span class="bf-tabs__label-text">{{ block.settings.title | escape }}</span>
+            </button>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <div class="bf-tabs__copy">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'tab' -%}
+            <div
+              class="bf-tabs__desc{% if forloop.first %} is-active{% endif %}"
+              role="tabpanel"
+              id="bf-tabpanel-{{ section.id }}-{{ forloop.index0 }}"
+              aria-labelledby="bf-tab-{{ section.id }}-{{ forloop.index0 }}"
+              data-bf-tab-desc
+              data-index="{{ forloop.index0 }}"
+            >
+              {%- if block.settings.body != blank -%}
+                <p>{{ block.settings.body | escape }}</p>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <div class="bf-tabs__media" aria-live="polite">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'tab' -%}
+          <figure
+            class="bf-tabs__figure{% if forloop.first %} is-active{% endif %}"
+            data-bf-tab-media
+            data-index="{{ forloop.index0 }}"
+          >
+            {%- render 'nf-media',
+              video: block.settings.video,
+              image: block.settings.image,
+              asset: block.settings.asset,
+              alt: block.settings.title,
+              class: 'bf-tabs__img',
+              sizes: '(min-width: 900px) 50vw, 100vw',
+              loading: 'lazy'
+            -%}
+          </figure>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'bf-feature-tabs.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "BF Feature Tabs",
+  "tag": "section",
+  "class": "bf-tabs-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "how"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Auto-cycle tabs",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_seconds",
+      "label": "Seconds per tab",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    },
+    {
+      "type": "color",
+      "id": "active_outline",
+      "label": "Active tab outline",
+      "default": "#6b9fd4"
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margin top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Margin bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading font size",
+      "min": 16,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "body_font_size",
+      "label": "Body font size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "heading_font_weight",
+      "label": "Heading font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "body_font_weight",
+      "label": "Body font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#0e1412"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body color",
+      "default": "#3a423e"
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 background"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background video",
+      "info": "Shopify Files MP4. Autoplay is muted and looped."
+    },
+    {
+      "type": "video_url",
+      "id": "background_video_url",
+      "label": "Background video URL",
+      "accept": [
+        "youtube",
+        "vimeo"
+      ],
+      "info": "Used when no Shopify-hosted video is set."
+    },
+    {
+      "type": "range",
+      "id": "background_image_opacity",
+      "label": "Background image opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "background_video_opacity",
+      "label": "Background video opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Tab label",
+          "default": "Fill"
+        },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Description",
+          "default": "Cold water carbonates best. Fill to the line, no further."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "text",
+          "id": "asset",
+          "label": "Theme asset fallback",
+          "default": "nf-lifestyle-how-01.jpg"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "BF Feature Tabs",
+      "blocks": [
+        {
+          "type": "tab",
+          "settings": {
+            "title": "Fill",
+            "body": "Cold water carbonates best. Fill to the line, no further.",
+            "asset": "nf-lifestyle-how-01.jpg"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "title": "Twist",
+            "body": "Lock a CO2 pod into the base and give it a quarter turn.",
+            "asset": "nf-lifestyle-how-02.jpg"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "title": "Sip",
+            "body": "Add a flavor pack if you like. Bubbles in under ten seconds.",
+            "asset": "nf-lifestyle-how-03.jpg"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

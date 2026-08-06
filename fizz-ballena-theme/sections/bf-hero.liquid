@@ -1,0 +1,451 @@
+{{ 'bf-hero.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign cta_url = section.settings.cta_url | default: routes.all_products_collection_url
+  assign slide_count = 0
+  for block in section.blocks
+    if block.type == 'slide'
+      assign slide_count = slide_count | plus: 1
+    endif
+  endfor
+-%}
+
+<section
+  class="bf-section bf-hero{% if section.settings.loader_enabled %} is-loading{% endif %}"
+  id="{{ section.settings.anchor_id | default: 'top' | handle }}"
+  data-bf-hero
+  data-autoplay="{{ section.settings.autoplay_interval | default: 5 }}"
+  data-loader-duration="{{ section.settings.loader_duration | default: 5.6 }}"
+  data-loader-enabled="{% if section.settings.loader_enabled %}true{% else %}false{% endif %}"
+>
+  {% render 'bf-section-chrome', section: section %}
+
+  <div class="bf-hero__media" data-bf-hero-slides>
+    {%- assign slide_i = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'slide' -%}
+        <div
+          class="bf-hero__slide{% if slide_i == 0 %} is-active{% endif %}"
+          data-bf-hero-slide
+          {{ block.shopify_attributes }}
+        >
+          {%- render 'nf-media',
+            video: block.settings.video,
+            video_url: block.settings.video_url,
+            image: block.settings.image,
+            asset: block.settings.asset,
+            alt: block.settings.label,
+            class: 'bf-hero__img',
+            sizes: '100vw',
+            widths: '1080, 1440, 1920, 2560',
+            max_width: 2560,
+            loading: 'eager'
+          -%}
+        </div>
+        {%- assign slide_i = slide_i | plus: 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if slide_count == 0 -%}
+      <div class="bf-hero__slide is-active" data-bf-hero-slide>
+        {%- render 'nf-media', asset: 'nf-lifestyle-hero-01.jpg', class: 'bf-hero__img', sizes: '100vw', loading: 'eager' -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="bf-hero__overlay" aria-hidden="true"></div>
+
+  <div class="bf-section__inner bf-hero__copy">
+    {%- if section.settings.heading != blank -%}
+      <h1 class="bf-section__heading bf-hero__heading">{{ section.settings.heading | escape | newline_to_br }}</h1>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="bf-section__body bf-hero__sub">{{ section.settings.subheading | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.cta_label != blank -%}
+      <a class="bf-btn" href="{{ cta_url }}">{{ section.settings.cta_label | escape }}</a>
+    {%- endif -%}
+
+    <div class="bf-hero__dots" data-bf-hero-dots role="tablist" aria-label="Hero slides">
+      {%- assign slide_i = 0 -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'slide' -%}
+          <button
+            type="button"
+            class="bf-hero__dot{% if slide_i == 0 %} is-active{% endif %}"
+            data-bf-hero-dot
+            data-index="{{ slide_i }}"
+            aria-label="Slide {{ slide_i | plus: 1 }}"
+          ></button>
+          {%- assign slide_i = slide_i | plus: 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if slide_count == 0 -%}
+        <button type="button" class="bf-hero__dot is-active" data-bf-hero-dot data-index="0" aria-label="Slide 1"></button>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if section.settings.loader_enabled -%}
+    <div class="nf-preloader" data-nf-preloader aria-hidden="true">
+      <div class="nf-preloader__logo" data-nf-preloader-logo>
+        <div class="nf-preloader__plate">
+          <div class="nf-preloader__water" data-nf-preloader-water></div>
+        </div>
+        <img
+          class="nf-preloader__stencil nf-preloader__stencil--desktop"
+          src="{{ 'Fizz_Logo_Intro.svg' | asset_url }}"
+          alt=""
+          width="640"
+          height="398"
+          decoding="async"
+        >
+        <img
+          class="nf-preloader__stencil nf-preloader__stencil--mobile"
+          src="{{ 'Fizz_Logo_INTRO_SVG_Mobile.svg' | asset_url }}"
+          alt=""
+          width="320"
+          height="749"
+          decoding="async"
+        >
+      </div>
+      <p class="nf-preloader__status" data-nf-preloader-status>
+        <span>loading...</span>
+        <span data-nf-preloader-pct>0%</span>
+      </p>
+    </div>
+  {%- endif -%}
+</section>
+
+<script src="{{ 'bf-hero.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "BF Hero",
+  "tag": "section",
+  "class": "bf-hero-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "top"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Hero text",
+      "default": "Sparkling water, anywhere."
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Fill. Twist. Fizz. Cold bubbles in under ten seconds."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button link"
+    },
+    {
+      "type": "range",
+      "id": "autoplay_interval",
+      "label": "Autoplay interval",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "unit": "s",
+      "default": 5,
+      "info": "0 disables autoplay."
+    },
+    {
+      "type": "header",
+      "content": "Intro loader"
+    },
+    {
+      "type": "checkbox",
+      "id": "loader_enabled",
+      "label": "Enable water-fill logo loader",
+      "default": true,
+      "info": "NeoFizz water-fill FIZZ logo preloader, then zoom into the hero."
+    },
+    {
+      "type": "range",
+      "id": "loader_duration",
+      "label": "Loader duration",
+      "min": 2,
+      "max": 8,
+      "step": 0.2,
+      "unit": "s",
+      "default": 5.6
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margin top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Margin bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading font size",
+      "min": 16,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "body_font_size",
+      "label": "Body font size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "heading_font_weight",
+      "label": "Heading font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "body_font_weight",
+      "label": "Body font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#0e1412"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body color",
+      "default": "#3a423e"
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 background"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f7f5f0"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background video",
+      "info": "Shopify Files MP4. Autoplay is muted and looped."
+    },
+    {
+      "type": "video_url",
+      "id": "background_video_url",
+      "label": "Background video URL",
+      "accept": [
+        "youtube",
+        "vimeo"
+      ],
+      "info": "Used when no Shopify-hosted video is set."
+    },
+    {
+      "type": "range",
+      "id": "background_image_opacity",
+      "label": "Background image opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "background_video_opacity",
+      "label": "Background video opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Slide"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": "Video URL",
+          "accept": [
+            "youtube",
+            "vimeo"
+          ]
+        },
+        {
+          "type": "text",
+          "id": "asset",
+          "label": "Theme asset fallback",
+          "default": "nf-lifestyle-hero-01.jpg"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "BF Hero",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "label": "Lifestyle",
+            "asset": "nf-lifestyle-hero-01.jpg"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "label": "On the go",
+            "asset": "nf-lifestyle-hero-02.jpg"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "label": "Active",
+            "asset": "nf-lifestyle-hero-03.jpg"
+          }
+        }
+      ],
+      "settings": {
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "background_color": "#0e1412",
+        "heading_color": "#FFFEFD",
+        "body_color": "#FFFEFD",
+        "heading_font_size": 56
+      }
+    }
+  ]
+}
+{% endschema %}

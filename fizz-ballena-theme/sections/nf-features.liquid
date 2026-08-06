@@ -1,0 +1,212 @@
+<section
+  class="nf-features"
+  id="{{ section.settings.anchor_id | default: 'features' | handle }}"
+  data-nf-features
+  data-nf-reveal
+>
+  <div class="nf-container">
+    <div class="nf-features__head">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="nf-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="nf-heading nf-features__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+    </div>
+
+    <div class="nf-features__layout">
+      <div class="nf-features__media" data-nf-features-media>
+        {%- for block in section.blocks -%}
+          <figure
+            class="nf-features__layer{% if forloop.first %} is-active{% endif %}"
+            data-nf-features-layer
+            {{ block.shopify_attributes }}
+          >
+            {%- render 'nf-media',
+              video: block.settings.video,
+              image: block.settings.image,
+              asset: block.settings.asset,
+              alt: block.settings.title,
+              class: 'nf-features__img',
+              sizes: '(min-width: 750px) 48vw, 100vw'
+            -%}
+          </figure>
+        {%- endfor -%}
+      </div>
+
+      <div class="nf-features__cards" data-nf-features-cards>
+        {%- for block in section.blocks -%}
+          <article
+            class="nf-features__card{% if forloop.first %} is-active{% endif %}"
+            data-nf-features-card
+            data-index="{{ forloop.index0 }}"
+            {{ block.shopify_attributes }}
+          >
+            <div class="nf-features__card-top">
+              {%- if block.settings.tag != blank -%}
+                <span class="nf-features__tag">{{ block.settings.tag | escape }}</span>
+              {%- endif -%}
+              <span class="nf-features__dots" aria-hidden="true">
+                {%- for i in (1..9) -%}
+                  <i class="{% if i <= block.settings.dot_count %}is-on{% endif %}"></i>
+                {%- endfor -%}
+              </span>
+            </div>
+            {%- if block.settings.title != blank -%}
+              <h3 class="nf-features__title">{{ block.settings.title | escape }}</h3>
+            {%- endif -%}
+            {%- if block.settings.body != blank -%}
+              <div class="nf-rte nf-features__body">{{ block.settings.body }}</div>
+            {%- endif -%}
+            {%- if block.settings.button_label != blank and block.settings.button_link != blank -%}
+              {% render 'nf-button',
+                label: block.settings.button_label,
+                url: block.settings.button_link,
+                style: block.settings.button_style,
+                class: 'nf-features__cta'
+              %}
+            {%- endif -%}
+          </article>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "NF Key Features",
+  "tag": "section",
+  "class": "nf-features-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Key features"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "The best in the business"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "features"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Tag",
+          "default": "custom"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Customizable colorways"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Body",
+          "default": "<p>Six finishes designed to travel from desk to trail without losing their cool.</p>"
+        },
+        {
+          "type": "range",
+          "id": "dot_count",
+          "label": "Active dots",
+          "min": 1,
+          "max": 9,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            { "value": "fill", "label": "Fill" },
+            { "value": "outline", "label": "Outline" },
+            { "value": "link", "label": "Linked text underline" }
+          ],
+          "default": "fill"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "text",
+          "id": "asset",
+          "label": "Theme asset fallback",
+          "default": "nf-lifestyle-story-02.jpg"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "NF Key Features",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "tag": "custom",
+            "title": "Customizable product",
+            "body": "<p>Pick your colorway and make every sip feel like yours.</p>",
+            "dot_count": 3,
+            "asset": "nf-lifestyle-story-02.jpg"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "tag": "flex",
+            "title": "Flexibility and flavor",
+            "body": "<p>Water, iced tea, or juice — carbonate what you already drink.</p>",
+            "dot_count": 5,
+            "asset": "nf-lifestyle-feature-01.jpg"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "tag": "performance",
+            "title": "Scalability",
+            "body": "<p>60 fizzes per pod. Scale up for the week, or down for the commute.</p>",
+            "dot_count": 7,
+            "asset": "nf-lifestyle-feature-02.jpg"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

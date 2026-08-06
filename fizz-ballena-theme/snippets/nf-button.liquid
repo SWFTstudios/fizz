@@ -1,0 +1,56 @@
+{% doc %}
+  Renders a merchant-styled CTA (fill, outline, or underlined link).
+
+  @param {string} label - Button or link text
+  @param {string} [url] - Destination URL (required for links)
+  @param {string} [style] - fill | outline | link (falls back to theme default, then fill)
+  @param {string} [class] - Extra classes
+  @param {string} [aria_label] - Accessible name override
+  @param {string} [tag] - a | button (default a when url present, else button)
+  @param {string} [type] - button type attribute when tag is button
+  @param {string} [attributes] - Extra HTML attributes string
+  @example
+  {% render 'nf-button', label: 'Shop', url: '/collections/all', style: 'fill' %}
+{% enddoc %}
+{%- liquid
+  assign btn_style = style | default: settings.button_style_default | default: 'fill'
+  if btn_style != 'fill' and btn_style != 'outline' and btn_style != 'link'
+    assign btn_style = 'fill'
+  endif
+
+  assign btn_class = 'nf-btn nf-btn--' | append: btn_style
+  if class != blank
+    assign btn_class = btn_class | append: ' ' | append: class
+  endif
+
+  assign btn_tag = tag
+  if btn_tag == blank
+    if url != blank
+      assign btn_tag = 'a'
+    else
+      assign btn_tag = 'button'
+    endif
+  endif
+
+  assign btn_type = type | default: 'button'
+  assign btn_href = url | default: '#'
+-%}
+{%- if btn_tag == 'button' -%}
+  <button
+    type="{{ btn_type }}"
+    class="{{ btn_class }}"
+    {% if aria_label != blank %}aria-label="{{ aria_label | escape }}"{% endif %}
+    {{ attributes }}
+  >
+    {{- label | escape -}}
+  </button>
+{%- else -%}
+  <a
+    class="{{ btn_class }}"
+    href="{{ btn_href }}"
+    {% if aria_label != blank %}aria-label="{{ aria_label | escape }}"{% endif %}
+    {{ attributes }}
+  >
+    {{- label | escape -}}
+  </a>
+{%- endif -%}

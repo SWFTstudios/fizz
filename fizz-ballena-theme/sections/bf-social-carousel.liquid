@@ -1,0 +1,340 @@
+{{ 'bf-social-carousel.css' | asset_url | stylesheet_tag }}
+<section
+  class="bf-section bf-social"
+  id="{{ section.settings.anchor_id | default: 'social' | handle }}"
+  data-bf-social
+>
+  {% render 'bf-section-chrome', section: section %}
+
+  <div class="bf-section__inner bf-social__head">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="bf-section__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="bf-section__body">{{ section.settings.subheading | escape }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="bf-social__carousel">
+    <button type="button" class="bf-social__nav bf-social__nav--prev" data-bf-social-prev aria-label="Previous">&#8249;</button>
+    <div class="bf-social__track" data-bf-social-track>
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'post' -%}
+          <figure class="bf-social__item" {{ block.shopify_attributes }}>
+            {%- render 'nf-media',
+              video: block.settings.video,
+              video_url: block.settings.video_url,
+              image: block.settings.image,
+              asset: block.settings.asset,
+              alt: block.settings.caption,
+              class: 'bf-social__media',
+              sizes: '(min-width: 900px) 20vw, 70vw',
+              loading: 'lazy'
+            -%}
+            {%- if block.settings.caption != blank -%}
+              <figcaption>{{ block.settings.caption | escape }}</figcaption>
+            {%- endif -%}
+          </figure>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+    <button type="button" class="bf-social__nav bf-social__nav--next" data-bf-social-next aria-label="Next">&#8250;</button>
+  </div>
+</section>
+
+<script src="{{ 'bf-social-carousel.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "BF Social Carousel",
+  "tag": "section",
+  "class": "bf-social-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "social"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "In the wild"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Real moments. Real fizz."
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margin top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Margin bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading font size",
+      "min": 16,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "body_font_size",
+      "label": "Body font size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "heading_font_weight",
+      "label": "Heading font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "body_font_weight",
+      "label": "Body font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#0e1412"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body color",
+      "default": "#3a423e"
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 background"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f7f5f0"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background video",
+      "info": "Shopify Files MP4. Autoplay is muted and looped."
+    },
+    {
+      "type": "video_url",
+      "id": "background_video_url",
+      "label": "Background video URL",
+      "accept": [
+        "youtube",
+        "vimeo"
+      ],
+      "info": "Used when no Shopify-hosted video is set."
+    },
+    {
+      "type": "range",
+      "id": "background_image_opacity",
+      "label": "Background image opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "background_video_opacity",
+      "label": "Background video opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "blocks": [
+    {
+      "type": "post",
+      "name": "Post",
+      "settings": [
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": "Video URL",
+          "accept": [
+            "youtube",
+            "vimeo"
+          ]
+        },
+        {
+          "type": "text",
+          "id": "asset",
+          "label": "Theme asset fallback",
+          "default": "nf-lifestyle-hero-01.jpg"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "BF Social Carousel",
+      "blocks": [
+        {
+          "type": "post",
+          "settings": {
+            "asset": "nf-lifestyle-hero-01.jpg",
+            "caption": "Trail sip"
+          }
+        },
+        {
+          "type": "post",
+          "settings": {
+            "asset": "nf-lifestyle-hero-02.jpg",
+            "caption": "Drive day"
+          }
+        },
+        {
+          "type": "post",
+          "settings": {
+            "asset": "nf-lifestyle-hero-03.jpg",
+            "caption": "Court side"
+          }
+        },
+        {
+          "type": "post",
+          "settings": {
+            "asset": "nf-lifestyle-hero-04.jpg",
+            "caption": "Field"
+          }
+        },
+        {
+          "type": "post",
+          "settings": {
+            "asset": "nf-lifestyle-hero-05.jpg",
+            "caption": "Night"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

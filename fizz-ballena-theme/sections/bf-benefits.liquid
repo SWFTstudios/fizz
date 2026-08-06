@@ -1,0 +1,334 @@
+{{ 'bf-benefits.css' | asset_url | stylesheet_tag }}
+<section
+  class="bf-section bf-benefits"
+  id="{{ section.settings.anchor_id | default: 'benefits' | handle }}"
+>
+  {% render 'bf-section-chrome', section: section %}
+
+  <div class="bf-section__inner">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="bf-section__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="bf-section__body">{{ section.settings.subheading | escape }}</p>
+    {%- endif -%}
+
+    <div class="bf-benefits__grid">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'benefit' -%}
+          <article
+            class="bf-benefits__card{% if forloop.index == 5 %} bf-benefits__card--wide{% endif %}"
+            {{ block.shopify_attributes }}
+          >
+            {%- if block.settings.image != blank or block.settings.asset != blank -%}
+              <div class="bf-benefits__media">
+                {%- render 'nf-media',
+                  image: block.settings.image,
+                  asset: block.settings.asset,
+                  alt: block.settings.title,
+                  class: 'bf-benefits__img',
+                  sizes: '(min-width: 900px) 30vw, 90vw',
+                  loading: 'lazy'
+                -%}
+              </div>
+            {%- endif -%}
+            <div class="bf-benefits__copy">
+              <p class="bf-benefits__index">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</p>
+              <h3 class="bf-benefits__title">{{ block.settings.title | escape }}</h3>
+              {%- if block.settings.body != blank -%}
+                <p class="bf-benefits__body">{{ block.settings.body | escape }}</p>
+              {%- endif -%}
+            </div>
+          </article>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "BF Benefits",
+  "tag": "section",
+  "class": "bf-benefits-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "benefits"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Why Fizz"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Five reasons the ritual sticks."
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margin top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Margin bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading font size",
+      "min": 16,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "body_font_size",
+      "label": "Body font size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "heading_font_weight",
+      "label": "Heading font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "body_font_weight",
+      "label": "Body font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#0e1412"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body color",
+      "default": "#3a423e"
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 background"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f7f5f0"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background video",
+      "info": "Shopify Files MP4. Autoplay is muted and looped."
+    },
+    {
+      "type": "video_url",
+      "id": "background_video_url",
+      "label": "Background video URL",
+      "accept": [
+        "youtube",
+        "vimeo"
+      ],
+      "info": "Used when no Shopify-hosted video is set."
+    },
+    {
+      "type": "range",
+      "id": "background_image_opacity",
+      "label": "Background image opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "background_video_opacity",
+      "label": "Background video opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Benefit"
+        },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Body",
+          "default": "Short supporting line."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "asset",
+          "label": "Theme asset fallback"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "BF Benefits",
+      "blocks": [
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Portable",
+            "body": "Carbonate anywhere \u2014 no machine."
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Zero sugar",
+            "body": "Clean bubbles, real fruit notes."
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "60 fizzes",
+            "body": "One pod, weeks of sparkle."
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Refillable",
+            "body": "Less cans. More ritual."
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Designed to last",
+            "body": "A bottle built for daily use and long trips."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

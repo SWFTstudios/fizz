@@ -1,0 +1,319 @@
+{{ 'bf-header.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign shop_label = section.settings.shop_label | default: 'SHOP NOW'
+  assign shop_url = section.settings.shop_url | default: routes.all_products_collection_url
+  if shop_url == blank
+    assign shop_url = routes.all_products_collection_url
+  endif
+  assign logo_text = section.settings.logo_text | default: 'FIZZ'
+  assign bar_bg = section.settings.bar_background | default: '#03090D'
+  assign bar_opacity = section.settings.bar_opacity | default: 19 | times: 1.0 | divided_by: 100.0
+  assign bar_bg_a = bar_bg | color_modify: 'alpha', bar_opacity
+  assign open_bg = section.settings.open_background | default: '#FFFEFD'
+  assign text_light = section.settings.text_color_light | default: '#FFFEFD'
+  assign text_dark = section.settings.text_color_dark | default: '#03090D'
+  assign accent = section.settings.accent_color | default: '#6b9fd4'
+  assign max_w = section.settings.max_width | default: 720
+  assign blur = section.settings.blur_amount | default: 25
+-%}
+
+<header
+  class="bf-header"
+  id="bf-header"
+  data-bf-header
+  style="
+    --bf-hdr-bg: {{ bar_bg_a }};
+    --bf-hdr-open-bg: {{ open_bg }};
+    --bf-hdr-text: {{ text_light }};
+    --bf-hdr-text-open: {{ text_dark }};
+    --bf-hdr-accent: {{ accent }};
+    --bf-hdr-max: {{ max_w }}px;
+    --bf-hdr-blur: blur({{ blur }}px) saturate(1.35);
+  "
+>
+  <div class="bf-header__bar">
+    <div class="bf-header__container">
+      <a class="bf-header__shop" href="{{ shop_url }}">{{ shop_label | escape }}</a>
+
+      <a class="bf-header__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
+        {%- if section.settings.logo_light != blank or section.settings.logo_dark != blank -%}
+          {%- if section.settings.logo_light != blank -%}
+            {{
+              section.settings.logo_light
+              | image_url: width: 400
+              | image_tag:
+                class: 'bf-header__logo-img bf-header__logo-img--light',
+                alt: shop.name,
+                loading: 'eager',
+                widths: '160, 240, 320, 400'
+            }}
+          {%- endif -%}
+          {%- if section.settings.logo_dark != blank -%}
+            {{
+              section.settings.logo_dark
+              | image_url: width: 400
+              | image_tag:
+                class: 'bf-header__logo-img bf-header__logo-img--dark',
+                alt: shop.name,
+                loading: 'eager',
+                widths: '160, 240, 320, 400'
+            }}
+          {%- elsif section.settings.logo_light != blank -%}
+            {{
+              section.settings.logo_light
+              | image_url: width: 400
+              | image_tag:
+                class: 'bf-header__logo-img bf-header__logo-img--dark',
+                alt: shop.name,
+                loading: 'eager',
+                widths: '160, 240, 320, 400'
+            }}
+          {%- endif -%}
+        {%- else -%}
+          <span class="bf-header__logo-text">{{ logo_text | escape }}</span>
+        {%- endif -%}
+      </a>
+
+      <button
+        type="button"
+        class="bf-header__toggle"
+        data-bf-menu-toggle
+        aria-expanded="false"
+        aria-controls="bf-header-menu"
+        aria-label="{{ section.settings.menu_label | default: 'Menu' | escape }}"
+      >
+        <span class="bf-header__toggle-line"></span>
+        <span class="bf-header__toggle-line"></span>
+        <span class="bf-header__toggle-line"></span>
+      </button>
+    </div>
+
+    <div class="bf-header__menu" id="bf-header-menu" data-bf-menu hidden>
+      <div class="bf-header__menu-inner">
+        <nav class="bf-header__nav" aria-label="Primary">
+          <ul class="bf-header__list">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'nav_link' -%}
+                {%- liquid
+                  assign link_url = block.settings.url
+                  if block.settings.anchor_id != blank
+                    assign link_url = routes.root_url | append: '#' | append: block.settings.anchor_id | handle
+                  endif
+                  if link_url == blank
+                    assign link_url = '#'
+                  endif
+                -%}
+                <li {{ block.shopify_attributes }}>
+                  <a href="{{ link_url }}" data-bf-nav-link>{{ block.settings.label | escape }}</a>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if section.settings.show_cart -%}
+              <li>
+                <a href="{{ routes.cart_url }}" data-bf-nav-link data-bf-cart-link>
+                  {{ section.settings.cart_label | default: 'Cart' | escape }}
+                  <span data-bf-cart-count>({{ cart.item_count }})</span>
+                </a>
+              </li>
+            {%- endif -%}
+          </ul>
+        </nav>
+
+        {%- if section.settings.show_social -%}
+          <div class="bf-header__social">
+            {%- if settings.social_instagram != blank -%}
+              <a href="{{ settings.social_instagram }}" target="_blank" rel="noopener">Instagram</a>
+            {%- endif -%}
+            {%- if settings.social_tiktok != blank -%}
+              <a href="{{ settings.social_tiktok }}" target="_blank" rel="noopener">TikTok</a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.menu_image != blank -%}
+          <div class="bf-header__menu-image">
+            {{
+              section.settings.menu_image
+              | image_url: width: 900
+              | image_tag:
+                loading: 'lazy',
+                sizes: '(min-width: 1024px) 720px, 90vw',
+                widths: '400, 600, 900',
+                alt: ''
+            }}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</header>
+
+<script src="{{ 'bf-header.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "BF Header",
+  "tag": "section",
+  "class": "bf-header-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "shop_label",
+      "label": "Shop button label",
+      "default": "SHOP NOW"
+    },
+    {
+      "type": "url",
+      "id": "shop_url",
+      "label": "Shop button link",
+      "info": "Defaults to Shop all (/collections/all) when empty."
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_light",
+      "label": "Logo (light / closed)"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_dark",
+      "label": "Logo (dark / menu open)"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Text logo fallback",
+      "default": "FIZZ"
+    },
+    {
+      "type": "text",
+      "id": "menu_label",
+      "label": "Menu toggle label",
+      "default": "Menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Show cart in menu",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cart_label",
+      "label": "Cart label",
+      "default": "Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "label": "Show social links",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "menu_image",
+      "label": "Menu panel image"
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color",
+      "id": "bar_background",
+      "label": "Bar background",
+      "default": "#03090D"
+    },
+    {
+      "type": "range",
+      "id": "bar_opacity",
+      "label": "Bar background opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 19
+    },
+    {
+      "type": "color",
+      "id": "open_background",
+      "label": "Open menu background",
+      "default": "#FFFEFD"
+    },
+    {
+      "type": "color",
+      "id": "text_color_light",
+      "label": "Text (closed)",
+      "default": "#FFFEFD"
+    },
+    {
+      "type": "color",
+      "id": "text_color_dark",
+      "label": "Text (open)",
+      "default": "#03090D"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / hover",
+      "default": "#6b9fd4"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Bar max width",
+      "min": 320,
+      "max": 960,
+      "step": 8,
+      "unit": "px",
+      "default": 720
+    },
+    {
+      "type": "range",
+      "id": "blur_amount",
+      "label": "Backdrop blur",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 25
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_link",
+      "name": "Nav link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Link"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+          "type": "text",
+          "id": "anchor_id",
+          "label": "Homepage anchor ID",
+          "info": "If set, links to /#anchor instead of URL."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "BF Header",
+      "blocks": [
+        { "type": "nav_link", "settings": { "label": "How it works", "anchor_id": "about" } },
+        { "type": "nav_link", "settings": { "label": "Features", "anchor_id": "features" } },
+        { "type": "nav_link", "settings": { "label": "Flavors", "anchor_id": "flavors" } },
+        { "type": "nav_link", "settings": { "label": "Shop", "url": "/collections/all" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

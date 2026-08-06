@@ -1,0 +1,654 @@
+{%- liquid
+  assign slide_count = section.blocks.size
+  assign cta_url = section.settings.cta_url | default: routes.all_products_collection_url
+  assign cta2_url = section.settings.cta2_url
+  assign scroll_length = section.settings.scroll_length | default: 180
+
+  assign main_x = section.settings.heading_x | default: 'left'
+  assign main_y = section.settings.heading_y | default: 'bottom'
+  assign side_x = section.settings.side_x | default: 'right'
+  assign side_y = section.settings.side_y | default: 'bottom'
+
+  assign main_mx = section.settings.heading_x_mobile | default: 'inherit'
+  assign main_my = section.settings.heading_y_mobile | default: 'inherit'
+  assign side_mx = section.settings.side_x_mobile | default: 'inherit'
+  assign side_my = section.settings.side_y_mobile | default: 'inherit'
+
+  if main_mx == blank or main_mx == 'inherit'
+    assign main_mx = main_x
+  endif
+  if main_my == blank or main_my == 'inherit'
+    assign main_my = main_y
+  endif
+  if side_mx == blank or side_mx == 'inherit'
+    assign side_mx = side_x
+  endif
+  if side_my == blank or side_my == 'inherit'
+    assign side_my = side_y
+  endif
+
+  assign heading_size = section.settings.heading_font_size | default: 56
+  assign heading_size_m = section.settings.heading_font_size_mobile | default: 0
+  assign heading_width = section.settings.heading_max_width | default: 14
+  assign heading_width_m = section.settings.heading_max_width_mobile | default: 0
+  assign sub_size = section.settings.sub_font_size | default: 18
+  assign sub_size_m = section.settings.sub_font_size_mobile | default: 0
+  assign sub_width = section.settings.sub_max_width | default: 36
+  assign sub_width_m = section.settings.sub_max_width_mobile | default: 0
+
+  if heading_size_m == 0
+    assign heading_size_m = heading_size
+  endif
+  if heading_width_m == 0
+    assign heading_width_m = heading_width
+  endif
+  if sub_size_m == 0
+    assign sub_size_m = sub_size
+  endif
+  if sub_width_m == 0
+    assign sub_width_m = sub_width
+  endif
+
+  assign pad_x = section.settings.copy_padding_x | default: 40
+  assign pad_y = section.settings.copy_padding_y | default: 40
+  assign pad_x_m = section.settings.copy_padding_x_mobile | default: 0
+  assign pad_y_m = section.settings.copy_padding_y_mobile | default: 0
+  assign media_end_h = section.settings.media_end_height | default: 45
+  if pad_x_m == 0
+    assign pad_x_m = pad_x
+  endif
+  if pad_y_m == 0
+    assign pad_y_m = pad_y
+  endif
+
+  assign main_classes = 'nf-hero__copy-main nf-hero__copy-main--x-' | append: main_x | append: ' nf-hero__copy-main--y-' | append: main_y | append: ' nf-hero__copy-main--mx-' | append: main_mx | append: ' nf-hero__copy-main--my-' | append: main_my
+  assign side_classes = 'nf-hero__copy-side nf-hero__copy-side--x-' | append: side_x | append: ' nf-hero__copy-side--y-' | append: side_y | append: ' nf-hero__copy-side--mx-' | append: side_mx | append: ' nf-hero__copy-side--my-' | append: side_my
+-%}
+<section
+  class="nf-hero"
+  id="{{ section.settings.anchor_id | default: 'top' | handle }}"
+  data-nf-hero
+  data-autoplay-interval="{{ section.settings.autoplay_interval | default: 5 }}"
+  data-loader-duration="{{ section.settings.loader_duration | default: 5.6 }}"
+  data-loader-enabled="{% if section.settings.loader_enabled %}true{% else %}false{% endif %}"
+  data-scroll-length="{{ scroll_length }}"
+  style="
+    --nf-hero-mask: url('{{ 'Fizz_Logo_Intro.svg' | asset_url }}');
+    --nf-hero-mask-mobile: url('{{ 'Fizz_Logo_INTRO_SVG_Mobile.svg' | asset_url }}');
+    --nf-hero-heading-size: {{ heading_size }}px;
+    --nf-hero-heading-size-m: {{ heading_size_m }}px;
+    --nf-hero-heading-width: {{ heading_width }}ch;
+    --nf-hero-heading-width-m: {{ heading_width_m }}ch;
+    --nf-hero-sub-size: {{ sub_size }}px;
+    --nf-hero-sub-size-m: {{ sub_size_m }}px;
+    --nf-hero-sub-width: {{ sub_width }}ch;
+    --nf-hero-sub-width-m: {{ sub_width_m }}ch;
+    --nf-hero-pad-x: {{ pad_x }}px;
+    --nf-hero-pad-y: {{ pad_y }}px;
+    --nf-hero-pad-x-m: {{ pad_x_m }}px;
+    --nf-hero-pad-y-m: {{ pad_y_m }}px;
+    --nf-hero-media-end-h: {{ media_end_h }}vh;
+  "
+>
+  <h1 class="nf-visually-hidden">{{ section.settings.seo_heading | default: shop.name }}</h1>
+
+  <div class="nf-hero__track" data-nf-hero-track>
+    <div class="nf-hero__stage" data-nf-hero-stage>
+      {%- comment -%}
+        Media-frame = end-state clip hole (height from --nf-hero-media-end-h).
+        Absolute media layer fills the stage; copy sits in-flow below the frame.
+      {%- endcomment -%}
+      <div class="nf-hero__media-frame" data-nf-hero-frame>
+        <div class="nf-hero__media-layer" data-nf-hero-media>
+          <div class="nf-hero__slides" data-nf-hero-slides>
+            {%- if slide_count > 0 -%}
+              {%- for block in section.blocks -%}
+                <div
+                  class="nf-hero__slide{% if forloop.first %} is-active{% endif %}"
+                  data-nf-hero-slide
+                  data-index="{{ forloop.index0 }}"
+                  {{ block.shopify_attributes }}
+                >
+                  {%- render 'nf-media',
+                    video: block.settings.video,
+                    video_url: block.settings.video_url,
+                    image: block.settings.image,
+                    asset: block.settings.asset,
+                    alt: block.settings.label,
+                    class: 'nf-hero__media',
+                    sizes: '100vw',
+                    widths: '1080, 1440, 1920, 2560, 2880',
+                    max_width: 2880,
+                    poster_size: '1920x',
+                    loading: 'eager'
+                  -%}
+                </div>
+              {%- endfor -%}
+            {%- else -%}
+              <div class="nf-hero__slide is-active" data-nf-hero-slide data-index="0">
+                {%- render 'nf-media',
+                  asset: 'nf-lifestyle-hero-01.jpg',
+                  class: 'nf-hero__media',
+                  sizes: '100vw',
+                  widths: '1080, 1440, 1920, 2560, 2880',
+                  max_width: 2880,
+                  loading: 'eager'
+                -%}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+
+      <div class="nf-hero__copy nf-hero__copy--stack-y-{{ main_my }}" data-nf-hero-copy>
+        <div class="{{ main_classes }}" data-nf-hero-over-media>
+          {%- if section.settings.hero_eyebrow != blank -%}
+            <p class="nf-eyebrow nf-hero__eyebrow" data-nf-hero-eyebrow>{{ section.settings.hero_eyebrow | escape }}</p>
+          {%- endif -%}
+          {%- if section.settings.hero_heading != blank -%}
+            <h2 class="nf-hero__heading" data-nf-hero-heading>{{ section.settings.hero_heading | escape | newline_to_br }}</h2>
+          {%- endif -%}
+        </div>
+        <div class="{{ side_classes }}" data-nf-hero-copy-side data-nf-hero-over-media>
+          {%- if section.settings.hero_subheading != blank -%}
+            <p class="nf-hero__sub">{{ section.settings.hero_subheading | escape | newline_to_br }}</p>
+          {%- endif -%}
+          <div class="nf-hero__ctas" data-nf-hero-ctas>
+            {%- if section.settings.cta_label != blank -%}
+              {% render 'nf-button',
+                label: section.settings.cta_label,
+                url: cta_url,
+                style: section.settings.button_style,
+                class: 'nf-btn--pill'
+              %}
+            {%- endif -%}
+            {%- if section.settings.cta2_label != blank and cta2_url != blank -%}
+              <a class="nf-btn nf-btn--circle" href="{{ cta2_url }}" aria-label="{{ section.settings.cta2_label | escape }}">
+                <span aria-hidden="true">→</span>
+              </a>
+            {%- elsif section.settings.cta_label != blank -%}
+              <a class="nf-btn nf-btn--circle" href="{{ cta_url }}" aria-label="{{ section.settings.cta_label | escape }}">
+                <span aria-hidden="true">→</span>
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+
+        {%- if slide_count > 1 -%}
+          <div class="nf-hero__dots" data-nf-hero-dots role="tablist" aria-label="Hero slides">
+            {%- for block in section.blocks -%}
+              <button
+                type="button"
+                class="nf-hero__dot{% if forloop.first %} is-active{% endif %}"
+                data-nf-hero-dot
+                data-index="{{ forloop.index0 }}"
+                aria-label="{{ block.settings.label | default: forloop.index | escape }}"
+              ></button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  {%- if section.settings.loader_enabled -%}
+    <div class="nf-preloader" data-nf-preloader aria-hidden="true">
+      <div class="nf-preloader__logo" data-nf-preloader-logo>
+        <div class="nf-preloader__plate">
+          <div class="nf-preloader__water" data-nf-preloader-water></div>
+        </div>
+        <img
+          class="nf-preloader__stencil nf-preloader__stencil--desktop"
+          src="{{ 'Fizz_Logo_Intro.svg' | asset_url }}"
+          alt=""
+          width="640"
+          height="398"
+          decoding="async"
+        >
+        <img
+          class="nf-preloader__stencil nf-preloader__stencil--mobile"
+          src="{{ 'Fizz_Logo_INTRO_SVG_Mobile.svg' | asset_url }}"
+          alt=""
+          width="320"
+          height="749"
+          decoding="async"
+        >
+      </div>
+      <p class="nf-preloader__status" data-nf-preloader-status>
+        <span>loading...</span>
+        <span data-nf-preloader-pct>0%</span>
+      </p>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "NF Hero",
+  "tag": "section",
+  "class": "nf-hero-section",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "text",
+      "id": "seo_heading",
+      "label": "Accessible page heading"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "top"
+    },
+    {
+      "type": "header",
+      "content": "Copy"
+    },
+    {
+      "type": "text",
+      "id": "hero_eyebrow",
+      "label": "Eyebrow",
+      "default": "Fast, secure and portable"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_heading",
+      "label": "Heading",
+      "default": "Sparkling water, anywhere.",
+      "info": "Use line breaks to control which words sit on each line."
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subheading",
+      "label": "Subheading",
+      "default": "Fill. Twist. Fizz. Cold bubbles in under ten seconds — no machine, no cans."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Primary button",
+      "default": "Shop bottles"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Primary button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Primary button style",
+      "options": [
+        { "value": "fill", "label": "Fill" },
+        { "value": "outline", "label": "Outline" },
+        { "value": "link", "label": "Linked text underline" }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "text",
+      "id": "cta2_label",
+      "label": "Arrow button label",
+      "default": "Shop"
+    },
+    {
+      "type": "url",
+      "id": "cta2_url",
+      "label": "Arrow button link"
+    },
+    {
+      "type": "header",
+      "content": "Copy padding"
+    },
+    {
+      "type": "paragraph",
+      "content": "Insets heading, subheading, buttons, and slide dots from the media edges. Does not change the media window."
+    },
+    {
+      "type": "range",
+      "id": "copy_padding_x",
+      "label": "Horizontal padding",
+      "min": 12,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "copy_padding_y",
+      "label": "Vertical padding",
+      "min": 12,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "copy_padding_x_mobile",
+      "label": "Horizontal padding (mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "range",
+      "id": "copy_padding_y_mobile",
+      "label": "Vertical padding (mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "header",
+      "content": "Heading layout"
+    },
+    {
+      "type": "select",
+      "id": "heading_x",
+      "label": "Desktop horizontal",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "heading_y",
+      "label": "Desktop vertical",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "middle", "label": "Middle" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "select",
+      "id": "heading_x_mobile",
+      "label": "Mobile horizontal",
+      "options": [
+        { "value": "inherit", "label": "Same as desktop" },
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "inherit"
+    },
+    {
+      "type": "select",
+      "id": "heading_y_mobile",
+      "label": "Mobile vertical",
+      "options": [
+        { "value": "inherit", "label": "Same as desktop" },
+        { "value": "top", "label": "Top" },
+        { "value": "middle", "label": "Middle" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "inherit",
+      "info": "On mobile, heading, subheading, and buttons stack as one group. This sets where that group sits."
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading font size",
+      "min": 28,
+      "max": 96,
+      "step": 2,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size_mobile",
+      "label": "Heading font size (mobile)",
+      "min": 0,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "range",
+      "id": "heading_max_width",
+      "label": "Heading max width",
+      "min": 8,
+      "max": 40,
+      "step": 1,
+      "unit": "ch",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "heading_max_width_mobile",
+      "label": "Heading max width (mobile)",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "ch",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "header",
+      "content": "Subheading / CTA layout"
+    },
+    {
+      "type": "paragraph",
+      "content": "Subheading and buttons share one positioned block."
+    },
+    {
+      "type": "select",
+      "id": "side_x",
+      "label": "Desktop horizontal",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "select",
+      "id": "side_y",
+      "label": "Desktop vertical",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "middle", "label": "Middle" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "select",
+      "id": "side_x_mobile",
+      "label": "Mobile horizontal",
+      "options": [
+        { "value": "inherit", "label": "Same as desktop" },
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "inherit"
+    },
+    {
+      "type": "select",
+      "id": "side_y_mobile",
+      "label": "Mobile vertical",
+      "options": [
+        { "value": "inherit", "label": "Same as desktop" },
+        { "value": "top", "label": "Top" },
+        { "value": "middle", "label": "Middle" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "inherit",
+      "info": "Desktop only. On mobile, blocks stack; group vertical follows the heading’s mobile vertical."
+    },
+    {
+      "type": "range",
+      "id": "sub_font_size",
+      "label": "Subheading font size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "sub_font_size_mobile",
+      "label": "Subheading font size (mobile)",
+      "min": 0,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "range",
+      "id": "sub_max_width",
+      "label": "Subheading max width",
+      "min": 16,
+      "max": 60,
+      "step": 1,
+      "unit": "ch",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "sub_max_width_mobile",
+      "label": "Subheading max width (mobile)",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "ch",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "header",
+      "content": "Slider"
+    },
+    {
+      "type": "range",
+      "id": "autoplay_interval",
+      "label": "Autoplay interval",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Scroll window"
+    },
+    {
+      "type": "range",
+      "id": "scroll_length",
+      "label": "Scroll distance to inset",
+      "info": "How far the visitor scrolls while the media clips from full-bleed into the rounded window.",
+      "min": 80,
+      "max": 200,
+      "step": 10,
+      "unit": "vh",
+      "default": 180
+    },
+    {
+      "type": "range",
+      "id": "media_end_height",
+      "label": "Media height after scroll",
+      "info": "How tall the media band is once the window finishes scaling down.",
+      "min": 25,
+      "max": 70,
+      "step": 5,
+      "unit": "vh",
+      "default": 45
+    },
+    {
+      "type": "header",
+      "content": "Intro loader"
+    },
+    {
+      "type": "checkbox",
+      "id": "loader_enabled",
+      "label": "Enable water-fill logo loader",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "loader_duration",
+      "label": "Loader duration",
+      "min": 2,
+      "max": 8,
+      "step": 0.2,
+      "unit": "s",
+      "default": 5.6,
+      "info": "Slower fills read more like water rising behind the logo, then zoom into the hero."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "media",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Lifestyle"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": "External video",
+          "accept": ["youtube", "vimeo"]
+        },
+        {
+          "type": "text",
+          "id": "asset",
+          "label": "Theme asset fallback",
+          "default": "nf-lifestyle-hero-01.jpg"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [
+    {
+      "name": "NF Hero",
+      "blocks": [
+        { "type": "media", "settings": { "label": "On the go", "asset": "nf-lifestyle-hero-01.jpg" } },
+        { "type": "media", "settings": { "label": "Drive", "asset": "nf-lifestyle-hero-02.jpg" } },
+        { "type": "media", "settings": { "label": "Active", "asset": "nf-lifestyle-hero-03.jpg" } },
+        { "type": "media", "settings": { "label": "Field", "asset": "nf-lifestyle-hero-04.jpg" } },
+        { "type": "media", "settings": { "label": "Court", "asset": "nf-lifestyle-hero-05.jpg" } }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  }
+}
+{% endschema %}

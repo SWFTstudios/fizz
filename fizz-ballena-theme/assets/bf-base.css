@@ -1,0 +1,26 @@
+/* Ballena Fizz — premium base tokens layered on NeoFizz */
+
+:root {
+  --bf-paper: #f7f5f0;
+  --bf-ink: #0e1412;
+  --bf-muted: #3a423e;
+  --bf-accent: #6b9fd4;
+  --bf-space-section: clamp(4.5rem, 8vw, 7.5rem);
+}
+
+html.nf-js {
+  scroll-behavior: auto;
+}
+
+body.bf-theme {
+  background: var(--bf-paper);
+}
+
+.bf-hero-section,
+.bf-about-section,
+.bf-benefits-section,
+.bf-flavors-section,
+.bf-social-section,
+.bf-footer-section {
+  position: relative;
+}

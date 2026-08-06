@@ -1,0 +1,67 @@
+/* NF Water Wave — looping SVG sine divider (Snaxx-style translate, no Lottie) */
+
+.nf-water-wave-section {
+  margin-block: calc(var(--nf-wave-overlap, 8px) * -1);
+  line-height: 0;
+  overflow: visible;
+}
+
+.nf-water-wave {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  height: var(--nf-wave-height, 40px);
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.nf-water-wave__viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.nf-water-wave__track {
+  display: block;
+  width: 200%;
+  height: 100%;
+  will-change: transform;
+  animation: nf-water-wave-drift var(--nf-wave-duration, 5s) linear infinite;
+}
+
+.nf-water-wave__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.nf-water-wave__svg path {
+  fill: var(--nf-wave-fill, #ffffff);
+}
+
+/* Snaxx .flipped — same asset, top-edge orientation */
+.nf-water-wave--flipped .nf-water-wave__viewport {
+  transform: rotateX(180deg);
+  transform-style: preserve-3d;
+}
+
+@keyframes nf-water-wave-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nf-water-wave__track {
+    animation: none;
+    transform: none;
+  }
+}
+
+.nf-no-motion .nf-water-wave__track {
+  animation: none;
+  transform: none;
+}

@@ -1,0 +1,74 @@
+/*
+ * ------------------------------------------------------------
+ * Ballena Fizz header group — floating pill nav
+ * ------------------------------------------------------------
+ */
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "bf_header": {
+      "type": "bf-header",
+      "blocks": {
+        "about": {
+          "type": "nav_link",
+          "settings": {
+            "label": "About",
+            "url": "",
+            "anchor_id": "about"
+          }
+        },
+        "features": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Features",
+            "url": "",
+            "anchor_id": "features"
+          }
+        },
+        "flavors": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Flavors",
+            "url": "",
+            "anchor_id": "flavors"
+          }
+        },
+        "shop": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Shop",
+            "url": "/collections/all",
+            "anchor_id": ""
+          }
+        }
+      },
+      "block_order": [
+        "about",
+        "features",
+        "flavors",
+        "shop"
+      ],
+      "settings": {
+        "shop_label": "Shop",
+        "shop_url": "/collections/all",
+        "logo_text": "FIZZ",
+        "menu_label": "Menu",
+        "show_cart": true,
+        "cart_label": "Cart",
+        "show_social": true,
+        "bar_background": "#03090D",
+        "bar_opacity": 19,
+        "open_background": "#FFFEFD",
+        "text_color_light": "#FFFEFD",
+        "text_color_dark": "#03090D",
+        "accent_color": "#6b9fd4",
+        "max_width": 720,
+        "blur_amount": 25
+      }
+    }
+  },
+  "order": [
+    "bf_header"
+  ]
+}
