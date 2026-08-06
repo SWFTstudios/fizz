@@ -1,0 +1,439 @@
+{{ 'swiper-bundle.min.css' | asset_url | stylesheet_tag }}
+{{ 'nf-lifestyle-carousel.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign bottle_product = section.settings.product | default: settings.bottle_product
+  assign autoplay_ms = section.settings.autoplay_seconds | default: 0 | times: 1000
+  assign card_radius = section.settings.card_radius | default: 16
+  assign show_section_header = false
+  if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.subheading != blank
+    assign show_section_header = true
+  endif
+%}
+
+{% if section.blocks.size > 0 %}
+  <section
+    class="nf-lifestyle-carousel"
+    id="{{ section.settings.anchor_id | default: 'lifestyle' | handle }}"
+    data-nf-lifestyle-carousel
+    data-autoplay-ms="{{ autoplay_ms }}"
+    data-show-arrows="{{ section.settings.show_arrows }}"
+    data-coverflow-rotate="{{ section.settings.coverflow_rotate | default: 28 }}"
+    data-coverflow-depth="{{ section.settings.coverflow_depth | default: 140 }}"
+    data-coverflow-stretch="{{ section.settings.coverflow_stretch | default: -28 }}"
+    aria-label="{{ section.settings.heading | default: 'Lifestyle carousel' | escape }}"
+    style="--nflc-radius: {{ card_radius }}px;"
+  >
+    <div class="nf-lifestyle-carousel__inner{% if show_section_header %} nf-container{% endif %}">
+      {% if show_section_header %}
+        <div class="nf-lifestyle-carousel__header">
+          {% if section.settings.eyebrow != blank %}
+            <p class="nf-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+          {% endif %}
+          {% if section.settings.heading != blank %}
+            <h2 class="nf-heading nf-lifestyle-carousel__heading">{{ section.settings.heading | escape }}</h2>
+          {% endif %}
+          {% if section.settings.subheading != blank %}
+            <p class="nf-lifestyle-carousel__lead">{{ section.settings.subheading | escape }}</p>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="nf-lifestyle-carousel__shell{% if section.blocks.size < 2 %} nf-lifestyle-carousel__shell--single{% endif %}">
+        {% if section.settings.show_arrows and section.blocks.size > 1 %}
+          <button
+            type="button"
+            class="nf-lifestyle-carousel__arrow nf-lifestyle-carousel__arrow--prev"
+            data-nf-lifestyle-prev
+            aria-label="Previous slide"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M12.5 4.5L7 10l5.5 5.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        {% endif %}
+
+        <div class="swiper nf-lifestyle-carousel__swiper" data-nf-lifestyle-swiper>
+          <div class="swiper-wrapper">
+            {% for block in section.blocks %}
+              {% liquid
+                assign color_slug = block.settings.color_slug
+                assign card_variant = ''
+                assign card_url = ''
+
+                if bottle_product != blank
+                  for variant in bottle_product.variants
+                    capture vslug_raw
+                      render 'nf-color-slug', variant: variant
+                    endcapture
+                    assign vslug = vslug_raw | strip
+                    if vslug == color_slug
+                      assign card_variant = variant
+                      break
+                    endif
+                  endfor
+
+                  if card_variant != blank
+                    assign card_url = bottle_product.url | append: '?variant=' | append: card_variant.id
+                  else
+                    assign card_url = bottle_product.url
+                  endif
+                endif
+
+                assign card_title = block.settings.title
+                if card_title == blank and card_variant != blank
+                  assign card_title = card_variant.title
+                endif
+
+                assign cta_label = block.settings.button_label | default: section.settings.default_button_label | default: 'Shop Now'
+
+                assign lifestyle_image = block.settings.lifestyle_image
+                assign hover_image = block.settings.hover_image
+                if hover_image == blank and card_variant != blank and card_variant.image != blank
+                  assign hover_image = card_variant.image
+                endif
+
+                assign image_alt = block.settings.image_alt
+                if image_alt == blank
+                  assign image_alt = card_title | default: color_slug
+                endif
+
+                assign has_asset_fallback = false
+                if lifestyle_image == blank and color_slug != blank
+                  assign has_asset_fallback = true
+                  assign asset_src = 'fizz-bottle-product-' | append: color_slug | append: '.png' | asset_url
+                endif
+
+                assign show_hover = false
+                if hover_image != blank
+                  if lifestyle_image == blank or hover_image != lifestyle_image
+                    assign show_hover = true
+                  endif
+                endif
+              %}
+
+              <div class="swiper-slide" {{ block.shopify_attributes }}>
+                {% if card_url != blank %}
+                  <a href="{{ card_url }}" class="nf-lifestyle-carousel__card nf-lifestyle-carousel__card--{{ color_slug }}">
+                {% else %}
+                  <article class="nf-lifestyle-carousel__card nf-lifestyle-carousel__card--{{ color_slug }}">
+                {% endif %}
+                  <div class="nf-lifestyle-carousel__media{% if show_hover %} nf-lifestyle-carousel__media--has-hover{% endif %}">
+                    {% if lifestyle_image != blank %}
+                      {{
+                        lifestyle_image
+                        | image_url: width: 1200
+                        | image_tag:
+                          class: 'nf-lifestyle-carousel__img nf-lifestyle-carousel__img--primary',
+                          loading: 'lazy',
+                          widths: '480, 720, 960, 1200',
+                          sizes: '(min-width: 1024px) 36vw, 78vw',
+                          alt: image_alt
+                      }}
+                    {% elsif has_asset_fallback %}
+                      <img
+                        class="nf-lifestyle-carousel__img nf-lifestyle-carousel__img--primary"
+                        src="{{ asset_src }}"
+                        alt="{{ image_alt | escape }}"
+                        loading="lazy"
+                        width="504"
+                        height="1400"
+                      >
+                    {% elsif card_variant != blank and card_variant.image != blank %}
+                      {{
+                        card_variant.image
+                        | image_url: width: 1200
+                        | image_tag:
+                          class: 'nf-lifestyle-carousel__img nf-lifestyle-carousel__img--primary',
+                          loading: 'lazy',
+                          widths: '480, 720, 960, 1200',
+                          sizes: '(min-width: 1024px) 36vw, 78vw',
+                          alt: image_alt
+                      }}
+                    {% elsif bottle_product != blank and bottle_product.featured_image != blank %}
+                      {{
+                        bottle_product.featured_image
+                        | image_url: width: 1200
+                        | image_tag:
+                          class: 'nf-lifestyle-carousel__img nf-lifestyle-carousel__img--primary',
+                          loading: 'lazy',
+                          widths: '480, 720, 960, 1200',
+                          sizes: '(min-width: 1024px) 36vw, 78vw',
+                          alt: image_alt
+                      }}
+                    {% else %}
+                      <div class="nf-lifestyle-carousel__placeholder" aria-hidden="true"></div>
+                    {% endif %}
+
+                    {% if show_hover %}
+                      {{
+                        hover_image
+                        | image_url: width: 1200
+                        | image_tag:
+                          class: 'nf-lifestyle-carousel__img nf-lifestyle-carousel__img--secondary',
+                          loading: 'lazy',
+                          widths: '480, 720, 960, 1200',
+                          sizes: '(min-width: 1024px) 36vw, 78vw',
+                          alt: image_alt
+                      }}
+                    {% endif %}
+
+                    <div class="nf-lifestyle-carousel__overlay">
+                      {% if card_title != blank %}
+                        <h3 class="nf-lifestyle-carousel__title">{{ card_title | escape }}</h3>
+                      {% endif %}
+                      {% if block.settings.caption != blank %}
+                        <p class="nf-lifestyle-carousel__caption">{{ block.settings.caption | escape }}</p>
+                      {% endif %}
+                      {% if cta_label != blank and card_url != blank %}
+                        <span class="nf-lifestyle-carousel__cta">{{ cta_label | escape }}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% if card_url != blank %}
+                  </a>
+                {% else %}
+                  </article>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% if section.settings.show_arrows and section.blocks.size > 1 %}
+          <button
+            type="button"
+            class="nf-lifestyle-carousel__arrow nf-lifestyle-carousel__arrow--next"
+            data-nf-lifestyle-next
+            aria-label="Next slide"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M7.5 4.5L13 10l-5.5 5.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <script src="{{ 'swiper-bundle.min.js' | asset_url }}" defer></script>
+  <script src="{{ 'nf-lifestyle-carousel.js' | asset_url }}" defer></script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "NF Lifestyle Carousel",
+  "tag": "section",
+  "class": "nf-lifestyle-carousel-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "info": "Leave blank to hide the section header (matches the coverflow reference)."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "lifestyle"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Bottle product",
+      "info": "Falls back to Theme settings → Bottle product. Cards link with ?variant= for the matched color."
+    },
+    {
+      "type": "text",
+      "id": "default_button_label",
+      "label": "Default button label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "header",
+      "content": "Carousel"
+    },
+    {
+      "type": "range",
+      "id": "autoplay_seconds",
+      "label": "Autoplay interval (seconds, 0 = off)",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show prev/next arrows",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "coverflow_rotate",
+      "label": "Side card rotation",
+      "min": 12,
+      "max": 50,
+      "step": 2,
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "coverflow_depth",
+      "label": "3D depth",
+      "min": 60,
+      "max": 280,
+      "step": 10,
+      "default": 140
+    },
+    {
+      "type": "range",
+      "id": "coverflow_stretch",
+      "label": "Card spacing (negative = tighter)",
+      "min": -80,
+      "max": 40,
+      "step": 4,
+      "default": -28
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Color card",
+      "settings": [
+        {
+          "type": "select",
+          "id": "color_slug",
+          "label": "Bottle color",
+          "options": [
+            { "value": "coral-orange", "label": "Coral Orange" },
+            { "value": "charcoal-black", "label": "Charcoal Black" },
+            { "value": "sage-green", "label": "Sage Green" },
+            { "value": "steel-navy", "label": "Steel Navy" },
+            { "value": "arctic-white", "label": "Arctic White" },
+            { "value": "electric-blue", "label": "Electric Blue" }
+          ],
+          "default": "coral-orange",
+          "info": "Links to the matching bottle variant via ?variant="
+        },
+        {
+          "type": "image_picker",
+          "id": "lifestyle_image",
+          "label": "Lifestyle image"
+        },
+        {
+          "type": "image_picker",
+          "id": "hover_image",
+          "label": "Hover image",
+          "info": "Falls back to the variant image when empty"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Headline",
+          "default": "Get ready for Spring"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Supporting line",
+          "default": "More sunlight and warmth"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Shop Now"
+        },
+        {
+          "type": "text",
+          "id": "image_alt",
+          "label": "Image alt text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "NF Lifestyle Carousel",
+      "blocks": [
+        {
+          "type": "card",
+          "settings": {
+            "color_slug": "coral-orange",
+            "title": "Delight your Senses",
+            "caption": "Hand-picked finishes just for you",
+            "button_label": "Shop Now"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "color_slug": "sage-green",
+            "title": "Get ready for Spring",
+            "caption": "More sunlight and warmth",
+            "button_label": "Learn more"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "color_slug": "charcoal-black",
+            "title": "Time for a Getaway",
+            "caption": "Embrace the vacation vibes",
+            "button_label": "Take a Look"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "color_slug": "electric-blue",
+            "title": "Poolside Spark",
+            "caption": "Cold bubbles under open sky",
+            "button_label": "Shop Now"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "color_slug": "arctic-white",
+            "title": "Clean & Minimal",
+            "caption": "A quiet everyday ritual",
+            "button_label": "Shop Now"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "color_slug": "steel-navy",
+            "title": "After Hours",
+            "caption": "Deep evening polish",
+            "button_label": "Shop Now"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

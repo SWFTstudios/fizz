@@ -1,0 +1,103 @@
+{% comment %}
+  Global CSS design tokens.
+  Colors resolve from colorway_preset (or custom pickers when enabled).
+  Brand typeface is Helvetica Neue LT Std (assets/nf-fonts.css) site-wide.
+{% endcomment %}
+{%- liquid
+  assign preset_id = settings.colorway_preset | default: 'steel_navy'
+  capture preset_raw
+    render 'nf-colorway-preset-data', preset: preset_id
+  endcapture
+  assign preset_parts = preset_raw | strip | split: '|'
+
+  assign paper = preset_parts[0]
+  assign ink = preset_parts[1]
+  assign accent = preset_parts[2]
+  assign surface = preset_parts[3]
+  assign dark = preset_parts[4]
+  assign dark_text = preset_parts[5]
+
+  if settings.colorway_custom_enabled
+    if settings.color_paper != blank
+      assign paper = settings.color_paper
+    endif
+    if settings.color_ink != blank
+      assign ink = settings.color_ink
+    endif
+    if settings.color_accent != blank
+      assign accent = settings.color_accent
+    endif
+    if settings.color_surface != blank
+      assign surface = settings.color_surface
+    endif
+    if settings.color_dark != blank
+      assign dark = settings.color_dark
+    endif
+    if settings.color_dark_text != blank
+      assign dark_text = settings.color_dark_text
+    endif
+  endif
+
+  assign btn_fill_bg = accent
+  assign btn_fill_text = '#0b0c0e'
+  assign btn_outline_border = ink
+  assign btn_outline_text = ink
+  assign btn_link_text = ink
+
+  if settings.button_fill_bg != blank
+    assign btn_fill_bg = settings.button_fill_bg
+  endif
+  if settings.button_fill_text != blank
+    assign btn_fill_text = settings.button_fill_text
+  endif
+  if settings.button_outline_border != blank
+    assign btn_outline_border = settings.button_outline_border
+  endif
+  if settings.button_outline_text != blank
+    assign btn_outline_text = settings.button_outline_text
+  endif
+  if settings.button_link_text != blank
+    assign btn_link_text = settings.button_link_text
+  endif
+
+  assign transition_liquid = accent
+  if settings.page_transition_color_mode == 'custom' and settings.page_transition_color != blank
+    assign transition_liquid = settings.page_transition_color
+  endif
+-%}
+<style>
+  :root {
+    --nf-paper: {{ paper }};
+    --nf-ink: {{ ink }};
+    --nf-accent: {{ accent }};
+    --nf-surface: {{ surface }};
+    --nf-dark: {{ dark }};
+    --nf-dark-text: {{ dark_text }};
+    --nf-transition-liquid: {{ transition_liquid }};
+    --nf-ink-rgb: {{ ink | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+    --nf-paper-rgb: {{ paper | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+
+    --nf-btn-fill-bg: {{ btn_fill_bg }};
+    --nf-btn-fill-text: {{ btn_fill_text }};
+    --nf-btn-outline-border: {{ btn_outline_border }};
+    --nf-btn-outline-text: {{ btn_outline_text }};
+    --nf-btn-link: {{ btn_link_text }};
+
+    --nf-font-heading: "Helvetica Neue LT Std", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --nf-font-heading-weight: 700;
+    --nf-font-body: "Helvetica Neue LT Std", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --nf-font-body-weight: 400;
+    --nf-heading-scale: {{ settings.heading_scale | divided_by: 100.0 }};
+    --nf-heading-transform: {% if settings.heading_uppercase %}uppercase{% else %}none{% endif %};
+
+    --nf-page-width: {{ settings.page_width }}px;
+    --nf-gutter: {{ settings.gutter }}px;
+    --bf-page-pad-x: {% if settings.horizontal_padding == '0' %}0{% else %}max(var(--nf-gutter), {{ settings.horizontal_padding | default: '5%' }}){% endif %};
+    --nf-btn-radius: {{ settings.button_radius }}px;
+    --nf-radius-lg: 32px;
+    --nf-radius-xl: 48px;
+    --nf-soft-shadow: 0 10px 32px rgba(var(--nf-ink-rgb), 0.08), 0 2px 8px rgba(var(--nf-ink-rgb), 0.04);
+    --nf-soft-shadow-sm: 0 4px 14px rgba(var(--nf-ink-rgb), 0.06);
+    --nf-soft-inset: inset 3px 3px 8px rgba(var(--nf-ink-rgb), 0.06), inset -2px -2px 6px rgba(255, 255, 255, 0.65);
+  }
+</style>

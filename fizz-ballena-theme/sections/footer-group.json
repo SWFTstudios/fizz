@@ -1,0 +1,53 @@
+/*
+ * ------------------------------------------------------------
+ * Ballena Fizz footer group
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "bf_footer": {
+      "type": "bf-footer",
+      "blocks": {
+        "link_shop": {
+          "type": "link",
+          "settings": {
+            "label": "Shop all",
+            "url": "/collections/all"
+          }
+        },
+        "link_search": {
+          "type": "link",
+          "settings": {
+            "label": "Search",
+            "url": "/search"
+          }
+        }
+      },
+      "block_order": [
+        "link_shop",
+        "link_search"
+      ],
+      "settings": {
+        "heading": "Sparkling water, anywhere.",
+        "subheading": "Clean space, quality imagery, and a ritual that travels.",
+        "cta_label": "Shop bottles",
+        "cta_url": "/collections/all",
+        "show_newsletter": true,
+        "newsletter_placeholder": "Your email",
+        "copyright_note": "All rights reserved",
+        "padding_top": 96,
+        "padding_bottom": 64,
+        "background_color": "#0e1412",
+        "heading_color": "#FFFEFD",
+        "body_color": "#c8cbc6",
+        "heading_font_size": 40,
+        "body_font_size": 16
+      }
+    }
+  },
+  "order": [
+    "bf_footer"
+  ]
+}

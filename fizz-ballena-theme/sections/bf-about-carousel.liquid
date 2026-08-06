@@ -1,0 +1,378 @@
+{{ 'bf-about-carousel.css' | asset_url | stylesheet_tag }}
+<section
+  class="bf-section bf-about"
+  id="{{ section.settings.anchor_id | default: 'about' | handle }}"
+  data-bf-about
+>
+  {% render 'bf-section-chrome', section: section %}
+
+  <div class="bf-about__wrap">
+    {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
+      <header class="bf-about__intro">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="bf-section__heading bf-about__heading">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+        {%- if section.settings.subheading != blank -%}
+          <p class="bf-section__body bf-about__sub">{{ section.settings.subheading | escape }}</p>
+        {%- endif -%}
+      </header>
+    {%- endif -%}
+
+    <div class="bf-about__carousel">
+      <div class="bf-about__track" data-bf-about-track>
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'card' -%}
+            {%- assign card_url = block.settings.url | default: '#' -%}
+            <article class="bf-about__card" {{ block.shopify_attributes }}>
+              <div class="bf-about__card-media" aria-hidden="true">
+                {%- render 'nf-media',
+                  image: block.settings.image,
+                  asset: block.settings.asset,
+                  alt: block.settings.title,
+                  class: 'bf-about__card-img',
+                  sizes: '(min-width: 900px) 28vw, 80vw',
+                  loading: 'lazy'
+                -%}
+              </div>
+
+              <div class="bf-about__card-content">
+                <h3 class="bf-about__card-title">{{ block.settings.title | escape }}</h3>
+
+                <div class="bf-about__card-bottom">
+                  {%- if block.settings.body != blank -%}
+                    <p class="bf-about__card-desc">{{ block.settings.body | escape }}</p>
+                  {%- endif -%}
+                  {%- if block.settings.link_label != blank -%}
+                    <a class="bf-about__card-link" href="{{ card_url }}">
+                      <span>{{ block.settings.link_label | escape }}</span>
+                      <span class="bf-about__card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="12" cy="12" r="11" fill="currentColor" fill-opacity="0.95"/>
+                          <path d="M10.2 7.8L14.4 12l-4.2 4.2" stroke="#03090D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </a>
+                  {%- endif -%}
+                </div>
+              </div>
+            </article>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <div class="bf-about__navigation" data-bf-about-nav>
+        <button type="button" class="bf-about__nav-btn" data-bf-about-prev aria-label="Previous">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="bf-about__progress" aria-hidden="true">
+          <span class="bf-about__progress-bar" data-bf-about-progress></span>
+        </div>
+        <button type="button" class="bf-about__nav-btn" data-bf-about-next aria-label="Next">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'bf-about-carousel.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "BF About Carousel",
+  "tag": "section",
+  "class": "bf-about-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "about"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Leave blank for Ballena-style image cards with no section title."
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margin top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Margin bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading font size",
+      "min": 16,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "body_font_size",
+      "label": "Body font size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "heading_font_weight",
+      "label": "Heading font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "body_font_weight",
+      "label": "Body font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#03090D"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body color",
+      "default": "#03090D"
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 background"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#F8F2E5"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background video",
+      "info": "Shopify Files MP4. Autoplay is muted and looped."
+    },
+    {
+      "type": "video_url",
+      "id": "background_video_url",
+      "label": "Background video URL",
+      "accept": [
+        "youtube",
+        "vimeo"
+      ],
+      "info": "Used when no Shopify-hosted video is set."
+    },
+    {
+      "type": "range",
+      "id": "background_image_opacity",
+      "label": "Background image opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "background_video_opacity",
+      "label": "Background video opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Shop Bottles"
+        },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Description",
+          "default": "Ways to gather beyond the table"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label",
+          "default": "Explore more"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "asset",
+          "label": "Theme asset fallback",
+          "default": "nf-lifestyle-story-01.jpg"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "BF About Carousel",
+      "blocks": [
+        {
+          "type": "card",
+          "settings": {
+            "title": "Shop Bottles",
+            "body": "Built for the way you move",
+            "link_label": "Explore more",
+            "url": "/collections/all",
+            "asset": "nf-lifestyle-story-01.jpg"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "title": "How it works",
+            "body": "Fill. Twist. Fizz.",
+            "link_label": "Explore more",
+            "url": "/#features",
+            "asset": "nf-lifestyle-how-01.jpg"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "title": "Refill",
+            "body": "Passed along, meant to be shared",
+            "link_label": "Explore more",
+            "url": "/collections/all",
+            "asset": "nf-lifestyle-story-02.jpg"
+          }
+        }
+      ],
+      "settings": {
+        "heading": "",
+        "subheading": "",
+        "background_color": "#F8F2E5",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    }
+  ]
+}
+{% endschema %}

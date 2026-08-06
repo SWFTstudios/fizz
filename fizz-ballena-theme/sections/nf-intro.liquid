@@ -1,0 +1,399 @@
+{%- liquid
+  assign slide_count = section.blocks.size
+  assign cta_url = section.settings.cta_url | default: routes.all_products_collection_url
+  assign scroll_zoom = section.settings.scroll_zoom_enabled
+  if scroll_zoom == nil
+    assign scroll_zoom = false
+  endif
+  assign loader_on = section.settings.loader_enabled
+  if loader_on == nil
+    assign loader_on = true
+  endif
+-%}
+<section
+  class="nf-intro{% unless scroll_zoom %} nf-intro--slides-only is-zoomed is-copy-in is-done{% endunless %}{% if loader_on %} is-loading{% endif %}"
+  data-nf-intro
+  data-scroll-zoom="{% if scroll_zoom %}true{% else %}false{% endif %}"
+  data-autoplay-interval="{{ section.settings.autoplay_interval }}"
+  data-autoscroll-enabled="{% if scroll_zoom and section.settings.autoscroll_enabled %}true{% else %}false{% endif %}"
+  data-autoscroll-delay="{{ section.settings.autoscroll_delay }}"
+  data-autoscroll-duration="{{ section.settings.autoscroll_duration }}"
+  data-autoscroll-ease="{{ section.settings.autoscroll_ease }}"
+  data-autoscroll-target="{{ section.settings.autoscroll_target }}"
+  data-loader-enabled="{% if loader_on %}true{% else %}false{% endif %}"
+  data-loader-duration="{{ section.settings.loader_duration | default: 5.6 }}"
+  style="--nf-intro-len: {{ section.settings.scroll_length }}vh; --nf-intro-mask: url('{{ 'Fizz_Logo_Intro.svg' | asset_url }}'); --nf-intro-mask-mobile: url('{{ 'Fizz_Logo_INTRO_SVG_Mobile.svg' | asset_url }}');"
+>
+  <h1 class="nf-visually-hidden">{{ section.settings.seo_heading | default: shop.name }}</h1>
+
+  <div class="nf-intro__track" data-nf-intro-track>
+    <div class="nf-intro__sticky">
+      <div class="nf-intro__stage" data-nf-intro-stage aria-hidden="true">
+        <div class="nf-intro__slides" data-nf-intro-slides>
+          {%- if slide_count > 0 -%}
+            {%- for block in section.blocks -%}
+              <div
+                class="nf-intro__slide{% if forloop.first %} is-active{% endif %}"
+                data-nf-intro-slide
+                data-index="{{ forloop.index0 }}"
+                {{ block.shopify_attributes }}
+              >
+                {%- render 'nf-media',
+                  video: block.settings.video,
+                  video_url: block.settings.video_url,
+                  image: block.settings.image,
+                  asset: block.settings.asset,
+                  alt: block.settings.label,
+                  class: 'nf-intro__media',
+                  sizes: '100vw',
+                  loading: 'eager'
+                -%}
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            <div class="nf-intro__slide is-active" data-nf-intro-slide data-index="0">
+              {%- render 'nf-media', asset: 'stitch-hero-slideshow-1.jpg', class: 'nf-intro__media', loading: 'eager' -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- if scroll_zoom -%}
+        <div class="nf-intro__mask" data-nf-intro-mask aria-hidden="true">
+          <div class="nf-intro__mask-fill"></div>
+        </div>
+      {%- endif -%}
+
+      <div class="nf-intro__hero-copy" data-nf-intro-copy>
+        {%- if section.settings.hero_eyebrow != blank -%}
+          <p class="nf-intro__hero-eyebrow">{{ section.settings.hero_eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.hero_heading != blank -%}
+          <h2 class="nf-intro__hero-heading">{{ section.settings.hero_heading | escape }}</h2>
+        {%- endif -%}
+        {%- if section.settings.hero_subheading != blank -%}
+          <p class="nf-intro__hero-sub">{{ section.settings.hero_subheading | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.cta_label != blank -%}
+          <a class="nf-btn nf-btn--accent nf-intro__hero-cta" href="{{ cta_url }}">
+            {{- section.settings.cta_label | escape -}}
+          </a>
+        {%- endif -%}
+      </div>
+
+      {%- if slide_count > 1 -%}
+        <div class="nf-intro__thumbs" data-nf-intro-thumbs role="tablist" aria-label="Intro media">
+          {%- for block in section.blocks -%}
+            <button
+              type="button"
+              class="nf-intro__thumb{% if forloop.first %} is-active{% endif %}"
+              data-nf-intro-thumb
+              data-index="{{ forloop.index0 }}"
+              aria-label="{{ block.settings.label | default: forloop.index | escape }}"
+            >
+              {%- liquid
+                assign thumb_image = block.settings.image
+                if thumb_image == blank and block.settings.video != blank
+                  assign thumb_image = block.settings.video.preview_image
+                endif
+              -%}
+              {%- if thumb_image != blank -%}
+                {{ thumb_image | image_url: width: 180 | image_tag: class: 'nf-intro__thumb-img', loading: 'lazy', alt: '' }}
+              {%- elsif block.settings.asset != blank -%}
+                <img src="{{ block.settings.asset | asset_url }}" class="nf-intro__thumb-img" loading="lazy" width="128" height="96" alt="">
+              {%- else -%}
+                <span class="nf-intro__thumb-fallback">{{ forloop.index }}</span>
+              {%- endif -%}
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if scroll_zoom and section.settings.show_hint -%}
+        <p class="nf-intro__hint" data-nf-intro-hint>
+          <span class="nf-intro__hint-line" aria-hidden="true"></span>
+          {{ section.settings.hint_text | default: 'Scroll' | escape }}
+        </p>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if loader_on -%}
+    <div class="nf-preloader" data-nf-preloader aria-hidden="true">
+      <div class="nf-preloader__logo" data-nf-preloader-logo>
+        <div class="nf-preloader__plate">
+          <div class="nf-preloader__water" data-nf-preloader-water></div>
+        </div>
+        <img
+          class="nf-preloader__stencil nf-preloader__stencil--desktop"
+          src="{{ 'Fizz_Logo_Intro.svg' | asset_url }}"
+          alt=""
+          width="640"
+          height="398"
+          decoding="async"
+        >
+        <img
+          class="nf-preloader__stencil nf-preloader__stencil--mobile"
+          src="{{ 'Fizz_Logo_INTRO_SVG_Mobile.svg' | asset_url }}"
+          alt=""
+          width="320"
+          height="749"
+          decoding="async"
+        >
+      </div>
+      <p class="nf-preloader__status" data-nf-preloader-status>
+        <span>loading...</span>
+        <span data-nf-preloader-pct>0%</span>
+      </p>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "NF Intro",
+  "tag": "section",
+  "class": "nf-intro-section",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Wordmark"
+    },
+    {
+      "type": "paragraph",
+      "content": "Paper mask uses Fizz_Logo_Intro.svg (desktop) and Fizz_Logo_INTRO_SVG_Mobile.svg (mobile). Hero media shows through the transparent letter cutouts; scroll scales through the I."
+    },
+    {
+      "type": "text",
+      "id": "seo_heading",
+      "label": "Accessible page heading",
+      "info": "Read by screen readers and search engines. Defaults to the store name."
+    },
+    {
+      "type": "header",
+      "content": "Expanded hero copy"
+    },
+    {
+      "type": "text",
+      "id": "hero_eyebrow",
+      "label": "Eyebrow",
+      "default": "The portable sparkling water bottle"
+    },
+    {
+      "type": "text",
+      "id": "hero_heading",
+      "label": "Heading",
+      "default": "Sparkling water, anywhere."
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subheading",
+      "label": "Subheading",
+      "default": "Fill. Twist. Fizz. Cold bubbles in under ten seconds — no machine, no cans."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Shop bottles"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Scroll zoom logo"
+    },
+    {
+      "type": "checkbox",
+      "id": "scroll_zoom_enabled",
+      "label": "Enable scroll-zoom FIZZ logo",
+      "default": false,
+      "info": "Off for Ballena Fizz — use the water-fill page loader instead. When off, the intro is a normal slide hero."
+    },
+    {
+      "type": "header",
+      "content": "Page loader"
+    },
+    {
+      "type": "checkbox",
+      "id": "loader_enabled",
+      "label": "Enable water-fill logo loader",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "loader_duration",
+      "label": "Loader duration",
+      "min": 2,
+      "max": 8,
+      "step": 0.2,
+      "unit": "s",
+      "default": 5.6
+    },
+    {
+      "type": "header",
+      "content": "Scroll behavior"
+    },
+    {
+      "type": "range",
+      "id": "scroll_length",
+      "label": "Scroll length",
+      "info": "Only used when scroll-zoom logo is enabled.",
+      "min": 150,
+      "max": 400,
+      "step": 10,
+      "unit": "vh",
+      "default": 280
+    },
+    {
+      "type": "range",
+      "id": "autoplay_interval",
+      "label": "Slide autoplay interval",
+      "info": "0 disables autoplay.",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Auto-play on load"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoscroll_enabled",
+      "label": "Auto-scroll through intro on load",
+      "default": true,
+      "info": "Scrolls the visitor through the intro animation automatically. Any scroll, click, touch, or key press cancels it."
+    },
+    {
+      "type": "range",
+      "id": "autoscroll_delay",
+      "label": "Auto-scroll delay",
+      "info": "Pause before auto-scroll starts so the logo is visible briefly.",
+      "min": 0,
+      "max": 3,
+      "step": 0.1,
+      "unit": "s",
+      "default": 0.4
+    },
+    {
+      "type": "range",
+      "id": "autoscroll_duration",
+      "label": "Auto-scroll duration",
+      "info": "How long the auto-scroll animation takes (speed).",
+      "min": 0.6,
+      "max": 6,
+      "step": 0.1,
+      "unit": "s",
+      "default": 2.2
+    },
+    {
+      "type": "select",
+      "id": "autoscroll_ease",
+      "label": "Auto-scroll easing",
+      "default": "power2.inOut",
+      "options": [
+        { "value": "none", "label": "Linear" },
+        { "value": "power1.out", "label": "Ease out" },
+        { "value": "power1.in", "label": "Ease in" },
+        { "value": "power1.inOut", "label": "Ease in-out" },
+        { "value": "power2.inOut", "label": "Ease in-out (medium)" },
+        { "value": "power3.inOut", "label": "Ease in-out (strong)" },
+        { "value": "expo.out", "label": "Ease out (strong)" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "autoscroll_target",
+      "label": "Auto-scroll end progress",
+      "info": "How far into the intro track to land (88% ≈ hero copy fully revealed).",
+      "min": 60,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 88
+    },
+    {
+      "type": "header",
+      "content": "Scroll hint"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hint",
+      "label": "Show scroll hint",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "hint_text",
+      "label": "Hint text",
+      "default": "Scroll"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "media",
+      "name": "Media slide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "Used for the thumbnail button and alt text.",
+          "default": "Slide"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Overrides the image. Autoplays muted."
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": "External video",
+          "accept": ["youtube", "vimeo"],
+          "info": "Used when no Shopify-hosted video is set."
+        },
+        {
+          "type": "text",
+          "id": "asset",
+          "label": "Theme asset fallback",
+          "info": "Advanced: filename of a theme asset, e.g. stitch-hero-slideshow-1.jpg"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [
+    {
+      "name": "NF Intro",
+      "settings": {
+        "hero_eyebrow": "The portable sparkling water bottle",
+        "hero_heading": "Sparkling water, anywhere.",
+        "hero_subheading": "Fill. Twist. Fizz. Cold bubbles in under ten seconds — no machine, no cans.",
+        "cta_label": "Shop bottles"
+      },
+      "blocks": [
+        { "type": "media", "settings": { "label": "Trail", "asset": "stitch-hero-slideshow-1.jpg" } },
+        { "type": "media", "settings": { "label": "Studio", "asset": "stitch-hero-slideshow-2.jpg" } },
+        { "type": "media", "settings": { "label": "Sunrise", "asset": "stitch-hero-slideshow-3.jpg" } }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  }
+}
+{% endschema %}

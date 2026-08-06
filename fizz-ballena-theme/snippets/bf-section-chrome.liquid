@@ -1,0 +1,80 @@
+{% doc %}
+  Applies Ballena Fizz section chrome: spacing, type, and layered backgrounds.
+  Pass section: section. Duplicate settings from design/BF-SECTION-CHROME-SCHEMA.json.
+  @param {object} section - The section object
+  @example
+  {% render 'bf-section-chrome', section: section %}
+{% enddoc %}
+{%- liquid
+  assign pad_t = section.settings.padding_top | default: 80
+  assign pad_b = section.settings.padding_bottom | default: 80
+  assign mar_t = section.settings.margin_top | default: 0
+  assign mar_b = section.settings.margin_bottom | default: 0
+  assign h_size = section.settings.heading_font_size | default: 48
+  assign b_size = section.settings.body_font_size | default: 18
+  assign h_weight = section.settings.heading_font_weight | default: '400'
+  assign b_weight = section.settings.body_font_weight | default: '400'
+  assign h_color = section.settings.heading_color | default: '#0e1412'
+  assign b_color = section.settings.body_color | default: '#3a423e'
+  assign bg_color = section.settings.background_color | default: '#f7f5f0'
+  assign img_op = section.settings.background_image_opacity | default: 100 | times: 1.0 | divided_by: 100.0
+  assign vid_op = section.settings.background_video_opacity | default: 100 | times: 1.0 | divided_by: 100.0
+  assign has_video = false
+  if section.settings.background_video != blank or section.settings.background_video_url != blank
+    assign has_video = true
+  endif
+  assign has_image = false
+  if section.settings.background_image != blank
+    assign has_image = true
+  endif
+-%}
+{{ 'bf-section-chrome.css' | asset_url | stylesheet_tag }}
+{% style %}
+  #shopify-section-{{ section.id }} {
+    --bf-pad-top: {{ pad_t }}px;
+    --bf-pad-bottom: {{ pad_b }}px;
+    --bf-margin-top: {{ mar_t }}px;
+    --bf-margin-bottom: {{ mar_b }}px;
+    --bf-heading-size: {{ h_size }}px;
+    --bf-body-size: {{ b_size }}px;
+    --bf-heading-weight: {{ h_weight }};
+    --bf-body-weight: {{ b_weight }};
+    --bf-heading-color: {{ h_color }};
+    --bf-body-color: {{ b_color }};
+    --bf-bg-color: {{ bg_color }};
+    --bf-bg-image-opacity: {{ img_op }};
+    --bf-bg-video-opacity: {{ vid_op }};
+    margin-top: var(--bf-margin-top);
+    margin-bottom: var(--bf-margin-bottom);
+  }
+{% endstyle %}
+<div class="bf-chrome__bg" aria-hidden="true">
+  <div class="bf-chrome__bg-color"></div>
+  {%- if has_image -%}
+    <div class="bf-chrome__bg-image">
+      {{
+        section.settings.background_image
+        | image_url: width: 2880
+        | image_tag:
+          class: 'bf-chrome__media',
+          loading: 'lazy',
+          sizes: '100vw',
+          widths: '720, 1080, 1440, 1920, 2880',
+          alt: ''
+      }}
+    </div>
+  {%- endif -%}
+  {%- if has_video -%}
+    <div class="bf-chrome__bg-video">
+      {%- render 'nf-media',
+        video: section.settings.background_video,
+        video_url: section.settings.background_video_url,
+        class: 'bf-chrome__media',
+        alt: '',
+        loading: 'lazy',
+        sizes: '100vw',
+        autoplay: true
+      -%}
+    </div>
+  {%- endif -%}
+</div>

@@ -1,0 +1,301 @@
+{
+  "sections": {
+    "intro": {
+      "type": "nf-intro",
+      "blocks": {
+        "slide_1": {
+          "type": "media",
+          "settings": {
+            "label": "Lifestyle",
+            "asset": "nf-lifestyle-hero-01.jpg"
+          }
+        },
+        "slide_2": {
+          "type": "media",
+          "settings": {
+            "label": "On the go",
+            "asset": "nf-lifestyle-hero-02.jpg"
+          }
+        },
+        "slide_3": {
+          "type": "media",
+          "settings": {
+            "label": "Active",
+            "asset": "nf-lifestyle-hero-03.jpg"
+          }
+        },
+        "slide_4": {
+          "type": "media",
+          "settings": {
+            "label": "Field",
+            "asset": "nf-lifestyle-hero-04.jpg"
+          }
+        }
+      },
+      "block_order": ["slide_1", "slide_2", "slide_3", "slide_4"],
+      "settings": {
+        "seo_heading": "Fizz",
+        "hero_eyebrow": "The portable sparkling water bottle",
+        "hero_heading": "Sparkling water, anywhere.",
+        "hero_subheading": "Fill. Twist. Fizz.",
+        "cta_label": "Shop Now",
+        "cta_url": "/collections/all",
+        "scroll_zoom_enabled": false,
+        "loader_enabled": true,
+        "loader_duration": 5.6,
+        "autoplay_interval": 5,
+        "autoscroll_enabled": false,
+        "show_hint": false
+      }
+    },
+    "marquee": {
+      "type": "nf-marquee",
+      "blocks": {
+        "w1": { "type": "word", "settings": { "text": "FIZZ ANYWHERE" } },
+        "w2": { "type": "word", "settings": { "text": "ZERO SUGAR" } },
+        "w3": { "type": "word", "settings": { "text": "REAL FRUIT" } },
+        "w4": { "type": "word", "settings": { "text": "60 FIZZES PER POD" } },
+        "w5": { "type": "word", "settings": { "text": "PORTABLE" } },
+        "w6": { "type": "word", "settings": { "text": "COLD BUBBLES" } }
+      },
+      "block_order": ["w1", "w2", "w3", "w4", "w5", "w6"],
+      "settings": {
+        "anchor_id": "marquee",
+        "font_size": 16,
+        "font_size_mobile": 14,
+        "text_transform": "lowercase",
+        "logo_height": 24,
+        "item_gap": 28,
+        "speed": 32,
+        "show_glyph": true,
+        "padding_unit": "rem",
+        "padding_top": 2,
+        "padding_bottom": 1
+      }
+    },
+    "about": {
+      "type": "bf-about-carousel",
+      "blocks": {
+        "c1": {
+          "type": "card",
+          "settings": {
+            "title": "Shop Bottles",
+            "body": "Built for the way you move",
+            "link_label": "Explore more",
+            "url": "/collections/all",
+            "asset": "nf-lifestyle-story-01.jpg"
+          }
+        },
+        "c2": {
+          "type": "card",
+          "settings": {
+            "title": "How it works",
+            "body": "Fill. Twist. Fizz.",
+            "link_label": "Explore more",
+            "url": "/#features",
+            "asset": "nf-lifestyle-how-01.jpg"
+          }
+        },
+        "c3": {
+          "type": "card",
+          "settings": {
+            "title": "Refill",
+            "body": "Passed along, meant to be shared",
+            "link_label": "Explore more",
+            "url": "/collections/all",
+            "asset": "nf-lifestyle-story-02.jpg"
+          }
+        }
+      },
+      "block_order": ["c1", "c2", "c3"],
+      "settings": {
+        "anchor_id": "about",
+        "heading": "",
+        "subheading": "",
+        "padding_top": 80,
+        "padding_bottom": 80,
+        "padding_left": 20,
+        "padding_right": 20,
+        "background_color": "#F8F2E5",
+        "heading_color": "#03090D",
+        "body_color": "#03090D"
+      }
+    },
+    "how_tabs": {
+      "type": "bf-feature-tabs",
+      "blocks": {
+        "t1": {
+          "type": "tab",
+          "settings": {
+            "title": "Fill",
+            "body": "Cold water carbonates best. Fill to the line, no further.",
+            "asset": "nf-lifestyle-how-01.jpg"
+          }
+        },
+        "t2": {
+          "type": "tab",
+          "settings": {
+            "title": "Twist",
+            "body": "Lock a CO2 pod into the base and give it a quarter turn.",
+            "asset": "nf-lifestyle-how-02.jpg"
+          }
+        },
+        "t3": {
+          "type": "tab",
+          "settings": {
+            "title": "Sip",
+            "body": "Add a flavor pack if you like. Bubbles in under ten seconds.",
+            "asset": "nf-lifestyle-how-03.jpg"
+          }
+        }
+      },
+      "block_order": ["t1", "t2", "t3"],
+      "settings": {
+        "anchor_id": "how",
+        "autoplay": true,
+        "autoplay_seconds": 5,
+        "active_outline": "#6b9fd4",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "padding_left": 0,
+        "padding_right": 0,
+        "background_color": "#FFFFFF"
+      }
+    },
+    "wave": {
+      "type": "nf-water-wave",
+      "settings": {}
+    },
+    "key_features": {
+      "type": "fizz-key-features",
+      "blocks": {
+        "f1": {
+          "type": "feature",
+          "settings": {
+            "tag": "Lid",
+            "title": "Integrated Fizz button",
+            "body": "<p>The lid houses the control — press to fizz without a separate gadget.</p>",
+            "rail_side": "left",
+            "desktop_x": 6,
+            "desktop_y": 58,
+            "frame_start": 0,
+            "frame_end": 30
+          }
+        },
+        "f2": {
+          "type": "feature",
+          "settings": {
+            "tag": "Charge",
+            "title": "Fizz CO2 canister",
+            "body": "<p>A compact cartridge sits at the heart of the system for on-demand sparkle.</p>",
+            "rail_side": "right",
+            "desktop_x": 70,
+            "desktop_y": 52,
+            "frame_start": 31,
+            "frame_end": 55
+          }
+        },
+        "f3": {
+          "type": "feature",
+          "settings": {
+            "tag": "Flavor",
+            "title": "Real fruit packs",
+            "body": "<p>Zero sugar flavor drops made for sparkling water.</p>",
+            "rail_side": "left",
+            "desktop_x": 8,
+            "desktop_y": 62,
+            "frame_start": 56,
+            "frame_end": 90
+          }
+        },
+        "f4": {
+          "type": "feature",
+          "settings": {
+            "tag": "Bottle",
+            "title": "Built to travel",
+            "body": "<p>A durable vessel for the commute, the trail, and the table.</p>",
+            "rail_side": "right",
+            "desktop_x": 68,
+            "desktop_y": 60,
+            "frame_start": 91,
+            "frame_end": 120
+          }
+        }
+      },
+      "block_order": ["f1", "f2", "f3", "f4"],
+      "settings": {
+        "anchor_id": "features",
+        "eyebrow": "Key features",
+        "heading": "Parallax reveal",
+        "subheading": "Scroll to explore the system.",
+        "layout": "split",
+        "scroll_track_vh": 360,
+        "padding_vertical": "flush"
+      }
+    },
+    "benefits": {
+      "type": "bf-benefits",
+      "blocks": {
+        "b1": { "type": "benefit", "settings": { "title": "Portable", "body": "Carbonate anywhere — no machine." } },
+        "b2": { "type": "benefit", "settings": { "title": "Zero sugar", "body": "Clean bubbles, real fruit notes." } },
+        "b3": { "type": "benefit", "settings": { "title": "60 fizzes", "body": "One pod, weeks of sparkle." } },
+        "b4": { "type": "benefit", "settings": { "title": "Refillable", "body": "Less cans. More ritual." } },
+        "b5": { "type": "benefit", "settings": { "title": "Designed to last", "body": "A bottle built for daily use and long trips." } }
+      },
+      "block_order": ["b1", "b2", "b3", "b4", "b5"],
+      "settings": {
+        "anchor_id": "benefits",
+        "heading": "Why Fizz",
+        "subheading": "Five reasons the ritual sticks.",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
+    "flavors": {
+      "type": "bf-flavors",
+      "blocks": {
+        "fl1": { "type": "flavor", "settings": { "title": "Citrus", "asset": "nf-lifestyle-hero-02.jpg" } },
+        "fl2": { "type": "flavor", "settings": { "title": "Berry", "asset": "nf-lifestyle-hero-03.jpg" } },
+        "fl3": { "type": "flavor", "settings": { "title": "Classic", "asset": "nf-lifestyle-hero-05.jpg" } }
+      },
+      "block_order": ["fl1", "fl2", "fl3"],
+      "settings": {
+        "anchor_id": "flavors",
+        "heading": "Intro to flavors",
+        "subheading": "Headline + video animation.",
+        "feature_asset": "nf-lifestyle-hero-04.jpg",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
+    "social": {
+      "type": "bf-social-carousel",
+      "blocks": {
+        "s1": { "type": "post", "settings": { "asset": "nf-lifestyle-hero-01.jpg", "caption": "Trail sip" } },
+        "s2": { "type": "post", "settings": { "asset": "nf-lifestyle-hero-02.jpg", "caption": "Drive day" } },
+        "s3": { "type": "post", "settings": { "asset": "nf-lifestyle-hero-03.jpg", "caption": "Court side" } },
+        "s4": { "type": "post", "settings": { "asset": "nf-lifestyle-hero-04.jpg", "caption": "Field" } },
+        "s5": { "type": "post", "settings": { "asset": "nf-lifestyle-hero-05.jpg", "caption": "Night" } }
+      },
+      "block_order": ["s1", "s2", "s3", "s4", "s5"],
+      "settings": {
+        "anchor_id": "social",
+        "heading": "In the wild",
+        "subheading": "Real moments. Real fizz.",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "intro",
+    "marquee",
+    "about",
+    "how_tabs",
+    "wave",
+    "key_features",
+    "benefits",
+    "flavors",
+    "social"
+  ]
+}

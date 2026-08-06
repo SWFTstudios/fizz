@@ -1,0 +1,65 @@
+.bf-flavors__intro {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .bf-flavors__intro {
+    grid-template-columns: 1fr 1.1fr;
+    gap: 3rem;
+  }
+}
+
+.bf-flavors__video {
+  border-radius: 1rem;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: #0e1412;
+}
+
+.bf-flavors__video-media,
+.bf-flavors__video img,
+.bf-flavors__video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bf-flavors__grid {
+  margin-top: 2.5rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .bf-flavors__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.bf-flavors__card {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.bf-flavors__card-media {
+  border-radius: 1rem;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+}
+
+.bf-flavors__card-img,
+.bf-flavors__card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bf-flavors__card-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--bf-heading-color, #0e1412);
+}

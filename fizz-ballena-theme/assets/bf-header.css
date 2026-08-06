@@ -1,0 +1,295 @@
+/* Ballena Fizz — floating pill header (Ballena-inspired) */
+
+.bf-header-section {
+  position: relative;
+  z-index: 1000;
+}
+
+.bf-header {
+  position: fixed;
+  top: 1em;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  padding: 0 0.5em;
+  pointer-events: none;
+}
+
+.bf-header__bar {
+  pointer-events: auto;
+  width: 100%;
+  max-width: var(--bf-hdr-max, 720px);
+  border-radius: 0.375em;
+  background: var(--bf-hdr-bg);
+  border: 1px solid color-mix(in srgb, var(--bf-hdr-text) 22%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
+  backdrop-filter: var(--bf-hdr-blur);
+  -webkit-backdrop-filter: var(--bf-hdr-blur);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
+  overflow: hidden;
+}
+
+.bf-header.is-menu-open .bf-header__bar {
+  background: var(--bf-hdr-open-bg);
+  border-color: color-mix(in srgb, var(--bf-hdr-text-open) 12%, transparent);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.bf-header__container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  height: 3.75em;
+  padding: 0.1875em;
+}
+
+.bf-header__shop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 1.5em;
+  border: 1px solid color-mix(in srgb, var(--bf-hdr-text) 25%, transparent);
+  border-radius: 0.25em;
+  color: var(--bf-hdr-text);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 0.75em;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.bf-header__shop:hover {
+  background: var(--bf-hdr-accent);
+  color: #03090d;
+  border-color: transparent;
+}
+
+.bf-header.is-menu-open .bf-header__shop {
+  color: var(--bf-hdr-text-open);
+  border-color: color-mix(in srgb, var(--bf-hdr-text-open) 25%, transparent);
+}
+
+.bf-header__logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  z-index: 2;
+}
+
+.bf-header__logo-img {
+  height: 1.75em;
+  width: auto;
+  object-fit: contain;
+}
+
+.bf-header__logo-img--dark {
+  display: none;
+}
+
+.bf-header.is-menu-open .bf-header__logo-img--light {
+  display: none;
+}
+
+.bf-header.is-menu-open .bf-header__logo-img--dark {
+  display: block;
+}
+
+.bf-header__logo-text {
+  color: var(--bf-hdr-text);
+  font-size: 1.35em;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.bf-header.is-menu-open .bf-header__logo-text {
+  color: var(--bf-hdr-text-open);
+}
+
+.bf-header__toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3125em;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 1.25em;
+  color: inherit;
+}
+
+.bf-header__toggle-line {
+  display: block;
+  width: 1.75em;
+  height: 1px;
+  background: var(--bf-hdr-text);
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.bf-header.is-menu-open .bf-header__toggle-line {
+  background: var(--bf-hdr-text-open);
+}
+
+.bf-header.is-menu-open .bf-header__toggle-line:first-child {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.bf-header.is-menu-open .bf-header__toggle-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.bf-header.is-menu-open .bf-header__toggle-line:last-child {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.bf-header__menu {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.45s ease, opacity 0.3s ease;
+}
+
+.bf-header__menu.is-open {
+  max-height: min(80vh, 640px);
+  opacity: 1;
+}
+
+.bf-header__menu-inner {
+  padding: 0.75em 1em 1.25em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+}
+
+.bf-header__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75em;
+}
+
+.bf-header__list a {
+  display: block;
+  color: var(--bf-hdr-text-open);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 0.875em;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.25em 0;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: color 0.25s ease, opacity 0.35s ease, transform 0.35s ease;
+}
+
+.bf-header__menu.is-open .bf-header__list a {
+  opacity: 1;
+  transform: none;
+}
+
+.bf-header__list li:nth-child(1) a { transition-delay: 0.05s; }
+.bf-header__list li:nth-child(2) a { transition-delay: 0.1s; }
+.bf-header__list li:nth-child(3) a { transition-delay: 0.15s; }
+.bf-header__list li:nth-child(4) a { transition-delay: 0.2s; }
+.bf-header__list li:nth-child(5) a { transition-delay: 0.25s; }
+.bf-header__list li:nth-child(6) a { transition-delay: 0.3s; }
+
+.bf-header__list a:hover {
+  color: var(--bf-hdr-accent);
+}
+
+.bf-header__social {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.35s ease 0.2s, transform 0.35s ease 0.2s;
+}
+
+.bf-header__menu.is-open .bf-header__social {
+  opacity: 1;
+  transform: none;
+}
+
+.bf-header__social a {
+  color: var(--bf-hdr-text-open);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  letter-spacing: 0.05em;
+}
+
+.bf-header__social a:hover {
+  color: var(--bf-hdr-accent);
+}
+
+.bf-header__menu-image {
+  width: 100%;
+  border-radius: 0.375em;
+  overflow: hidden;
+  display: none;
+}
+
+.bf-header__menu-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (min-width: 1025px) {
+  .bf-header__menu-image {
+    display: block;
+  }
+}
+
+@media (max-width: 1024px) {
+  .bf-header {
+    top: 0.5em;
+  }
+
+  .bf-header__container {
+    height: 2.875em;
+    padding: 0.5em;
+  }
+
+  .bf-header__shop {
+    padding: 0 0.75em;
+    border: 0;
+  }
+
+  .bf-header__logo-img {
+    height: 1.375em;
+  }
+
+  .bf-header__toggle {
+    padding: 0.5em;
+  }
+
+  .bf-header__menu-inner {
+    min-height: min(70vh, 480px);
+    justify-content: flex-start;
+    padding-top: 2em;
+  }
+}
+
+body.bf-menu-open {
+  overflow: hidden;
+}

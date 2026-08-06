@@ -1,0 +1,86 @@
+/* Ballena Fizz — shared section chrome backgrounds + spacing hooks */
+
+.bf-section {
+  position: relative;
+  isolation: isolate;
+  padding-block: var(--bf-pad-top, 80px) var(--bf-pad-bottom, 80px);
+  padding-inline: var(--bf-page-pad-x, max(var(--nf-gutter, 16px), 5%));
+  color: var(--bf-body-color, #3a423e);
+  background-color: var(--bf-bg-color, #f7f5f0);
+  overflow: hidden;
+}
+
+.bf-section__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--nf-page-width);
+  margin-inline: auto;
+}
+
+.bf-section__heading {
+  margin: 0 0 0.5em;
+  font-size: var(--bf-heading-size, 48px);
+  font-weight: var(--bf-heading-weight, 400);
+  color: var(--bf-heading-color, #0e1412);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.bf-section__body {
+  margin: 0;
+  font-size: var(--bf-body-size, 18px);
+  font-weight: var(--bf-body-weight, 400);
+  color: var(--bf-body-color, #3a423e);
+  line-height: 1.55;
+  max-width: 36em;
+}
+
+.bf-chrome__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bf-chrome__bg-color {
+  position: absolute;
+  inset: 0;
+  background: var(--bf-bg-color, #f7f5f0);
+}
+
+.bf-chrome__bg-image,
+.bf-chrome__bg-video {
+  position: absolute;
+  inset: 0;
+}
+
+.bf-chrome__bg-image {
+  opacity: var(--bf-bg-image-opacity, 1);
+}
+
+.bf-chrome__bg-video {
+  opacity: var(--bf-bg-video-opacity, 1);
+}
+
+.bf-chrome__media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bf-chrome__bg-video .nf-media--embed,
+.bf-chrome__bg-video iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+}
+
+.bf-chrome__bg-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

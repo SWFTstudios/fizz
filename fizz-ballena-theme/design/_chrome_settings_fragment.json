@@ -1,0 +1,189 @@
+[
+  {
+    "type": "header",
+    "content": "Section chrome \u2014 spacing"
+  },
+  {
+    "type": "range",
+    "id": "padding_top",
+    "label": "Padding top",
+    "min": 0,
+    "max": 200,
+    "step": 4,
+    "unit": "px",
+    "default": 80
+  },
+  {
+    "type": "range",
+    "id": "padding_bottom",
+    "label": "Padding bottom",
+    "min": 0,
+    "max": 200,
+    "step": 4,
+    "unit": "px",
+    "default": 80
+  },
+  {
+    "type": "range",
+    "id": "margin_top",
+    "label": "Margin top",
+    "min": 0,
+    "max": 160,
+    "step": 4,
+    "unit": "px",
+    "default": 0
+  },
+  {
+    "type": "range",
+    "id": "margin_bottom",
+    "label": "Margin bottom",
+    "min": 0,
+    "max": 160,
+    "step": 4,
+    "unit": "px",
+    "default": 0
+  },
+  {
+    "type": "header",
+    "content": "Section chrome \u2014 typography"
+  },
+  {
+    "type": "range",
+    "id": "heading_font_size",
+    "label": "Heading font size",
+    "min": 16,
+    "max": 96,
+    "step": 1,
+    "unit": "px",
+    "default": 48
+  },
+  {
+    "type": "range",
+    "id": "body_font_size",
+    "label": "Body font size",
+    "min": 12,
+    "max": 32,
+    "step": 1,
+    "unit": "px",
+    "default": 18
+  },
+  {
+    "type": "select",
+    "id": "heading_font_weight",
+    "label": "Heading font weight",
+    "options": [
+      {
+        "value": "300",
+        "label": "Light"
+      },
+      {
+        "value": "400",
+        "label": "Regular"
+      },
+      {
+        "value": "500",
+        "label": "Medium"
+      },
+      {
+        "value": "600",
+        "label": "Semibold"
+      },
+      {
+        "value": "700",
+        "label": "Bold"
+      }
+    ],
+    "default": "400"
+  },
+  {
+    "type": "select",
+    "id": "body_font_weight",
+    "label": "Body font weight",
+    "options": [
+      {
+        "value": "300",
+        "label": "Light"
+      },
+      {
+        "value": "400",
+        "label": "Regular"
+      },
+      {
+        "value": "500",
+        "label": "Medium"
+      },
+      {
+        "value": "600",
+        "label": "Semibold"
+      },
+      {
+        "value": "700",
+        "label": "Bold"
+      }
+    ],
+    "default": "400"
+  },
+  {
+    "type": "color",
+    "id": "heading_color",
+    "label": "Heading color",
+    "default": "#0e1412"
+  },
+  {
+    "type": "color",
+    "id": "body_color",
+    "label": "Body color",
+    "default": "#3a423e"
+  },
+  {
+    "type": "header",
+    "content": "Section chrome \u2014 background"
+  },
+  {
+    "type": "color",
+    "id": "background_color",
+    "label": "Background color",
+    "default": "#f7f5f0"
+  },
+  {
+    "type": "image_picker",
+    "id": "background_image",
+    "label": "Background image"
+  },
+  {
+    "type": "video",
+    "id": "background_video",
+    "label": "Background video",
+    "info": "Shopify Files MP4. Autoplay is muted and looped."
+  },
+  {
+    "type": "video_url",
+    "id": "background_video_url",
+    "label": "Background video URL",
+    "accept": [
+      "youtube",
+      "vimeo"
+    ],
+    "info": "Used when no Shopify-hosted video is set."
+  },
+  {
+    "type": "range",
+    "id": "background_image_opacity",
+    "label": "Background image opacity",
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "unit": "%",
+    "default": 100
+  },
+  {
+    "type": "range",
+    "id": "background_video_opacity",
+    "label": "Background video opacity",
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "unit": "%",
+    "default": 100
+  }
+]
