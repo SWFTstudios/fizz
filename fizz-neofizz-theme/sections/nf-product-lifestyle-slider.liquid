@@ -1,0 +1,517 @@
+{{ 'nf-product-lifestyle-slider.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign bottle = section.settings.product | default: settings.bottle_product
+  assign eyebrow_default = section.settings.eyebrow
+  if eyebrow_default == blank and bottle != blank
+    assign eyebrow_default = bottle.title
+  endif
+  if eyebrow_default == blank
+    assign eyebrow_default = 'Fizz Bottle'
+  endif
+
+  assign cta_default = section.settings.cta_label | default: 'Shop Now'
+  assign section_min = section.settings.section_min_height | default: 860
+  assign stage_height = section.settings.stage_height | default: 680
+  assign bottle_scale = section.settings.bottle_scale | default: 110
+  assign pad_x = section.settings.padding_horizontal | default: 64
+  assign autoplay_on = section.settings.autoplay
+  assign autoplay_ms = section.settings.autoplay_seconds | default: 5 | times: 1000
+  unless autoplay_on
+    assign autoplay_ms = 0
+  endunless
+
+  assign bg = section.settings.background_color
+  if bg == blank
+    assign bg = 'var(--nf-paper, #f4f3ee)'
+  endif
+
+  assign demo_slugs = 'coral-orange,sage-green,charcoal-black,electric-blue,arctic-white,steel-navy' | split: ','
+  assign slide_count = 0
+  if bottle != blank
+    assign slide_count = bottle.variants.size
+  else
+    assign slide_count = demo_slugs.size
+  endif
+%}
+
+{% if slide_count > 0 %}
+  <section
+    class="nf-pls"
+    id="{{ section.settings.anchor_id | default: 'lifestyle-slider' | handle }}"
+    data-nf-pls
+    data-autoplay-ms="{{ autoplay_ms }}"
+    data-slide-count="{{ slide_count }}"
+    aria-roledescription="carousel"
+    aria-label="{{ section.settings.heading | default: eyebrow_default | escape }}"
+    style="
+      --pls-min-h: {{ section_min }}px;
+      --pls-stage-h: {{ stage_height }}px;
+      --pls-bottle-scale: {{ bottle_scale | times: 0.01 }};
+      --pls-pad-x: {{ pad_x }}px;
+      --pls-bg: {{ bg }};
+    "
+  >
+    <div class="nf-pls__shell">
+      <div class="nf-pls__copy-col">
+        <div class="nf-pls__copy-stack" data-nf-pls-copy>
+          {% if bottle != blank %}
+            {% for variant in bottle.variants %}
+              {% liquid
+                capture slug_raw
+                  render 'nf-color-slug', variant: variant
+                endcapture
+                assign slug = slug_raw | strip
+                assign override = blank
+                for block in section.blocks
+                  if block.type == 'variant_override' and block.settings.color_slug == slug
+                    assign override = block
+                    break
+                  endif
+                endfor
+
+                assign slide_url = bottle.url | append: '?variant=' | append: variant.id
+                assign slide_title = variant.title
+                assign slide_quote = ''
+                assign slide_body = ''
+                assign slide_cta = cta_default
+                assign slide_eyebrow = eyebrow_default
+
+                if override != blank
+                  if override.settings.title != blank
+                    assign slide_title = override.settings.title
+                  endif
+                  if override.settings.quote != blank
+                    assign slide_quote = override.settings.quote
+                  endif
+                  if override.settings.body != blank
+                    assign slide_body = override.settings.body
+                  endif
+                  if override.settings.button_label != blank
+                    assign slide_cta = override.settings.button_label
+                  endif
+                  if override.settings.eyebrow != blank
+                    assign slide_eyebrow = override.settings.eyebrow
+                  endif
+                endif
+
+                if slide_body == blank and bottle.description != blank and forloop.first
+                  assign slide_body = bottle.description | strip_html | truncate: 180
+                endif
+              %}
+              <article
+                class="nf-pls__copy{% if forloop.first %} is-active{% endif %}"
+                data-nf-pls-copy-slide
+                data-index="{{ forloop.index0 }}"
+                {% if override != blank %}{{ override.shopify_attributes }}{% endif %}
+                {% unless forloop.first %}hidden{% endunless %}
+              >
+                <p class="nf-pls__eyebrow">{{ slide_eyebrow | escape }}</p>
+                <h2 class="nf-pls__title">{{ slide_title | escape }}</h2>
+                <p class="nf-pls__price">{{ variant.price | money }}</p>
+                {% if slide_quote != blank %}
+                  <p class="nf-pls__quote">{{ slide_quote | escape }}</p>
+                {% endif %}
+                {% if slide_body != blank %}
+                  <p class="nf-pls__body">{{ slide_body | escape }}</p>
+                {% endif %}
+                <a class="nf-pls__cta" href="{{ slide_url }}">{{ slide_cta | escape }} <span aria-hidden="true">→</span></a>
+              </article>
+            {% endfor %}
+          {% else %}
+            {% for slug in demo_slugs %}
+              {% liquid
+                assign slide_title = slug | replace: '-', ' ' | capitalize
+              %}
+              <article
+                class="nf-pls__copy{% if forloop.first %} is-active{% endif %}"
+                data-nf-pls-copy-slide
+                data-index="{{ forloop.index0 }}"
+                {% unless forloop.first %}hidden{% endunless %}
+              >
+                <p class="nf-pls__eyebrow">{{ eyebrow_default | escape }}</p>
+                <h2 class="nf-pls__title">{{ slide_title | escape }}</h2>
+                <p class="nf-pls__price">$34.00</p>
+                <p class="nf-pls__quote">Pick a bottle product in the section settings to load live variants.</p>
+                <a class="nf-pls__cta" href="{{ routes.all_products_collection_url }}">{{ cta_default | escape }} <span aria-hidden="true">→</span></a>
+              </article>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="nf-pls__stage-col">
+        <div class="nf-pls__stage-viewport" data-nf-pls-stage-viewport>
+          <div class="nf-pls__stage-track" data-nf-pls-stage-track>
+            {% if bottle != blank %}
+              {% for variant in bottle.variants %}
+                {% liquid
+                  capture slug_raw
+                    render 'nf-color-slug', variant: variant
+                  endcapture
+                  assign slug = slug_raw | strip
+                  assign override = blank
+                  for block in section.blocks
+                    if block.type == 'variant_override' and block.settings.color_slug == slug
+                      assign override = block
+                      break
+                    endif
+                  endfor
+
+                  assign slide_url = bottle.url | append: '?variant=' | append: variant.id
+                  assign bottle_img = blank
+                  assign lifestyle_img = blank
+                  assign asset_bottle = 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url
+
+                  if override != blank and override.settings.bottle_image != blank
+                    assign bottle_img = override.settings.bottle_image
+                  endif
+                  if override != blank and override.settings.lifestyle_image != blank
+                    assign lifestyle_img = override.settings.lifestyle_image
+                  endif
+
+                  assign warp = variant.metafields.custom.warp_media.value
+                  if lifestyle_img == blank and warp != blank
+                    if warp.media_type != 'video'
+                      assign lifestyle_img = warp
+                    endif
+                  endif
+
+                  capture scene_raw
+                    render 'nf-colorway-scene', slug: slug, variant: variant
+                  endcapture
+                  assign scene_parts = scene_raw | strip | split: '|'
+                  assign pill_bg = scene_parts[0]
+                  assign pill_bg_end = scene_parts[1]
+
+                  assign alt_text = variant.title
+                %}
+                <div
+                  class="nf-pls__stage{% if forloop.first %} is-active{% endif %}"
+                  data-nf-pls-stage
+                  data-index="{{ forloop.index0 }}"
+                  style="--pls-pill-a: {{ pill_bg }}; --pls-pill-b: {{ pill_bg_end }};"
+                >
+                  <a class="nf-pls__stage-link" href="{{ slide_url }}" aria-label="{{ alt_text | escape }} — shop this color">
+                    <div class="nf-pls__pill">
+                      {% if lifestyle_img != blank %}
+                        {{
+                          lifestyle_img
+                          | image_url: width: 900
+                          | image_tag:
+                            class: 'nf-pls__lifestyle',
+                            loading: 'lazy',
+                            widths: '400, 600, 900',
+                            sizes: '(min-width: 1024px) 28vw, 70vw',
+                            alt: alt_text
+                        }}
+                      {% else %}
+                        <div class="nf-pls__lifestyle nf-pls__lifestyle--fallback" aria-hidden="true"></div>
+                      {% endif %}
+                    </div>
+                    <div class="nf-pls__bottle">
+                      {% if bottle_img != blank %}
+                        {{
+                          bottle_img
+                          | image_url: width: 800
+                          | image_tag:
+                            class: 'nf-pls__bottle-img',
+                            loading: 'lazy',
+                            widths: '320, 480, 640, 800',
+                            sizes: '(min-width: 1024px) 22vw, 55vw',
+                            alt: alt_text
+                        }}
+                      {% else %}
+                        <img
+                          class="nf-pls__bottle-img"
+                          src="{{ asset_bottle }}"
+                          alt="{{ alt_text | escape }}"
+                          loading="lazy"
+                          width="504"
+                          height="1400"
+                        >
+                      {% endif %}
+                    </div>
+                  </a>
+                </div>
+              {% endfor %}
+            {% else %}
+              {% for slug in demo_slugs %}
+                {% liquid
+                  capture scene_raw
+                    render 'nf-colorway-scene', slug: slug
+                  endcapture
+                  assign scene_parts = scene_raw | strip | split: '|'
+                  assign asset_bottle = 'fizz-bottle-product-' | append: slug | append: '.png' | asset_url
+                  assign alt_text = slug | replace: '-', ' ' | capitalize
+                %}
+                <div
+                  class="nf-pls__stage{% if forloop.first %} is-active{% endif %}"
+                  data-nf-pls-stage
+                  data-index="{{ forloop.index0 }}"
+                  style="--pls-pill-a: {{ scene_parts[0] }}; --pls-pill-b: {{ scene_parts[1] }};"
+                >
+                  <div class="nf-pls__stage-link">
+                    <div class="nf-pls__pill">
+                      <div class="nf-pls__lifestyle nf-pls__lifestyle--fallback" aria-hidden="true"></div>
+                    </div>
+                    <div class="nf-pls__bottle">
+                      <img
+                        class="nf-pls__bottle-img"
+                        src="{{ asset_bottle }}"
+                        alt="{{ alt_text | escape }}"
+                        loading="lazy"
+                        width="504"
+                        height="1400"
+                      >
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="nf-pls__nav-col">
+        {% if section.settings.show_counter %}
+          <p class="nf-pls__counter" data-nf-pls-counter aria-live="polite">
+            <span data-nf-pls-current>01</span>
+            <span class="nf-pls__counter-sep" aria-hidden="true"> / </span>
+            <span data-nf-pls-total>{% if slide_count < 10 %}0{% endif %}{{ slide_count }}</span>
+          </p>
+        {% endif %}
+        {% if section.settings.show_arrows and slide_count > 1 %}
+          <div class="nf-pls__arrows">
+            <button type="button" class="nf-pls__arrow nf-pls__arrow--prev" data-nf-pls-prev aria-label="Previous slide">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <path d="M11 3.5L5.5 9 11 14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button type="button" class="nf-pls__arrow nf-pls__arrow--next" data-nf-pls-next aria-label="Next slide">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <path d="M7 3.5L12.5 9 7 14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <script src="{{ 'nf-product-lifestyle-slider.js' | asset_url }}" defer></script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "NF Lifestyle Slider",
+  "tag": "section",
+  "class": "nf-pls-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "lifestyle-slider"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Bottle product",
+      "info": "One slide is created per variant automatically. Falls back to Theme settings → Bottle product."
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Fizz Bottle",
+      "info": "Shown above the variant name. Defaults to the product title when blank."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Accessibility label",
+      "info": "Optional aria-label for the carousel region"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Default CTA label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "header",
+      "content": "Size"
+    },
+    {
+      "type": "range",
+      "id": "section_min_height",
+      "label": "Section min height",
+      "min": 560,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 860,
+      "info": "Section also grows with viewport height on large screens."
+    },
+    {
+      "type": "range",
+      "id": "stage_height",
+      "label": "Stage height (pill + bottle)",
+      "min": 420,
+      "max": 900,
+      "step": 20,
+      "unit": "px",
+      "default": 680
+    },
+    {
+      "type": "range",
+      "id": "bottle_scale",
+      "label": "Bottle size",
+      "min": 70,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 110
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Auto cycle slides",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_seconds",
+      "label": "Auto cycle interval",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_counter",
+      "label": "Show slide counter",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f4f3ee"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "variant_override",
+      "name": "Variant override",
+      "settings": [
+        {
+          "type": "select",
+          "id": "color_slug",
+          "label": "Bottle color",
+          "options": [
+            { "value": "coral-orange", "label": "Coral Orange" },
+            { "value": "charcoal-black", "label": "Charcoal Black" },
+            { "value": "sage-green", "label": "Sage Green" },
+            { "value": "steel-navy", "label": "Steel Navy" },
+            { "value": "arctic-white", "label": "Arctic White" },
+            { "value": "electric-blue", "label": "Electric Blue" }
+          ],
+          "default": "coral-orange",
+          "info": "Matches the auto-generated slide for this color"
+        },
+        {
+          "type": "image_picker",
+          "id": "lifestyle_image",
+          "label": "Lifestyle image (pill)"
+        },
+        {
+          "type": "image_picker",
+          "id": "bottle_image",
+          "label": "Bottle image override",
+          "info": "Defaults to theme bottle PNG for this color"
+        },
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow override"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title override"
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote"
+        },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Body"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "CTA label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "NF Lifestyle Slider",
+      "blocks": [
+        {
+          "type": "variant_override",
+          "settings": {
+            "color_slug": "coral-orange",
+            "quote": "Bright citrus energy for every refill.",
+            "body": "A portable sparkling ritual that skips the plastic bottles."
+          }
+        },
+        {
+          "type": "variant_override",
+          "settings": {
+            "color_slug": "sage-green",
+            "quote": "Calm color for everyday hydration.",
+            "body": "Soft natural tones that fit the kitchen counter and the trail."
+          }
+        },
+        {
+          "type": "variant_override",
+          "settings": {
+            "color_slug": "charcoal-black",
+            "quote": "After-hours polish in one twist.",
+            "body": "A sleek finish for dinner parties and nightcaps."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

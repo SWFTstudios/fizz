@@ -3,6 +3,24 @@
     "main": {
       "type": "nf-product",
       "blocks": {
+        "feature_1": {
+          "type": "feature",
+          "settings": {
+            "label": "CO₂ charged"
+          }
+        },
+        "feature_2": {
+          "type": "feature",
+          "settings": {
+            "label": "Flavor ready"
+          }
+        },
+        "feature_3": {
+          "type": "feature",
+          "settings": {
+            "label": "30-day returns"
+          }
+        },
         "trust_1": {
           "type": "trust",
           "settings": {
@@ -30,10 +48,19 @@
           }
         }
       },
-      "block_order": ["trust_1", "trust_2", "acc_1", "acc_2"],
+      "block_order": [
+        "feature_1",
+        "feature_2",
+        "feature_3",
+        "trust_1",
+        "trust_2",
+        "acc_1",
+        "acc_2"
+      ],
       "settings": {
         "eyebrow": "Colorways",
         "tagline": "Sparkling water, dialed to your colorway.",
+        "badge_label": "Bestseller",
         "media_fit": "cover",
         "gallery_mode": "slider",
         "show_thumbnails": true,

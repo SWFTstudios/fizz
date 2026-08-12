@@ -1,8 +1,4 @@
-/* Ballena-style image card slider — overlay titles, cream field, bottom pill nav */
-
-.bf-about-section .bf-section {
-  --bf-bg-color: #f8f2e5;
-}
+/* Ballena-style image card slider — overlay titles, bottom pill nav */
 
 .bf-about__wrap {
   position: relative;

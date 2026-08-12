@@ -1,0 +1,296 @@
+.nf-lifestyle-carousel {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(2.5rem, 6vw, 5rem);
+  background: var(--nf-paper, #fff);
+  color: var(--nf-ink, #111);
+}
+
+.nf-lifestyle-carousel__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.nf-lifestyle-carousel__header {
+  max-width: 720px;
+  margin: 0 auto 2rem;
+  padding-inline: clamp(1rem, 4vw, 2rem);
+  text-align: center;
+}
+
+.nf-lifestyle-carousel__heading {
+  margin: 0 0 0.75rem;
+}
+
+.nf-lifestyle-carousel__lead {
+  margin: 0;
+  opacity: 0.75;
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  line-height: 1.5;
+}
+
+.nf-lifestyle-carousel__shell {
+  position: relative;
+  padding-block: 0.25rem 1rem;
+}
+
+.nf-lifestyle-carousel__shell--single .nf-lifestyle-carousel__swiper {
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.nf-lifestyle-carousel__swiper {
+  overflow: visible;
+  padding-block: 1.5rem 2rem;
+}
+
+.nf-lifestyle-carousel__swiper.swiper {
+  overflow: visible;
+}
+
+.nf-lifestyle-carousel .swiper-slide {
+  width: min(78vw, 380px);
+  height: auto;
+}
+
+@media (min-width: 768px) {
+  .nf-lifestyle-carousel .swiper-slide {
+    width: min(46vw, 400px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .nf-lifestyle-carousel .swiper-slide {
+    width: min(34vw, 440px);
+  }
+}
+
+.nf-lifestyle-carousel__card {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  color: #fff;
+  border-radius: var(--nflc-radius, 16px);
+  outline: none;
+}
+
+.nf-lifestyle-carousel__card:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--nf-ink, #111) 40%, transparent);
+}
+
+.nf-lifestyle-carousel__media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--nflc-radius, 16px);
+  overflow: hidden;
+  background: #d8d4cb;
+  box-shadow:
+    0 14px 36px rgba(17, 18, 20, 0.16),
+    0 2px 8px rgba(17, 18, 20, 0.06);
+  transform: translateZ(0);
+}
+
+.nf-lifestyle-carousel .swiper-slide-active .nf-lifestyle-carousel__media {
+  box-shadow:
+    0 22px 48px rgba(17, 18, 20, 0.2),
+    0 6px 16px rgba(17, 18, 20, 0.08);
+}
+
+.nf-lifestyle-carousel__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: opacity 0.45s ease, transform 0.55s ease;
+}
+
+.nf-lifestyle-carousel__img--primary {
+  opacity: 1;
+  z-index: 1;
+}
+
+.nf-lifestyle-carousel__img--secondary {
+  opacity: 0;
+  z-index: 2;
+}
+
+.nf-lifestyle-carousel__placeholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(145deg, #e8e4dc, #c9c3b8);
+}
+
+.nf-lifestyle-carousel__overlay {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  padding: 1.75rem 1.35rem 1.5rem;
+  text-align: center;
+  background: linear-gradient(
+    to top,
+    rgba(12, 14, 16, 0.62) 0%,
+    rgba(12, 14, 16, 0.28) 55%,
+    rgba(12, 14, 16, 0) 100%
+  );
+  pointer-events: none;
+  transition: inset 0.35s ease, background 0.35s ease, padding 0.35s ease;
+}
+
+/* Active center card: copy sits near the top, like the reference */
+.nf-lifestyle-carousel .swiper-slide-active .nf-lifestyle-carousel__overlay {
+  inset: 0 0 auto;
+  justify-content: flex-start;
+  padding: 1.6rem 1.35rem 2.25rem;
+  background: linear-gradient(
+    to bottom,
+    rgba(12, 14, 16, 0.55) 0%,
+    rgba(12, 14, 16, 0.22) 55%,
+    rgba(12, 14, 16, 0) 100%
+  );
+}
+
+.nf-lifestyle-carousel__title {
+  margin: 0;
+  max-width: 16ch;
+  font-family: "Helvetica Neue LT Std", Helvetica, Arial, sans-serif;
+  font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: #fff;
+  text-wrap: balance;
+}
+
+.nf-lifestyle-carousel__caption {
+  margin: 0;
+  max-width: 28ch;
+  font-size: clamp(0.8125rem, 1.4vw, 0.9375rem);
+  font-weight: 400;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.nf-lifestyle-carousel__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.55rem;
+  min-height: 2.35rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: 2px;
+  background: #fff;
+  color: #121418;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.nf-lifestyle-carousel .swiper-slide-active .nf-lifestyle-carousel__cta {
+  background: #1a1c1f;
+  color: #fff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nf-lifestyle-carousel__media--has-hover:hover .nf-lifestyle-carousel__img--secondary,
+  .nf-lifestyle-carousel__card:focus-visible .nf-lifestyle-carousel__media--has-hover .nf-lifestyle-carousel__img--secondary {
+    opacity: 1;
+  }
+
+  .nf-lifestyle-carousel__media--has-hover:hover .nf-lifestyle-carousel__img--primary,
+  .nf-lifestyle-carousel__card:focus-visible .nf-lifestyle-carousel__media--has-hover .nf-lifestyle-carousel__img--primary {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+
+.nf-lifestyle-carousel__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #1a1c1f;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.nf-lifestyle-carousel__arrow:hover {
+  opacity: 1;
+}
+
+.nf-lifestyle-carousel__arrow:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--nf-ink, #111) 45%, transparent);
+  outline-offset: 2px;
+}
+
+.nf-lifestyle-carousel__arrow--prev {
+  left: max(0.25rem, calc((100% - min(92vw, 1180px)) / 2 - 0.25rem));
+}
+
+.nf-lifestyle-carousel__arrow--next {
+  right: max(0.25rem, calc((100% - min(92vw, 1180px)) / 2 - 0.25rem));
+}
+
+@media (max-width: 767px) {
+  .nf-lifestyle-carousel__arrow {
+    display: none;
+  }
+
+  .nf-lifestyle-carousel .swiper-slide {
+    width: min(82vw, 340px);
+  }
+}
+
+.nf-lifestyle-carousel--reduced-motion .nf-lifestyle-carousel__swiper {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-inline: 1rem;
+}
+
+.nf-lifestyle-carousel--reduced-motion .swiper-wrapper {
+  display: flex;
+  gap: 1rem;
+}
+
+.nf-lifestyle-carousel--reduced-motion .swiper-slide {
+  flex: 0 0 auto;
+  scroll-snap-align: center;
+}
+
+.nf-lifestyle-carousel--reduced-motion .nf-lifestyle-carousel__img,
+.nf-lifestyle-carousel--reduced-motion .nf-lifestyle-carousel__overlay {
+  transition: none;
+}
+
+.nf-lifestyle-carousel--reduced-motion .nf-lifestyle-carousel__overlay {
+  inset: auto 0 0;
+  justify-content: flex-end;
+  background: linear-gradient(
+    to top,
+    rgba(12, 14, 16, 0.62) 0%,
+    rgba(12, 14, 16, 0.28) 55%,
+    rgba(12, 14, 16, 0) 100%
+  );
+}

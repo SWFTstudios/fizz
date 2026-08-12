@@ -1,0 +1,66 @@
+{% doc %}
+  Renders the NF Intro hero copy stack (eyebrow, heading, body, CTA).
+  @param {string} eyebrow - Eyebrow text
+  @param {string} heading - Heading text
+  @param {string} subheading - Body / subheading text
+  @param {string} cta_label - Button label
+  @param {string} cta_url - Button URL
+  @param {string} copy_x - Desktop horizontal: left|center|right
+  @param {string} copy_y - Desktop vertical: top|middle|bottom
+  @param {string} copy_mx - Mobile horizontal (resolved)
+  @param {string} copy_my - Mobile vertical (resolved)
+  @param {string} eyebrow_align - left|center|right
+  @param {string} heading_align - left|center|right
+  @param {string} sub_align - left|center|right
+  @param {string} cta_align - left|center|right
+  @param {boolean} [is_default] - Section default copy (vs per-slide)
+  @param {boolean} [is_slide] - Per-slide overlay copy
+  @example
+  {% render 'nf-intro-copy', eyebrow: section.settings.hero_eyebrow, heading: section.settings.hero_heading, is_default: true %}
+{% enddoc %}
+{%- liquid
+  assign cx = copy_x | default: 'center'
+  assign cy = copy_y | default: 'middle'
+  assign cmx = copy_mx | default: cx
+  assign cmy = copy_my | default: cy
+  assign ea = eyebrow_align | default: cx
+  assign ha = heading_align | default: cx
+  assign sa = sub_align | default: cx
+  assign ca = cta_align | default: cx
+  assign href = cta_url | default: routes.all_products_collection_url
+
+  assign classes = 'nf-intro__hero-copy'
+  assign classes = classes | append: ' nf-intro__hero-copy--x-' | append: cx
+  assign classes = classes | append: ' nf-intro__hero-copy--y-' | append: cy
+  assign classes = classes | append: ' nf-intro__hero-copy--mx-' | append: cmx
+  assign classes = classes | append: ' nf-intro__hero-copy--my-' | append: cmy
+  if is_default
+    assign classes = classes | append: ' nf-intro__hero-copy--default'
+  endif
+  if is_slide
+    assign classes = classes | append: ' nf-intro__hero-copy--slide'
+  endif
+-%}
+<div
+  class="{{ classes }}"
+  {% if is_default %}data-nf-intro-copy{% endif %}
+  {% if is_slide %}data-nf-intro-slide-copy{% endif %}
+>
+  {%- if eyebrow != blank -%}
+    <p class="nf-intro__hero-eyebrow nf-intro__hero-eyebrow--align-{{ ea }}">{{ eyebrow | escape }}</p>
+  {%- endif -%}
+  {%- if heading != blank -%}
+    <h2 class="nf-intro__hero-heading nf-intro__hero-heading--align-{{ ha }}">{{ heading | escape }}</h2>
+  {%- endif -%}
+  {%- if subheading != blank -%}
+    <p class="nf-intro__hero-sub nf-intro__hero-sub--align-{{ sa }}">{{ subheading | escape }}</p>
+  {%- endif -%}
+  {%- if cta_label != blank -%}
+    <a
+      class="nf-btn nf-btn--accent nf-intro__hero-cta nf-intro__hero-cta--align-{{ ca }}"
+      href="{{ href }}"
+    >
+      {{- cta_label | escape -}}
+    </a>
+  {%- endif -%}
+</div>

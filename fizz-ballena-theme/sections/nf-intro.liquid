@@ -9,6 +9,60 @@
   if loader_on == nil
     assign loader_on = true
   endif
+
+  assign copy_x = section.settings.copy_x | default: 'center'
+  assign copy_y = section.settings.copy_y | default: 'middle'
+  assign copy_mx = section.settings.copy_x_mobile | default: 'inherit'
+  assign copy_my = section.settings.copy_y_mobile | default: 'inherit'
+  if copy_mx == blank or copy_mx == 'inherit'
+    assign copy_mx = copy_x
+  endif
+  if copy_my == blank or copy_my == 'inherit'
+    assign copy_my = copy_y
+  endif
+
+  assign eyebrow_align = section.settings.eyebrow_align | default: 'center'
+  assign heading_align = section.settings.heading_align | default: 'center'
+  assign sub_align = section.settings.sub_align | default: 'center'
+  assign cta_align = section.settings.cta_align | default: 'center'
+
+  assign eyebrow_size = section.settings.eyebrow_font_size | default: 12
+  assign eyebrow_size_m = section.settings.eyebrow_font_size_mobile | default: 0
+  assign heading_size = section.settings.heading_font_size | default: 56
+  assign heading_size_m = section.settings.heading_font_size_mobile | default: 0
+  assign sub_size = section.settings.sub_font_size | default: 18
+  assign sub_size_m = section.settings.sub_font_size_mobile | default: 0
+  assign cta_size = section.settings.cta_font_size | default: 13
+  assign cta_size_m = section.settings.cta_font_size_mobile | default: 0
+  if eyebrow_size_m == 0
+    assign eyebrow_size_m = eyebrow_size
+  endif
+  if heading_size_m == 0
+    assign heading_size_m = heading_size
+  endif
+  if sub_size_m == 0
+    assign sub_size_m = sub_size
+  endif
+  if cta_size_m == 0
+    assign cta_size_m = cta_size
+  endif
+
+  assign eyebrow_color = section.settings.eyebrow_color | default: '#f7f6f1'
+  assign heading_color = section.settings.heading_color | default: '#f7f6f1'
+  assign sub_color = section.settings.sub_color | default: '#f7f6f1'
+  assign cta_bg = section.settings.cta_bg
+  assign cta_text = section.settings.cta_text
+
+  assign thumbs_pad_x = section.settings.thumbs_pad_x | default: 24
+  assign thumbs_pad_y = section.settings.thumbs_pad_y | default: 24
+  assign thumbs_pad_x_m = section.settings.thumbs_pad_x_mobile | default: 0
+  assign thumbs_pad_y_m = section.settings.thumbs_pad_y_mobile | default: 0
+  if thumbs_pad_x_m == 0
+    assign thumbs_pad_x_m = thumbs_pad_x
+  endif
+  if thumbs_pad_y_m == 0
+    assign thumbs_pad_y_m = thumbs_pad_y
+  endif
 -%}
 <section
   class="nf-intro{% unless scroll_zoom %} nf-intro--slides-only is-zoomed is-copy-in is-done{% endunless %}{% if loader_on %} is-loading{% endif %}"
@@ -22,20 +76,86 @@
   data-autoscroll-target="{{ section.settings.autoscroll_target }}"
   data-loader-enabled="{% if loader_on %}true{% else %}false{% endif %}"
   data-loader-duration="{{ section.settings.loader_duration | default: 5.6 }}"
-  style="--nf-intro-len: {{ section.settings.scroll_length }}vh; --nf-intro-mask: url('{{ 'Fizz_Logo_Intro.svg' | asset_url }}'); --nf-intro-mask-mobile: url('{{ 'Fizz_Logo_INTRO_SVG_Mobile.svg' | asset_url }}');"
+  style="
+    --nf-intro-len: {{ section.settings.scroll_length }}vh;
+    --nf-intro-mask: url('{{ 'Fizz_Logo_Intro.svg' | asset_url }}');
+    --nf-intro-mask-mobile: url('{{ 'Fizz_Logo_INTRO_SVG_Mobile.svg' | asset_url }}');
+    --nf-intro-eyebrow-size: {{ eyebrow_size }}px;
+    --nf-intro-eyebrow-size-m: {{ eyebrow_size_m }}px;
+    --nf-intro-heading-size: {{ heading_size }}px;
+    --nf-intro-heading-size-m: {{ heading_size_m }}px;
+    --nf-intro-sub-size: {{ sub_size }}px;
+    --nf-intro-sub-size-m: {{ sub_size_m }}px;
+    --nf-intro-cta-size: {{ cta_size }}px;
+    --nf-intro-cta-size-m: {{ cta_size_m }}px;
+    --nf-intro-eyebrow-color: {{ eyebrow_color }};
+    --nf-intro-heading-color: {{ heading_color }};
+    --nf-intro-sub-color: {{ sub_color }};
+    --nf-intro-thumbs-pad-x: {{ thumbs_pad_x }}px;
+    --nf-intro-thumbs-pad-y: {{ thumbs_pad_y }}px;
+    --nf-intro-thumbs-pad-x-m: {{ thumbs_pad_x_m }}px;
+    --nf-intro-thumbs-pad-y-m: {{ thumbs_pad_y_m }}px;
+    {% if cta_bg != blank %}--nf-intro-cta-bg: {{ cta_bg }};{% endif %}
+    {% if cta_text != blank %}--nf-intro-cta-text: {{ cta_text }};{% endif %}
+  "
 >
   <h1 class="nf-visually-hidden">{{ section.settings.seo_heading | default: shop.name }}</h1>
 
   <div class="nf-intro__track" data-nf-intro-track>
     <div class="nf-intro__sticky">
-      <div class="nf-intro__stage" data-nf-intro-stage aria-hidden="true">
+      <div class="nf-intro__stage" data-nf-intro-stage>
         <div class="nf-intro__slides" data-nf-intro-slides>
           {%- if slide_count > 0 -%}
             {%- for block in section.blocks -%}
+              {%- liquid
+                assign has_slide_copy = false
+                if block.settings.hero_eyebrow != blank or block.settings.hero_heading != blank or block.settings.hero_subheading != blank or block.settings.cta_label != blank or block.settings.cta_url != blank
+                  assign has_slide_copy = true
+                endif
+
+                assign slide_eyebrow = section.settings.hero_eyebrow
+                assign slide_heading = section.settings.hero_heading
+                assign slide_sub = section.settings.hero_subheading
+                assign slide_cta_label = section.settings.cta_label
+                assign slide_cta_url = cta_url
+                if block.settings.hero_eyebrow != blank
+                  assign slide_eyebrow = block.settings.hero_eyebrow
+                endif
+                if block.settings.hero_heading != blank
+                  assign slide_heading = block.settings.hero_heading
+                endif
+                if block.settings.hero_subheading != blank
+                  assign slide_sub = block.settings.hero_subheading
+                endif
+                if block.settings.cta_label != blank
+                  assign slide_cta_label = block.settings.cta_label
+                endif
+                if block.settings.cta_url != blank
+                  assign slide_cta_url = block.settings.cta_url
+                endif
+
+                assign slide_x = block.settings.copy_x | default: 'inherit'
+                assign slide_y = block.settings.copy_y | default: 'inherit'
+                assign slide_mx = block.settings.copy_x_mobile | default: 'inherit'
+                assign slide_my = block.settings.copy_y_mobile | default: 'inherit'
+                if slide_x == blank or slide_x == 'inherit'
+                  assign slide_x = copy_x
+                endif
+                if slide_y == blank or slide_y == 'inherit'
+                  assign slide_y = copy_y
+                endif
+                if slide_mx == blank or slide_mx == 'inherit'
+                  assign slide_mx = slide_x
+                endif
+                if slide_my == blank or slide_my == 'inherit'
+                  assign slide_my = slide_y
+                endif
+              -%}
               <div
-                class="nf-intro__slide{% if forloop.first %} is-active{% endif %}"
+                class="nf-intro__slide{% if forloop.first %} is-active{% endif %}{% if has_slide_copy %} has-slide-copy{% endif %}"
                 data-nf-intro-slide
                 data-index="{{ forloop.index0 }}"
+                {% if has_slide_copy %}data-has-slide-copy="true"{% endif %}
                 {{ block.shopify_attributes }}
               >
                 {%- render 'nf-media',
@@ -48,6 +168,24 @@
                   sizes: '100vw',
                   loading: 'eager'
                 -%}
+                {%- if has_slide_copy -%}
+                  {%- render 'nf-intro-copy',
+                    eyebrow: slide_eyebrow,
+                    heading: slide_heading,
+                    subheading: slide_sub,
+                    cta_label: slide_cta_label,
+                    cta_url: slide_cta_url,
+                    copy_x: slide_x,
+                    copy_y: slide_y,
+                    copy_mx: slide_mx,
+                    copy_my: slide_my,
+                    eyebrow_align: eyebrow_align,
+                    heading_align: heading_align,
+                    sub_align: sub_align,
+                    cta_align: cta_align,
+                    is_slide: true
+                  -%}
+                {%- endif -%}
               </div>
             {%- endfor -%}
           {%- else -%}
@@ -64,22 +202,22 @@
         </div>
       {%- endif -%}
 
-      <div class="nf-intro__hero-copy" data-nf-intro-copy>
-        {%- if section.settings.hero_eyebrow != blank -%}
-          <p class="nf-intro__hero-eyebrow">{{ section.settings.hero_eyebrow | escape }}</p>
-        {%- endif -%}
-        {%- if section.settings.hero_heading != blank -%}
-          <h2 class="nf-intro__hero-heading">{{ section.settings.hero_heading | escape }}</h2>
-        {%- endif -%}
-        {%- if section.settings.hero_subheading != blank -%}
-          <p class="nf-intro__hero-sub">{{ section.settings.hero_subheading | escape }}</p>
-        {%- endif -%}
-        {%- if section.settings.cta_label != blank -%}
-          <a class="nf-btn nf-btn--accent nf-intro__hero-cta" href="{{ cta_url }}">
-            {{- section.settings.cta_label | escape -}}
-          </a>
-        {%- endif -%}
-      </div>
+      {%- render 'nf-intro-copy',
+        eyebrow: section.settings.hero_eyebrow,
+        heading: section.settings.hero_heading,
+        subheading: section.settings.hero_subheading,
+        cta_label: section.settings.cta_label,
+        cta_url: cta_url,
+        copy_x: copy_x,
+        copy_y: copy_y,
+        copy_mx: copy_mx,
+        copy_my: copy_my,
+        eyebrow_align: eyebrow_align,
+        heading_align: heading_align,
+        sub_align: sub_align,
+        cta_align: cta_align,
+        is_default: true
+      -%}
 
       {%- if slide_count > 1 -%}
         <div class="nf-intro__thumbs" data-nf-intro-thumbs role="tablist" aria-label="Intro media">
@@ -202,6 +340,278 @@
       "type": "url",
       "id": "cta_url",
       "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Content placement"
+    },
+    {
+      "type": "paragraph",
+      "content": "Moves the whole copy stack (eyebrow, heading, body, button). Mobile inherits desktop unless you change it."
+    },
+    {
+      "type": "select",
+      "id": "copy_x",
+      "label": "Desktop horizontal",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "copy_y",
+      "label": "Desktop vertical",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "middle", "label": "Middle" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "middle"
+    },
+    {
+      "type": "select",
+      "id": "copy_x_mobile",
+      "label": "Mobile horizontal",
+      "options": [
+        { "value": "inherit", "label": "Same as desktop" },
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "inherit"
+    },
+    {
+      "type": "select",
+      "id": "copy_y_mobile",
+      "label": "Mobile vertical",
+      "options": [
+        { "value": "inherit", "label": "Same as desktop" },
+        { "value": "top", "label": "Top" },
+        { "value": "middle", "label": "Middle" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "inherit"
+    },
+    {
+      "type": "header",
+      "content": "Text alignment"
+    },
+    {
+      "type": "select",
+      "id": "eyebrow_align",
+      "label": "Eyebrow align",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "heading_align",
+      "label": "Heading align",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "sub_align",
+      "label": "Body align",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "cta_align",
+      "label": "Button align",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Eyebrow color",
+      "default": "#f7f6f1"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_font_size",
+      "label": "Eyebrow font size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_font_size_mobile",
+      "label": "Eyebrow font size (mobile)",
+      "min": 0,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#f7f6f1"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading font size",
+      "min": 28,
+      "max": 96,
+      "step": 2,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size_mobile",
+      "label": "Heading font size (mobile)",
+      "min": 0,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "color",
+      "id": "sub_color",
+      "label": "Body color",
+      "default": "#f7f6f1"
+    },
+    {
+      "type": "range",
+      "id": "sub_font_size",
+      "label": "Body font size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "sub_font_size_mobile",
+      "label": "Body font size (mobile)",
+      "min": 0,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "header",
+      "content": "Button style"
+    },
+    {
+      "type": "color",
+      "id": "cta_bg",
+      "label": "Button background"
+    },
+    {
+      "type": "color",
+      "id": "cta_text",
+      "label": "Button text color"
+    },
+    {
+      "type": "range",
+      "id": "cta_font_size",
+      "label": "Button font size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "cta_font_size_mobile",
+      "label": "Button font size (mobile)",
+      "min": 0,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "header",
+      "content": "Slide thumbnails"
+    },
+    {
+      "type": "paragraph",
+      "content": "Thumbnails stay in the bottom-left. Adjust padding from the edges."
+    },
+    {
+      "type": "range",
+      "id": "thumbs_pad_x",
+      "label": "Horizontal padding",
+      "min": 8,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "thumbs_pad_y",
+      "label": "Vertical padding",
+      "min": 8,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "thumbs_pad_x_mobile",
+      "label": "Horizontal padding (mobile)",
+      "min": 0,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "range",
+      "id": "thumbs_pad_y_mobile",
+      "label": "Vertical padding (mobile)",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
     },
     {
       "type": "header",
@@ -371,6 +781,95 @@
           "id": "asset",
           "label": "Theme asset fallback",
           "info": "Advanced: filename of a theme asset, e.g. stitch-hero-slideshow-1.jpg"
+        },
+        {
+          "type": "header",
+          "content": "Optional slide copy"
+        },
+        {
+          "type": "paragraph",
+          "content": "Leave blank to use the section default copy. Fill any field to give this slide its own text and button."
+        },
+        {
+          "type": "text",
+          "id": "hero_eyebrow",
+          "label": "Eyebrow"
+        },
+        {
+          "type": "text",
+          "id": "hero_heading",
+          "label": "Heading"
+        },
+        {
+          "type": "textarea",
+          "id": "hero_subheading",
+          "label": "Subheading"
+        },
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "Button label"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "Button link"
+        },
+        {
+          "type": "header",
+          "content": "Slide placement"
+        },
+        {
+          "type": "paragraph",
+          "content": "Only used when this slide has custom copy. Same as section unless changed."
+        },
+        {
+          "type": "select",
+          "id": "copy_x",
+          "label": "Desktop horizontal",
+          "options": [
+            { "value": "inherit", "label": "Same as section" },
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "inherit"
+        },
+        {
+          "type": "select",
+          "id": "copy_y",
+          "label": "Desktop vertical",
+          "options": [
+            { "value": "inherit", "label": "Same as section" },
+            { "value": "top", "label": "Top" },
+            { "value": "middle", "label": "Middle" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "inherit"
+        },
+        {
+          "type": "select",
+          "id": "copy_x_mobile",
+          "label": "Mobile horizontal",
+          "options": [
+            { "value": "inherit", "label": "Same as desktop" },
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "inherit"
+        },
+        {
+          "type": "select",
+          "id": "copy_y_mobile",
+          "label": "Mobile vertical",
+          "options": [
+            { "value": "inherit", "label": "Same as desktop" },
+            { "value": "top", "label": "Top" },
+            { "value": "middle", "label": "Middle" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "inherit"
         }
       ]
     }

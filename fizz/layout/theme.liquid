@@ -32,6 +32,7 @@
       {% if template.name == 'index' and template.suffix != 'fizz-claude' %}
         {{ 'swiper-bundle.min.css' | asset_url | stylesheet_tag }}
         {{ 'fizz-progress-carousel.css' | asset_url | stylesheet_tag }}
+        {{ 'fizz-lifestyle-carousel.css' | asset_url | stylesheet_tag }}
       {% endif %}
       {% if template == 'page.lifestyle' %}
         {{ 'fizz-lifestyle-gallery.css' | asset_url | stylesheet_tag }}
@@ -82,6 +83,7 @@
       {% if template.name == 'index' %}
         <script src="{{ 'swiper-bundle.min.js' | asset_url }}" defer></script>
         <script src="{{ 'fizz-progress-carousel.js' | asset_url }}" defer></script>
+        <script src="{{ 'fizz-lifestyle-carousel.js' | asset_url }}" defer></script>
         <script src="{{ 'fizz-home.js' | asset_url }}" defer></script>
       {% elsif template.name == 'product' %}
         <script src="{{ 'kinetic-spark.js' | asset_url }}" defer></script>

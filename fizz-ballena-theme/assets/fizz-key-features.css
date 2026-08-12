@@ -5,6 +5,7 @@
   --fkf-media-h-desktop: 72dvh;
   --fkf-media-h-mobile: 58dvh;
   --fkf-media-h: var(--fkf-media-h-desktop);
+  --fkf-aspect: 1600 / 1280;
   --fkf-cards-pad-x: 16px;
   --fkf-cards-pad-y: 24px;
   --fkf-glass-bg: color-mix(in srgb, var(--fkf-glass-tint, #fff) 22%, transparent);
@@ -20,6 +21,10 @@
   position: relative;
   z-index: 1;
   color: var(--fkf-heading);
+}
+
+.fizz-key-features[data-fkf-mode="mobile"] {
+  --fkf-aspect: 1080 / 1922;
 }
 
 .fizz-key-features__track {
@@ -139,11 +144,11 @@
 .fizz-key-features__canvas,
 .fizz-key-features__poster {
   display: block;
-  width: var(--fkf-media-h, 72dvh);
+  width: auto;
   height: var(--fkf-media-h, 72dvh);
-  max-width: min(100%, calc(100dvh - var(--fkf-nav-offset)));
+  max-width: 100%;
   max-height: calc(100dvh - var(--fkf-nav-offset) - 2rem);
-  aspect-ratio: 1;
+  aspect-ratio: var(--fkf-aspect, 1600 / 1280);
   object-fit: contain;
   object-position: center top;
   margin: 0 auto;
@@ -334,10 +339,11 @@
 
   .fizz-key-features__canvas,
   .fizz-key-features__poster {
-    width: var(--fkf-media-h);
+    width: auto;
     height: var(--fkf-media-h);
     max-width: 100%;
     max-height: calc(100dvh - var(--fkf-nav-offset));
+    aspect-ratio: var(--fkf-aspect, 1080 / 1922);
   }
 
   .fizz-key-features__cards-layer {

@@ -1,11 +1,14 @@
 {{ 'bf-feature-tabs.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign section_height = section.settings.section_height | default: 100
+-%}
 <section
   class="bf-section bf-tabs"
   id="{{ section.settings.anchor_id | default: 'how' | handle }}"
   data-bf-tabs
   data-autoplay="{{ section.settings.autoplay_seconds | default: 5 }}"
   data-autoplay-enabled="{% if section.settings.autoplay %}true{% else %}false{% endif %}"
-  style="--bf-tabs-outline: {{ section.settings.active_outline | default: '#6b9fd4' }};"
+  style="--bf-tabs-outline: {{ section.settings.active_outline | default: '#6b9fd4' }}; --bf-tabs-height: {{ section_height }}dvh;"
 >
   {% render 'bf-section-chrome', section: section %}
 
@@ -110,6 +113,17 @@
       "id": "active_outline",
       "label": "Active tab outline",
       "default": "#6b9fd4"
+    },
+    {
+      "type": "range",
+      "id": "section_height",
+      "label": "Section height",
+      "info": "Viewport height (dvh). Use 100 so the next section (Parallax reveal) enters after one full scroll.",
+      "min": 60,
+      "max": 120,
+      "step": 5,
+      "unit": "vh",
+      "default": 100
     },
     {
       "type": "header",

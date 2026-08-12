@@ -242,3 +242,31 @@ Extending to **global theme tokens** requires an explicit merchant toggle and Li
 | 2026-07-09 | Cursor agent | Initial research report; Phase 2 implementation |
 | 2026-07-13 | Cursor agent | Variant product media research + implementation notes |
 | 2026-07-13 | Cursor agent | Bottle PDP bundle cards + scene hero image pipeline |
+
+---
+
+## Lifestyle coverflow carousel + variant deep-links (2026-08-04)
+
+**Scope:** `sections/fizz-lifestyle-carousel.liquid` — 3D Swiper coverflow of lifestyle cards, each tied to a bottle color variant.
+
+### Verified capabilities
+
+| Question | Answer | Source |
+|----------|--------|--------|
+| Does `?variant={id}` preselect on PDP? | **Yes** — `product.selected_variant` / `selected_or_first_available_variant` use the `variant` URL param on product pages | [Liquid product object](https://shopify.dev/docs/api/liquid/objects/product) |
+| Can theme-only code deep-link a color card? | **Yes** — `product.url \| append: '?variant=' \| append: variant.id` | Existing: `fizz-variant-card`, `fizz-lifestyle-mosaic`, `fizz-claude-colorways` |
+| Can merchants pick a variant in schema? | **No** native variant setting — use product + `color_slug` match (metafield / `fizz-color-slug`) | Theme settings architecture |
+| Is Swiper Coverflow available? | **Yes** — `assets/swiper-bundle.min.js` includes Coverflow | Theme vendor bundle |
+| Secondary image on hover in Liquid? | **Theme-only CSS** — dual stacked images; no Shopify API for “hover media” | Storefront CSS |
+
+### Storefront vs editor
+
+- **Editor:** section product + card blocks (`color_slug`, lifestyle image, hover image).
+- **Storefront:** Liquid resolves variant → `?variant=` link; Swiper coverflow is runtime JS; hover swap is CSS (`@media (hover: hover)`).
+
+### Limitations
+
+- Hover swap does not apply on touch devices (pointer hover only; `:focus-visible` optional).
+- Lifestyle photography must be merchant-uploaded (or theme asset fallback `hero-lifestyle-{slug}.png`); not inventable in Liquid.
+- Continuity requires bottle PDP to honor `variant` (Fizz does via Liquid + `fizz-pdp.js`).
+

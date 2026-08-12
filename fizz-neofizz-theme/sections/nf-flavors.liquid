@@ -1,4 +1,12 @@
-<section class="nf-flavors" id="{{ section.settings.anchor_id | default: 'flavors' }}">
+{%- liquid
+  assign media_radius = section.settings.media_radius | default: 16
+  assign button_radius = section.settings.button_radius | default: 8
+-%}
+<section
+  class="nf-flavors"
+  id="{{ section.settings.anchor_id | default: 'flavors' }}"
+  style="--nf-flavors-media-radius: {{ media_radius }}px; --nf-flavors-btn-radius: {{ button_radius }}px;"
+>
   <div class="nf-flavors__head">
     {%- if section.settings.eyebrow != blank -%}
       <p class="nf-eyebrow">{{ section.settings.eyebrow | escape }}</p>
@@ -112,6 +120,30 @@
       "id": "anchor_id",
       "label": "Anchor ID",
       "default": "flavors"
+    },
+    {
+      "type": "header",
+      "content": "Corners"
+    },
+    {
+      "type": "range",
+      "id": "media_radius",
+      "label": "Media corner radius",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "Button corner radius",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 8
     }
   ],
   "blocks": [

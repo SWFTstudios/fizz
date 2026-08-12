@@ -1,0 +1,114 @@
+{{ 'nf-water-wave.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign fill_color = section.settings.fill_color
+  if fill_color == blank
+    assign fill_color = '#ffffff'
+  endif
+  assign wave_height = section.settings.height | default: 40
+  assign duration = section.settings.duration | default: 5
+  assign overlap = section.settings.overlap | default: 8
+  assign flip = section.settings.flip
+-%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    --nf-wave-fill: {{ fill_color }};
+    --nf-wave-height: {{ wave_height }}px;
+    --nf-wave-duration: {{ duration }}s;
+    --nf-wave-overlap: {{ overlap }}px;
+  }
+{% endstyle %}
+
+<section
+  class="nf-water-wave{% if flip %} nf-water-wave--flipped{% endif %}"
+  id="{{ section.settings.anchor_id | default: 'water-wave' | handle }}"
+  data-nf-water-wave
+  data-nf-wave-period="60"
+  data-nf-wave-tiles="6"
+  aria-hidden="true"
+>
+  <div class="nf-water-wave__viewport">
+    <div class="nf-water-wave__track" data-nf-water-wave-track>
+      <svg
+        class="nf-water-wave__svg"
+        data-nf-water-wave-svg
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+        focusable="false"
+      ></svg>
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'nf-water-wave.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "NF Water Wave",
+  "tag": "section",
+  "class": "nf-water-wave-section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Place between two sections. Set fill color to match the section below (or above when flipped) so the wave reads as that color flowing across the seam."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "water-wave"
+    },
+    {
+      "type": "color",
+      "id": "fill_color",
+      "label": "Wave fill color",
+      "default": "#FFFFFF",
+      "info": "Match the background of the adjacent section this wave should blend into."
+    },
+    {
+      "type": "checkbox",
+      "id": "flip",
+      "label": "Flip (top edge)",
+      "default": false,
+      "info": "Off = wave sits on the bottom of the section above. On = wave sits on the top of the section below."
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "min": 16,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Wave height",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "duration",
+      "min": 2,
+      "max": 20,
+      "step": 1,
+      "unit": "s",
+      "label": "Loop duration",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "overlap",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Overlap into adjacent sections",
+      "default": 8,
+      "info": "Pulls the wave into neighboring sections for a flush seam."
+    }
+  ],
+  "presets": [
+    {
+      "name": "NF Water Wave"
+    }
+  ]
+}
+{% endschema %}

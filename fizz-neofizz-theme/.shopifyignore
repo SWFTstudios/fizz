@@ -7,7 +7,15 @@ design/
 preview/
 scripts/
 *.md
+INSTRUCTIONS.md
 .git/
 .gitignore
 .DS_Store
 **/Thumbs.db
+
+# Merchant Theme Editor content — NEVER overwrite on feature pushes.
+# These hold live images, copy, section order, and theme settings.
+# Only push them when the merchant explicitly requests a full content sync.
+config/settings_data.json
+templates/**/*.json
+sections/*-group.json

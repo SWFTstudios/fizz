@@ -13,6 +13,10 @@ INSTRUCTIONS.md
 .DS_Store
 **/Thumbs.db
 
+# Lottie source packs (PNG + JSON) — convert to flat WebP in assets/ before deploy
+fizz_lottie_sequence_v2/
+fizz_lottie_sequence_v2_desktop/
+
 # Merchant Theme Editor content — NEVER overwrite on feature pushes.
 # These hold live images, copy, section order, and theme settings.
 # Only push them when the merchant explicitly requests a full content sync.

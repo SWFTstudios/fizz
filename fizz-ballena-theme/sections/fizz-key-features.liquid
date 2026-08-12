@@ -11,7 +11,8 @@
     assign poster = last_frame
   endif
   assign poster_pad = poster | prepend: '000' | slice: -3, 3
-  assign poster_file = 'fizz-kf-seq-' | append: poster_pad | append: '.webp'
+  assign poster_file_mobile = 'fizz-kf-m-' | append: poster_pad | append: '.webp'
+  assign poster_file_desktop = 'fizz-kf-d-' | append: poster_pad | append: '.webp'
   assign layout = section.settings.layout | default: 'split'
   assign glass_tint = section.settings.glass_tint | default: '#ffffff'
   assign scroll_vh = section.settings.scroll_track_vh | default: 360
@@ -27,11 +28,41 @@
   assign cards_pad_y = section.settings.cards_padding_y | default: 24
   assign feature_count = section.blocks.size | at_least: 1
   assign base_override = section.settings.sequence_base_url | strip
+  assign base_override_mobile = section.settings.sequence_base_url_mobile | strip
+  assign base_override_desktop = section.settings.sequence_base_url_desktop | strip
   if base_override != blank
     assign base_last = base_override | slice: -1, 1
     if base_last != '/'
       assign base_override = base_override | append: '/'
     endif
+  endif
+  if base_override_mobile == blank and base_override != blank
+    assign base_override_mobile = base_override
+  endif
+  if base_override_desktop == blank and base_override != blank
+    assign base_override_desktop = base_override
+  endif
+  if base_override_mobile != blank
+    assign base_last = base_override_mobile | slice: -1, 1
+    if base_last != '/'
+      assign base_override_mobile = base_override_mobile | append: '/'
+    endif
+  endif
+  if base_override_desktop != blank
+    assign base_last = base_override_desktop | slice: -1, 1
+    if base_last != '/'
+      assign base_override_desktop = base_override_desktop | append: '/'
+    endif
+  endif
+  if base_override_mobile != blank
+    assign poster_url_mobile = base_override_mobile | append: 'fizz-kf-m-' | append: poster_pad | append: '.webp'
+  else
+    assign poster_url_mobile = poster_file_mobile | asset_url
+  endif
+  if base_override_desktop != blank
+    assign poster_url_desktop = base_override_desktop | append: 'fizz-kf-d-' | append: poster_pad | append: '.webp'
+  else
+    assign poster_url_desktop = poster_file_desktop | asset_url
   endif
 
   assign color_eyebrow = section.settings.color_eyebrow | default: '#1a1f1c'
@@ -111,34 +142,69 @@
   }
 {% endstyle %}
 
-{% capture frame_manifest %}
+{% capture frame_manifest_mobile %}
 [
 {%- for i in (0..49) -%}
   {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
-  {%- if base_override != blank -%}
-    {%- assign frame_url = base_override | append: 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+  {%- if base_override_mobile != blank -%}
+    {%- assign frame_url = base_override_mobile | append: 'fizz-kf-m-' | append: pad | append: '.webp' -%}
   {%- else -%}
-    {%- assign fname = 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+    {%- assign fname = 'fizz-kf-m-' | append: pad | append: '.webp' -%}
     {%- assign frame_url = fname | asset_url -%}
   {%- endif -%}
   {{ frame_url | json }},
 {%- endfor -%}
 {%- for i in (50..99) -%}
   {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
-  {%- if base_override != blank -%}
-    {%- assign frame_url = base_override | append: 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+  {%- if base_override_mobile != blank -%}
+    {%- assign frame_url = base_override_mobile | append: 'fizz-kf-m-' | append: pad | append: '.webp' -%}
   {%- else -%}
-    {%- assign fname = 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+    {%- assign fname = 'fizz-kf-m-' | append: pad | append: '.webp' -%}
     {%- assign frame_url = fname | asset_url -%}
   {%- endif -%}
   {{ frame_url | json }},
 {%- endfor -%}
 {%- for i in (100..120) -%}
   {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
-  {%- if base_override != blank -%}
-    {%- assign frame_url = base_override | append: 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+  {%- if base_override_mobile != blank -%}
+    {%- assign frame_url = base_override_mobile | append: 'fizz-kf-m-' | append: pad | append: '.webp' -%}
   {%- else -%}
-    {%- assign fname = 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+    {%- assign fname = 'fizz-kf-m-' | append: pad | append: '.webp' -%}
+    {%- assign frame_url = fname | asset_url -%}
+  {%- endif -%}
+  {{ frame_url | json }}{%- unless forloop.last -%},{%- endunless -%}
+{%- endfor -%}
+]
+{% endcapture %}
+
+{% capture frame_manifest_desktop %}
+[
+{%- for i in (0..49) -%}
+  {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
+  {%- if base_override_desktop != blank -%}
+    {%- assign frame_url = base_override_desktop | append: 'fizz-kf-d-' | append: pad | append: '.webp' -%}
+  {%- else -%}
+    {%- assign fname = 'fizz-kf-d-' | append: pad | append: '.webp' -%}
+    {%- assign frame_url = fname | asset_url -%}
+  {%- endif -%}
+  {{ frame_url | json }},
+{%- endfor -%}
+{%- for i in (50..99) -%}
+  {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
+  {%- if base_override_desktop != blank -%}
+    {%- assign frame_url = base_override_desktop | append: 'fizz-kf-d-' | append: pad | append: '.webp' -%}
+  {%- else -%}
+    {%- assign fname = 'fizz-kf-d-' | append: pad | append: '.webp' -%}
+    {%- assign frame_url = fname | asset_url -%}
+  {%- endif -%}
+  {{ frame_url | json }},
+{%- endfor -%}
+{%- for i in (100..120) -%}
+  {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
+  {%- if base_override_desktop != blank -%}
+    {%- assign frame_url = base_override_desktop | append: 'fizz-kf-d-' | append: pad | append: '.webp' -%}
+  {%- else -%}
+    {%- assign fname = 'fizz-kf-d-' | append: pad | append: '.webp' -%}
     {%- assign frame_url = fname | asset_url -%}
   {%- endif -%}
   {{ frame_url | json }}{%- unless forloop.last -%},{%- endunless -%}
@@ -150,6 +216,7 @@
   class="fizz-key-features fizz-key-features--cards-{{ layout }}"
   id="{{ section.settings.anchor_id | default: 'features' | handle }}"
   data-fizz-key-features
+  data-fkf-mode="desktop"
   data-frame-count="{{ frame_count }}"
   data-feature-count="{{ feature_count }}"
   data-poster-frame="{{ poster }}"
@@ -158,6 +225,7 @@
     --fkf-media-h-desktop: {{ media_vh }}dvh;
     --fkf-media-h-mobile: {{ media_vh_mobile }}dvh;
     --fkf-media-h: {{ media_vh }}dvh;
+    --fkf-aspect: 1600 / 1280;
     --fkf-glass-tint: {{ glass_tint }};
     --fkf-features: {{ feature_count }};
     --fkf-cards-pad-x: {{ cards_pad_x }}px;
@@ -219,14 +287,16 @@
 
       <div class="fizz-key-features__shell">
         <div class="fizz-key-features__stage" data-fkf-stage>
-          <canvas class="fizz-key-features__canvas" data-fkf-canvas width="1080" height="1080" aria-hidden="true"></canvas>
+          <canvas class="fizz-key-features__canvas" data-fkf-canvas width="1600" height="1280" aria-hidden="true"></canvas>
           <img
             class="fizz-key-features__poster"
             data-fkf-poster
-            src="{% if base_override != blank %}{{ base_override }}fizz-kf-seq-{{ poster_pad }}.webp{% else %}{{ poster_file | asset_url }}{% endif %}"
+            data-poster-mobile="{{ poster_url_mobile | escape }}"
+            data-poster-desktop="{{ poster_url_desktop | escape }}"
+            src="{{ poster_url_desktop | escape }}"
             alt=""
-            width="1080"
-            height="1080"
+            width="1600"
+            height="1280"
             decoding="async"
           >
         </div>
@@ -323,8 +393,11 @@
     </div>
   </div>
 
-  <script type="application/json" data-fkf-frames>
-    {{ frame_manifest | strip }}
+  <script type="application/json" data-fkf-frames-mobile>
+    {{ frame_manifest_mobile | strip }}
+  </script>
+  <script type="application/json" data-fkf-frames-desktop>
+    {{ frame_manifest_desktop | strip }}
   </script>
 </section>
 
@@ -595,7 +668,19 @@
       "type": "text",
       "id": "sequence_base_url",
       "label": "Sequence base URL (optional)",
-      "info": "Leave blank to use theme assets."
+      "info": "Shared CDN folder prefix ending with /. Frames resolve as {prefix}fizz-kf-m-000.webp and {prefix}fizz-kf-d-000.webp. Leave blank to use theme assets."
+    },
+    {
+      "type": "text",
+      "id": "sequence_base_url_mobile",
+      "label": "Mobile sequence base URL (optional)",
+      "info": "Overrides the shared base for mobile frames only (fizz-kf-m-NNN.webp)."
+    },
+    {
+      "type": "text",
+      "id": "sequence_base_url_desktop",
+      "label": "Desktop sequence base URL (optional)",
+      "info": "Overrides the shared base for desktop frames only (fizz-kf-d-NNN.webp)."
     }
   ],
   "blocks": [

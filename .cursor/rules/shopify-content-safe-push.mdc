@@ -1,0 +1,44 @@
+---
+description: Never overwrite live Theme Editor content when pushing new theme features
+alwaysApply: true
+---
+
+# Content-safe Shopify theme pushes
+
+When adding or updating theme **code** (sections, snippets, assets, layout), preserve merchant content that already lives in the Theme Editor.
+
+## Never push these unless the user explicitly asks to sync/overwrite editor content
+
+- `config/settings_data.json` — theme settings + section instances/settings
+- `templates/**/*.json` — page section order and per-section settings/blocks
+- `sections/*-group.json` — header/footer group content
+
+Pushing these resets images, text, padding, and section order merchants configured in the editor.
+
+## Required push pattern for new features
+
+1. Add/update only code files (`.liquid`, `.css`, `.js`, new assets).
+2. Push with `--only` for those paths, plus `--nodelete`.
+3. For the live theme, also use `--allow-live` (and the live theme id/role).
+4. Do **not** edit remote `index.json` (or other templates) to insert the new section — merchants add it in the Theme Editor after the code is live.
+5. Prefer loading new CSS/JS from the section itself so `layout/theme.liquid` changes are unnecessary when possible.
+
+Example:
+
+```bash
+shopify theme push --theme <LIVE_THEME_ID> --allow-live --nodelete \
+  --only sections/nf-lifestyle-carousel.liquid \
+  --only assets/nf-lifestyle-carousel.css \
+  --only assets/nf-lifestyle-carousel.js
+```
+
+## Wrong
+
+```bash
+# Full directory push — overwrites settings_data + templates
+shopify theme push --theme <LIVE_THEME_ID> --allow-live
+```
+
+## After a safe code push
+
+Tell the merchant to refresh the Theme Editor and **Add section** → pick the new section (e.g. "NF Lifestyle Carousel"). Their existing section content stays intact.

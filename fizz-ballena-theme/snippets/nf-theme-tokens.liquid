@@ -60,6 +60,15 @@
     assign btn_link_text = settings.button_link_text
   endif
 
+  assign btn_corner = settings.button_corner_style | default: 'pill'
+  if btn_corner == 'sharp'
+    assign btn_radius = '0px'
+  elsif btn_corner == 'rounded'
+    assign btn_radius = '12px'
+  else
+    assign btn_radius = '999px'
+  endif
+
   assign transition_liquid = accent
   if settings.page_transition_color_mode == 'custom' and settings.page_transition_color != blank
     assign transition_liquid = settings.page_transition_color
@@ -93,7 +102,7 @@
     --nf-page-width: {{ settings.page_width }}px;
     --nf-gutter: {{ settings.gutter }}px;
     --bf-page-pad-x: {% if settings.horizontal_padding == '0' %}0{% else %}max(var(--nf-gutter), {{ settings.horizontal_padding | default: '5%' }}){% endif %};
-    --nf-btn-radius: {{ settings.button_radius }}px;
+    --nf-btn-radius: {{ btn_radius }};
     --nf-radius-lg: 32px;
     --nf-radius-xl: 48px;
     --nf-soft-shadow: 0 10px 32px rgba(var(--nf-ink-rgb), 0.08), 0 2px 8px rgba(var(--nf-ink-rgb), 0.04);

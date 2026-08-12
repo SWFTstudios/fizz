@@ -213,14 +213,16 @@
         "default": "#0f1a2e"
       },
       {
-        "type": "range",
-        "id": "button_radius",
-        "label": "Button corner radius",
-        "min": 0,
-        "max": 40,
-        "step": 2,
-        "unit": "px",
-        "default": 4
+        "type": "select",
+        "id": "button_corner_style",
+        "label": "Button corners",
+        "options": [
+          { "value": "sharp", "label": "Sharp" },
+          { "value": "rounded", "label": "Rounded" },
+          { "value": "pill", "label": "Pill" }
+        ],
+        "default": "pill",
+        "info": "Applies to all theme buttons (.nf-btn) and matching form fields."
       }
     ]
   },
