@@ -58,6 +58,7 @@
   endif
   assign lightbox_index = -1
   assign thumb_ratio = section.settings.thumb_media_ratio | default: '1 / 1'
+  assign thumb_radius = section.settings.thumb_corner_radius | default: 10
 -%}
 <section
   class="nf-product nf-product--soft nf-product--fit-{{ media_fit }} nf-product--gallery-{{ gallery_mode }} nf-product--layout-{{ desktop_layout }}{% if show_thumbs %} nf-product--thumbs{% endif %}{% if thumbs_mobile %} nf-product--thumbs-mobile{% endif %}{% if dark_surface %} nf-product--dark{% endif %}{% if enable_lightbox %} nf-product--lightbox{% endif %}"
@@ -71,6 +72,7 @@
     --pdp-stage-text: {{ stage_text }};
     --nf-pdp-media-ratio: {{ mobile_ratio }};
     --nf-pdp-thumb-ratio: {{ thumb_ratio }};
+    --nf-pdp-thumb-radius: {{ thumb_radius }}px;
   "
 >
   <div class="nf-product__layout">
@@ -600,6 +602,17 @@
         { "value": "4 / 3", "label": "Landscape 4:3" }
       ],
       "default": "1 / 1",
+      "visible_if": "{{ section.settings.show_thumbnails }}"
+    },
+    {
+      "type": "range",
+      "id": "thumb_corner_radius",
+      "label": "Thumbnail corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 10,
       "visible_if": "{{ section.settings.show_thumbnails }}"
     },
     {

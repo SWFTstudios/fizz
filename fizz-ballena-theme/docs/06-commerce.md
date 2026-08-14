@@ -24,12 +24,14 @@ Section settings on `nf-product`:
 | `dark_surface` | dark `--nf-dark` section background (Ballena PDP) |
 | `desktop_layout` | side / stack |
 | `mobile_media_ratio` | 4:5, 1:1, 3:4, auto |
-| `thumb_media_ratio` | 1:1, 4:5, 3:4, 4:3 (small centered thumbs under the stage) |
+| `thumb_media_ratio` | 1:1, 4:5, 3:4, 4:3 |
+| `thumb_corner_radius` | 0–48px (default 10) |
 | `stage_mode` | surface / colorway gradient / dark |
 
 On desktop **side** layout the gallery is `position: sticky` and fills
 remaining viewport height (`100dvh` minus `--nf-nav-top` and a 16px inset).
-Thumbnails stay a small centered row under the stage. The buy box scrolls.
+Thumbnails are a single-line horizontal scroller under the stage; overflow
+is clipped. The buy box scrolls.
 Mobile stays stacked (no sticky, no forced `dvh`) so Add to cart stays
 reachable.
 

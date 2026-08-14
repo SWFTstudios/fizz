@@ -42,6 +42,8 @@
   viewport under the floating header.
 - Buy box is **not** sticky; long accordion copy scrolls beside the gallery.
 - Mobile / stack layout keep aspect-ratio stages (ATC stays above the fold).
+- Thumbnails: one-line `overflow-x: auto` strip; `thumb_corner_radius` default 10px
+  (independent of theme `image_corner_radius`).
 
 ## Description accordion
 

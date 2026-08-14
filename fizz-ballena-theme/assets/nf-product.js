@@ -139,6 +139,13 @@
       var on = thumb.dataset.mediaId === String(mediaId);
       thumb.classList.toggle('is-active', on);
       thumb.setAttribute('aria-current', on ? 'true' : 'false');
+      if (on) {
+        var strip = section.querySelector('[data-nf-thumbs]');
+        if (strip) {
+          var left = thumb.offsetLeft - (strip.clientWidth - thumb.offsetWidth) / 2;
+          strip.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+        }
+      }
     });
     section.querySelectorAll('[data-nf-dot]').forEach(function (dot) {
       var on = dot.dataset.mediaId === String(mediaId);
