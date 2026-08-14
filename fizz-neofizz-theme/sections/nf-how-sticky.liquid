@@ -46,8 +46,16 @@
               data-nf-how-step
               {{ block.shopify_attributes }}
             >
-              <span class="nf-how__step-num" aria-hidden="true">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
-              <h3 class="nf-how__step-title">{{ block.settings.title | escape }}</h3>
+              <button
+                type="button"
+                class="nf-how__step-trigger"
+                data-nf-how-goto
+                aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+                aria-label="Go to step {{ forloop.index }}: {{ block.settings.title | escape }}"
+              >
+                <span class="nf-how__step-num" aria-hidden="true">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+                <span class="nf-how__step-title">{{ block.settings.title | escape }}</span>
+              </button>
               {%- if block.settings.body != blank -%}
                 <div class="nf-how__step-body">{{ block.settings.body }}</div>
               {%- endif -%}

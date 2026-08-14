@@ -8,7 +8,7 @@ alwaysApply: true
 Before proposing theme architecture, preset systems, or merchant workflows:
 
 1. **Verify** against Shopify developer documentation (shopify.dev) via Shopify Dev MCP `search_docs_chunks` or official docs — not training data alone.
-2. **Record** findings in `fizz-claude-theme/design/colorway-presets/SHOPIFY-COLORWAY-RESEARCH.md` (or a topic-specific report in `design/`).
+2. **Record** findings in the **active theme’s** `design/` folder (topic-specific `*.md`), e.g. `fizz-neofizz-theme/design/NF-WATER-WAVE-RESEARCH.md`. Prefer the active theme over legacy paths under `fizz-claude-theme/` unless that theme is the target.
 3. **Never suggest** features documented as impossible, unsupported, or deprecated without stating the limitation and source.
 4. **Distinguish** storefront runtime behavior (Liquid) from theme editor UI behavior (settings_schema / settings_data).
 5. **Note hard limits** explicitly (e.g. max 5 theme presets in `settings_data.json`, no JSON parse in Liquid).

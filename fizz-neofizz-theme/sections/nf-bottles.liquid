@@ -1,0 +1,317 @@
+{%- liquid
+  assign bottle_product = section.settings.product | default: settings.bottle_product
+  assign media_radius = section.settings.media_radius | default: 16
+  assign button_radius = section.settings.button_radius | default: 8
+  assign section_bg = section.settings.background_color
+-%}
+<section
+  class="nf-bottles"
+  id="{{ section.settings.anchor_id | default: 'bottles' }}"
+  style="--nf-bottles-media-radius: {{ media_radius }}px; --nf-bottles-btn-radius: {{ button_radius }}px;{% if section_bg != blank %} --nf-bottles-bg: {{ section_bg }};{% endif %}"
+>
+  <div class="nf-bottles__head">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="nf-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.heading != blank -%}
+      <h2 class="nf-heading nf-bottles__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="nf-bottles__sub">{{ section.settings.subheading | escape }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="nf-bottles__grid">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign color_slug = block.settings.color_slug
+        assign card_variant = ''
+        assign panel_url = block.settings.link
+        assign panel_title = block.settings.title
+        assign panel_image = block.settings.image
+        assign panel_asset = ''
+        assign warp = ''
+        assign has_warp_video = false
+
+        if bottle_product != blank
+          for variant in bottle_product.variants
+            capture vslug_raw
+              render 'nf-color-slug', variant: variant
+            endcapture
+            assign vslug = vslug_raw | strip
+            if vslug == color_slug
+              assign card_variant = variant
+              break
+            endif
+          endfor
+        endif
+
+        if panel_url == blank and card_variant != blank and bottle_product != blank
+          assign panel_url = bottle_product.url | append: '?variant=' | append: card_variant.id
+        elsif panel_url == blank and bottle_product != blank
+          assign panel_url = bottle_product.url
+        endif
+
+        if panel_title == blank and card_variant != blank
+          assign panel_title = card_variant.title
+        endif
+
+        if panel_image == blank and card_variant != blank
+          assign warp = card_variant.metafields.custom.warp_media.value
+          if warp == blank and bottle_product != blank
+            assign warp = bottle_product.metafields.custom.warp_media.value
+          endif
+          if warp != blank
+            if warp.media_type == 'video'
+              assign has_warp_video = true
+            else
+              assign panel_image = warp
+            endif
+          endif
+        endif
+
+        if panel_image == blank and has_warp_video == false and bottle_product != blank and color_slug != blank
+          assign slug_needle = color_slug | downcase | replace: '-', ' '
+          for media in bottle_product.media
+            if media.media_type == 'image'
+              assign alt_lc = media.alt | downcase
+              if alt_lc contains color_slug or alt_lc contains slug_needle
+                assign panel_image = media
+                break
+              endif
+            endif
+          endfor
+        endif
+
+        if panel_image == blank and has_warp_video == false and card_variant != blank
+          if card_variant.featured_media != blank
+            assign panel_image = card_variant.featured_media
+          elsif card_variant.image != blank
+            assign panel_image = card_variant.image
+          endif
+        endif
+
+        if panel_image == blank and has_warp_video == false and color_slug != blank
+          assign panel_asset = 'fizz-bottle-product-' | append: color_slug | append: '.png'
+        endif
+
+        assign cta_label = block.settings.cta_label | default: 'Shop this color'
+        assign cta_style = block.settings.button_style | default: 'outline'
+      -%}
+      <article class="nf-bottle" {{ block.shopify_attributes }}>
+        <a class="nf-bottle__media-link" {% if panel_url != blank %}href="{{ panel_url }}"{% endif %}>
+          <div class="nf-bottle__media" style="--bottle-tint: {{ block.settings.tint | default: '#e9e7df' }};">
+            {%- if has_warp_video -%}
+              {{ warp | video_tag: image_size: '1080x', autoplay: true, loop: true, muted: true, controls: false, playsinline: true, class: 'nf-bottle__img', preload: 'metadata' }}
+            {%- else -%}
+              {%- render 'nf-media',
+                image: panel_image,
+                asset: panel_asset,
+                alt: panel_title,
+                class: 'nf-bottle__img',
+                sizes: '(min-width: 750px) 33vw, 84vw'
+              -%}
+            {%- endif -%}
+          </div>
+        </a>
+        <div class="nf-bottle__info">
+          <h3 class="nf-bottle__title">{{ panel_title | default: 'Bottle color' | escape }}</h3>
+          {%- if block.settings.body != blank -%}
+            <div class="nf-bottle__body">{{ block.settings.body }}</div>
+          {%- endif -%}
+          <p class="nf-bottle__price">
+            {%- if card_variant != blank -%}
+              {{ card_variant.price | money }}
+            {%- elsif bottle_product != blank -%}
+              {{ bottle_product.price | money }}
+            {%- endif -%}
+          </p>
+          <div class="nf-bottle__actions">
+            {%- if panel_url != blank -%}
+              {% render 'nf-button',
+                label: cta_label,
+                url: panel_url,
+                style: cta_style
+              %}
+            {%- endif -%}
+          </div>
+        </div>
+      </article>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "NF Bottles",
+  "tag": "section",
+  "class": "nf-bottles-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Colorways"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Three bottles. Zero guesswork."
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Pick a finish. Fill it with sparkle."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "bottles"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Bottle product",
+      "info": "Falls back to Theme settings → Bottle product. Cards link with ?variant= for the matched color."
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "info": "Leave blank to use the theme paper color."
+    },
+    {
+      "type": "header",
+      "content": "Corners"
+    },
+    {
+      "type": "range",
+      "id": "media_radius",
+      "label": "Media corner radius",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "Button corner radius",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    }
+  ],
+  "blocks": [
+    {
+      "type": "colorway",
+      "name": "Colorway",
+      "settings": [
+        {
+          "type": "select",
+          "id": "color_slug",
+          "label": "Bottle color",
+          "options": [
+            { "value": "coral-orange", "label": "Coral Orange" },
+            { "value": "charcoal-black", "label": "Charcoal Black" },
+            { "value": "sage-green", "label": "Sage Green" },
+            { "value": "steel-navy", "label": "Steel Navy" },
+            { "value": "arctic-white", "label": "Arctic White" },
+            { "value": "electric-blue", "label": "Electric Blue" }
+          ],
+          "default": "steel-navy",
+          "info": "Links to the matching bottle variant via ?variant="
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title override"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Description"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image override",
+          "info": "Otherwise uses warp media, gallery alt match, then variant media."
+        },
+        {
+          "type": "color",
+          "id": "tint",
+          "label": "Panel tint",
+          "default": "#e9e7df"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link override"
+        },
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "Button label",
+          "default": "Shop this color"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            { "value": "fill", "label": "Fill" },
+            { "value": "outline", "label": "Outline" },
+            { "value": "link", "label": "Linked text underline" }
+          ],
+          "default": "outline"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "NF Bottles",
+      "blocks": [
+        {
+          "type": "colorway",
+          "settings": {
+            "color_slug": "steel-navy",
+            "title": "Steel Navy",
+            "body": "<p>Cool depth for everyday sparkle.</p>",
+            "tint": "#d4dce6"
+          }
+        },
+        {
+          "type": "colorway",
+          "settings": {
+            "color_slug": "coral-orange",
+            "title": "Coral Orange",
+            "body": "<p>Bright citrus energy in hand.</p>",
+            "tint": "#f4ddc4"
+          }
+        },
+        {
+          "type": "colorway",
+          "settings": {
+            "color_slug": "electric-blue",
+            "title": "Electric Blue",
+            "body": "<p>Poolside pop, cold and bold.</p>",
+            "tint": "#d0e0f0"
+          }
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index", "page", "collection", "product"]
+  }
+}
+{% endschema %}

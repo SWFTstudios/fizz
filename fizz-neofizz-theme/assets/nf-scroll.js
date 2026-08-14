@@ -70,8 +70,28 @@
     this.steps = Array.prototype.slice.call(section.querySelectorAll('[data-nf-how-step]'));
     this.counter = section.querySelector('[data-nf-how-counter]');
     this.active = -1;
+    this.lockUntil = 0;
+    this.lockedIndex = 0;
+    this.onTriggerClick = this.onTriggerClick.bind(this);
+    this.bindTriggers();
     this.setActive(0);
   }
+
+  HowController.prototype.bindTriggers = function () {
+    var self = this;
+    this.steps.forEach(function (step, i) {
+      var trigger = step.querySelector('[data-nf-how-goto]');
+      if (!trigger) return;
+      trigger.setAttribute('data-nf-how-index', String(i));
+      trigger.addEventListener('click', self.onTriggerClick);
+    });
+  };
+
+  HowController.prototype.onTriggerClick = function (event) {
+    var trigger = event.currentTarget;
+    var index = parseInt(trigger.getAttribute('data-nf-how-index') || '0', 10);
+    this.goTo(index);
+  };
 
   HowController.prototype.setActive = function (index) {
     index = clamp(index, 0, Math.max(this.layers.length - 1, 0));
@@ -83,11 +103,40 @@
       layer.classList.toggle('is-prev', i === prev && prev < index);
     });
     this.steps.forEach(function (step, i) {
-      step.classList.toggle('is-active', i === index);
+      var isActive = i === index;
+      step.classList.toggle('is-active', isActive);
+      var trigger = step.querySelector('[data-nf-how-goto]');
+      if (trigger) trigger.setAttribute('aria-current', isActive ? 'true' : 'false');
     });
     if (this.counter) {
       this.counter.textContent = String(index + 1).padStart(2, '0') + ' / ' + String(this.layers.length).padStart(2, '0');
     }
+  };
+
+  HowController.prototype.goTo = function (index) {
+    index = clamp(index, 0, Math.max(this.layers.length - 1, 0));
+    this.setActive(index);
+
+    if (motionOff) {
+      var step = this.steps[index];
+      if (step && typeof step.scrollIntoView === 'function') {
+        step.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
+      }
+      return;
+    }
+
+    if (!this.track || !this.layers.length) return;
+
+    var total = this.track.offsetHeight - window.innerHeight;
+    if (total <= 0) return;
+
+    var progress = (index + 0.5) / this.layers.length;
+    var trackTop = this.track.getBoundingClientRect().top + window.pageYOffset;
+    var targetY = trackTop + progress * total;
+
+    this.lockedIndex = index;
+    this.lockUntil = performance.now() + 900;
+    window.scrollTo({ top: targetY, behavior: reduced ? 'auto' : 'smooth' });
   };
 
   HowController.prototype.update = function () {
@@ -95,11 +144,22 @@
     var p = trackProgress(this.track);
     this.section.style.setProperty('--how-progress', p.toFixed(4));
     if (motionOff) return;
+    if (this.lockUntil && performance.now() < this.lockUntil) {
+      this.setActive(this.lockedIndex);
+      return;
+    }
+    this.lockUntil = 0;
     var index = Math.min(this.layers.length - 1, Math.floor(p * this.layers.length));
     this.setActive(index);
   };
 
-  HowController.prototype.destroy = function () {};
+  HowController.prototype.destroy = function () {
+    var self = this;
+    this.steps.forEach(function (step) {
+      var trigger = step.querySelector('[data-nf-how-goto]');
+      if (trigger) trigger.removeEventListener('click', self.onTriggerClick);
+    });
+  };
 
   var controllers = [];
 
@@ -161,7 +221,7 @@
       if (!ctrl.section.contains(block)) return;
       if (ctrl instanceof HowController) {
         var idx = ctrl.steps.indexOf(block.closest('[data-nf-how-step]'));
-        if (idx >= 0) ctrl.setActive(idx);
+        if (idx >= 0) ctrl.goTo(idx);
       }
     });
   });

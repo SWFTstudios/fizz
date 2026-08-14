@@ -1,11 +1,14 @@
 {{ 'bf-feature-tabs.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign section_height = section.settings.section_height | default: 100
+-%}
 <section
   class="bf-section bf-tabs"
   id="{{ section.settings.anchor_id | default: 'how' | handle }}"
   data-bf-tabs
   data-autoplay="{{ section.settings.autoplay_seconds | default: 5 }}"
   data-autoplay-enabled="{% if section.settings.autoplay %}true{% else %}false{% endif %}"
-  style="--bf-tabs-outline: {{ section.settings.active_outline | default: '#6b9fd4' }};"
+  style="--bf-tabs-outline: {{ section.settings.active_outline | default: '#6b9fd4' }}; --bf-tabs-height: {{ section_height }}dvh;"
 >
   {% render 'bf-section-chrome', section: section %}
 
@@ -112,28 +115,270 @@
       "default": "#6b9fd4"
     },
     {
+      "type": "range",
+      "id": "section_height",
+      "label": "Section height",
+      "info": "Viewport height (dvh). Use 100 so the next section (Parallax reveal) enters after one full scroll.",
+      "min": 60,
+      "max": 120,
+      "step": 5,
+      "unit": "vh",
+      "default": 100
+    },
+    {
       "type": "header",
-      "content": "Section chrome \u2014 spacing"
+      "content": "Section chrome — spacing"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_theme_spacing",
+      "label": "Use global padding",
+      "info": "Uses Theme settings → Layout for desktop and mobile padding. Turn off to set unique padding below.",
+      "default": false
     },
     {
       "type": "range",
       "id": "padding_top",
-      "label": "Padding top",
+      "label": "Padding top (desktop)",
       "min": 0,
       "max": 200,
       "step": 4,
       "unit": "px",
-      "default": 0
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
     },
     {
       "type": "range",
       "id": "padding_bottom",
-      "label": "Padding bottom",
+      "label": "Padding bottom (desktop)",
       "min": 0,
       "max": 200,
       "step": 4,
       "unit": "px",
-      "default": 0
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "select",
+      "id": "padding_x",
+      "label": "Horizontal padding (desktop)",
+      "info": "Side inset at 750px+. Full width = edge to edge.",
+      "options": [
+        {
+          "value": "16px",
+          "label": "16px",
+          "group": "Pixels"
+        },
+        {
+          "value": "20px",
+          "label": "20px",
+          "group": "Pixels"
+        },
+        {
+          "value": "24px",
+          "label": "24px",
+          "group": "Pixels"
+        },
+        {
+          "value": "32px",
+          "label": "32px",
+          "group": "Pixels"
+        },
+        {
+          "value": "40px",
+          "label": "40px",
+          "group": "Pixels"
+        },
+        {
+          "value": "48px",
+          "label": "48px",
+          "group": "Pixels"
+        },
+        {
+          "value": "64px",
+          "label": "64px",
+          "group": "Pixels"
+        },
+        {
+          "value": "1rem",
+          "label": "1rem",
+          "group": "Rem"
+        },
+        {
+          "value": "1.5rem",
+          "label": "1.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2rem",
+          "label": "2rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2.5rem",
+          "label": "2.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "3rem",
+          "label": "3rem",
+          "group": "Rem"
+        },
+        {
+          "value": "4%",
+          "label": "4%",
+          "group": "Percent"
+        },
+        {
+          "value": "5%",
+          "label": "5%",
+          "group": "Percent"
+        },
+        {
+          "value": "6%",
+          "label": "6%",
+          "group": "Percent"
+        },
+        {
+          "value": "8%",
+          "label": "8%",
+          "group": "Percent"
+        },
+        {
+          "value": "10%",
+          "label": "10%",
+          "group": "Percent"
+        },
+        {
+          "value": "0",
+          "label": "Full width",
+          "group": "Full width"
+        }
+      ],
+      "default": "0",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "select",
+      "id": "padding_x_mobile",
+      "label": "Horizontal padding (mobile)",
+      "info": "Side inset below 750px. Full width = edge to edge.",
+      "options": [
+        {
+          "value": "16px",
+          "label": "16px",
+          "group": "Pixels"
+        },
+        {
+          "value": "20px",
+          "label": "20px",
+          "group": "Pixels"
+        },
+        {
+          "value": "24px",
+          "label": "24px",
+          "group": "Pixels"
+        },
+        {
+          "value": "32px",
+          "label": "32px",
+          "group": "Pixels"
+        },
+        {
+          "value": "40px",
+          "label": "40px",
+          "group": "Pixels"
+        },
+        {
+          "value": "48px",
+          "label": "48px",
+          "group": "Pixels"
+        },
+        {
+          "value": "64px",
+          "label": "64px",
+          "group": "Pixels"
+        },
+        {
+          "value": "1rem",
+          "label": "1rem",
+          "group": "Rem"
+        },
+        {
+          "value": "1.5rem",
+          "label": "1.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2rem",
+          "label": "2rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2.5rem",
+          "label": "2.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "3rem",
+          "label": "3rem",
+          "group": "Rem"
+        },
+        {
+          "value": "4%",
+          "label": "4%",
+          "group": "Percent"
+        },
+        {
+          "value": "5%",
+          "label": "5%",
+          "group": "Percent"
+        },
+        {
+          "value": "6%",
+          "label": "6%",
+          "group": "Percent"
+        },
+        {
+          "value": "8%",
+          "label": "8%",
+          "group": "Percent"
+        },
+        {
+          "value": "10%",
+          "label": "10%",
+          "group": "Percent"
+        },
+        {
+          "value": "0",
+          "label": "Full width",
+          "group": "Full width"
+        }
+      ],
+      "default": "0",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
     },
     {
       "type": "range",
@@ -157,7 +402,7 @@
     },
     {
       "type": "header",
-      "content": "Section chrome \u2014 typography"
+      "content": "Section chrome — typography"
     },
     {
       "type": "range",
@@ -249,7 +494,7 @@
     },
     {
       "type": "header",
-      "content": "Section chrome \u2014 background"
+      "content": "Section chrome — background"
     },
     {
       "type": "color",

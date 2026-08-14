@@ -4,7 +4,7 @@
   position: relative;
   isolation: isolate;
   padding-block: var(--bf-pad-top, 80px) var(--bf-pad-bottom, 80px);
-  padding-inline: var(--bf-page-pad-x, max(var(--nf-gutter, 16px), 5%));
+  padding-inline: var(--bf-pad-x, var(--bf-page-pad-x, max(var(--nf-gutter, 16px), 5%)));
   color: var(--bf-body-color, #3a423e);
   background-color: var(--bf-bg-color, #f7f5f0);
   overflow: hidden;

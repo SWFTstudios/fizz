@@ -1,0 +1,313 @@
+/* NF Horizontal Benefits — Webflow-style vertical→horizontal scrub */
+
+.nf-hbenefits {
+  --nf-hben-w: 420px;
+  --nf-hben-gap: 24px;
+  --nf-hben-radius: 20px;
+  --nf-hben-ratio: 3 / 4;
+  --nf-hben-overlay: 0.45;
+  --nf-hben-eyebrow: #8a948c;
+  --nf-hben-heading: #0e1412;
+  --nf-hben-lead: #3a423e;
+  --nf-hben-card-title: #ffffff;
+  --nf-hben-card-body: rgba(255, 255, 255, 0.88);
+  --nf-hben-pad-top: var(--bf-pad-top, 0px);
+  --nf-hben-pad-bottom: var(--bf-pad-bottom, 0px);
+  --nf-hben-bg-opacity: 1;
+  --nf-hben-pad-x: var(--bf-pad-x, var(--bf-page-pad-x, var(--nf-gutter, 1.25rem)));
+  position: relative;
+  z-index: 1;
+  color: var(--nf-hben-heading);
+}
+
+.nf-hbenefits__track {
+  position: relative;
+  width: 100%;
+}
+
+.nf-hbenefits__sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding-top: var(--nf-hben-pad-top);
+  padding-bottom: var(--nf-hben-pad-bottom);
+  overflow: hidden;
+}
+
+.nf-hbenefits__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.nf-hbenefits__bg-image,
+.nf-hbenefits__bg-video {
+  position: absolute;
+  inset: 0;
+  opacity: var(--nf-hben-bg-opacity, 1);
+}
+
+.nf-hbenefits__bg-video {
+  z-index: 1;
+}
+
+.nf-hbenefits__bg-media,
+.nf-hbenefits__bg-video .nf-media--embed,
+.nf-hbenefits__bg-video iframe,
+.nf-hbenefits__bg-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border: 0;
+}
+
+.nf-hbenefits__head {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  padding-inline: var(--nf-hben-pad-x);
+  padding-block: clamp(1rem, 2.5vh, 1.75rem) clamp(0.75rem, 1.5vh, 1.25rem);
+  max-width: var(--nf-page-width, 1120px);
+  margin-inline: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.nf-hbenefits__eyebrow {
+  color: var(--nf-hben-eyebrow);
+  margin: 0 0 0.35rem;
+}
+
+.nf-hbenefits__heading {
+  color: var(--nf-hben-heading);
+  margin: 0;
+}
+
+.nf-hbenefits__lead {
+  color: var(--nf-hben-lead);
+  margin: 0.5rem 0 0;
+  max-width: 36rem;
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+  line-height: 1.45;
+}
+
+.nf-hbenefits__viewport {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding-inline: var(--nf-hben-pad-x);
+  box-sizing: border-box;
+}
+
+.nf-hbenefits__rail {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--nf-hben-gap);
+  width: max-content;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+.nf-hbenefits__card {
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--nf-hben-w);
+  aspect-ratio: var(--nf-hben-ratio);
+  border-radius: var(--nf-hben-radius);
+  overflow: hidden;
+  isolation: isolate;
+  background: #1a221e;
+}
+
+.nf-hbenefits__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.nf-hbenefits__img,
+.nf-hbenefits__placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.nf-hbenefits__placeholder {
+  background:
+    linear-gradient(145deg, #2a3530 0%, #1a221e 48%, #0f1512 100%);
+}
+
+.nf-hbenefits__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 12, 10, 0.12) 0%,
+    rgba(8, 12, 10, calc(var(--nf-hben-overlay) * 0.55)) 42%,
+    rgba(8, 12, 10, var(--nf-hben-overlay)) 100%
+  );
+  pointer-events: none;
+}
+
+.nf-hbenefits__copy {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0 0;
+  padding: clamp(1rem, 2.2vw, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.nf-hbenefits__card--bottom-center .nf-hbenefits__copy {
+  align-items: center;
+  text-align: center;
+}
+
+.nf-hbenefits__card--center .nf-hbenefits__copy {
+  inset: 0;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.nf-hbenefits__title {
+  margin: 0;
+  color: var(--nf-hben-card-title);
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.nf-hbenefits__body {
+  margin: 0;
+  color: var(--nf-hben-card-body);
+  font-size: clamp(0.9rem, 1.3vw, 1.05rem);
+  line-height: 1.4;
+  max-width: 28ch;
+}
+
+.nf-hbenefits__card--bottom-center .nf-hbenefits__body,
+.nf-hbenefits__card--center .nf-hbenefits__body {
+  max-width: 32ch;
+}
+
+.nf-hbenefits__cta {
+  margin-top: 0.35rem;
+  color: var(--nf-hben-card-title);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  width: fit-content;
+}
+
+.nf-hbenefits__card--bottom-center .nf-hbenefits__cta,
+.nf-hbenefits__card--center .nf-hbenefits__cta {
+  margin-inline: auto;
+}
+
+/* Desktop active scrub state (set by JS) */
+.nf-hbenefits.is-scrubbing .nf-hbenefits__rail {
+  transition: none;
+}
+
+/* Mobile / reduced motion: stack vertically, no pin */
+@media (max-width: 749px) {
+  .nf-hbenefits__track {
+    height: auto !important;
+  }
+
+  .nf-hbenefits__sticky {
+    position: relative;
+    top: auto;
+    height: auto;
+    overflow: visible;
+  }
+
+  .nf-hbenefits__viewport {
+    overflow: visible;
+    padding-bottom: 1.5rem;
+  }
+
+  .nf-hbenefits__rail {
+    flex-direction: column;
+    width: 100%;
+    transform: none !important;
+    gap: calc(var(--nf-hben-gap) * 0.85);
+  }
+
+  .nf-hbenefits__card {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+html.nf-no-motion .nf-hbenefits__track,
+.nf-hbenefits.is-reduced .nf-hbenefits__track {
+  height: auto !important;
+}
+
+html.nf-no-motion .nf-hbenefits__sticky,
+.nf-hbenefits.is-reduced .nf-hbenefits__sticky {
+  position: relative;
+  top: auto;
+  height: auto;
+  overflow: visible;
+}
+
+html.nf-no-motion .nf-hbenefits__viewport,
+.nf-hbenefits.is-reduced .nf-hbenefits__viewport {
+  overflow: visible;
+}
+
+html.nf-no-motion .nf-hbenefits__rail,
+.nf-hbenefits.is-reduced .nf-hbenefits__rail {
+  flex-wrap: wrap;
+  width: 100%;
+  transform: none !important;
+}
+
+@media (min-width: 750px) {
+  html.nf-no-motion .nf-hbenefits__rail,
+  .nf-hbenefits.is-reduced .nf-hbenefits__rail {
+    flex-direction: row;
+  }
+
+  html.nf-no-motion .nf-hbenefits__card,
+  .nf-hbenefits.is-reduced .nf-hbenefits__card {
+    width: min(var(--nf-hben-w), calc(50% - var(--nf-hben-gap) / 2));
+  }
+}
+
+html:not(.nf-js) .nf-hbenefits__track {
+  height: auto !important;
+}
+
+html:not(.nf-js) .nf-hbenefits__sticky {
+  position: relative;
+  height: auto;
+  overflow: visible;
+}
+
+html:not(.nf-js) .nf-hbenefits__rail {
+  flex-wrap: wrap;
+  width: 100%;
+}

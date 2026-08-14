@@ -530,10 +530,10 @@
 .nf-marquee.is-static .nf-marquee__track {
   animation: none !important;
   transform: none !important;
-  flex-wrap: wrap;
-  width: auto;
-  max-width: 100%;
-  justify-content: center;
+  flex-wrap: nowrap;
+  width: max-content;
+  max-width: none;
+  justify-content: flex-start;
 }
 
 .nf-story-section {

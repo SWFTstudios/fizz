@@ -1,0 +1,402 @@
+{% render 'fizz-section-spacing', section: section %}
+
+{{ 'fizz-key-features.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign frame_count = 121
+  assign last_frame = frame_count | minus: 1
+  assign poster = section.settings.poster_frame | default: 0
+  if poster < 0
+    assign poster = 0
+  endif
+  if poster > last_frame
+    assign poster = last_frame
+  endif
+  assign poster_pad = poster | prepend: '000' | slice: -3, 3
+  assign poster_file = 'fizz-kf-seq-' | append: poster_pad | append: '.webp'
+  assign layout = section.settings.layout | default: 'right'
+  assign glass_tint = section.settings.glass_tint | default: '#ffffff'
+  assign scroll_vh = section.settings.scroll_track_vh | default: 360
+  assign feature_count = section.blocks.size | at_least: 1
+  assign base_override = section.settings.sequence_base_url | strip
+  if base_override != blank
+    unless base_override contains '/'
+      assign base_override = base_override | append: '/'
+    endunless
+    assign base_last = base_override | slice: -1, 1
+    if base_last != '/'
+      assign base_override = base_override | append: '/'
+    endif
+  endif
+%}
+
+{% capture frame_manifest %}
+[
+{%- for i in (0..49) -%}
+  {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
+  {%- if base_override != blank -%}
+    {%- assign frame_url = base_override | append: 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+  {%- else -%}
+    {%- assign fname = 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+    {%- assign frame_url = fname | asset_url -%}
+  {%- endif -%}
+  {{ frame_url | json }},
+{%- endfor -%}
+{%- for i in (50..99) -%}
+  {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
+  {%- if base_override != blank -%}
+    {%- assign frame_url = base_override | append: 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+  {%- else -%}
+    {%- assign fname = 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+    {%- assign frame_url = fname | asset_url -%}
+  {%- endif -%}
+  {{ frame_url | json }},
+{%- endfor -%}
+{%- for i in (100..120) -%}
+  {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
+  {%- if base_override != blank -%}
+    {%- assign frame_url = base_override | append: 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+  {%- else -%}
+    {%- assign fname = 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+    {%- assign frame_url = fname | asset_url -%}
+  {%- endif -%}
+  {{ frame_url | json }}{%- unless forloop.last -%},{%- endunless -%}
+{%- endfor -%}
+]
+{% endcapture %}
+
+<section
+  class="fizz-key-features fizz-key-features--cards-{{ layout }}"
+  id="{{ section.settings.anchor_id | default: 'features' | handle }}"
+  data-fizz-key-features
+  data-frame-count="{{ frame_count }}"
+  data-feature-count="{{ feature_count }}"
+  data-poster-frame="{{ poster }}"
+  style="
+    --fkf-scroll-vh: {{ scroll_vh }};
+    --fkf-glass-tint: {{ glass_tint }};
+    --fkf-features: {{ feature_count }};
+  "
+>
+  <div class="fizz-key-features__track" data-fkf-track style="height: {{ scroll_vh }}vh;">
+    <div class="fizz-key-features__sticky" data-fkf-sticky>
+      <header class="fizz-key-features__head">
+        {% if section.settings.eyebrow != blank %}
+          <p class="fizz-key-features__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {% endif %}
+        {% if section.settings.heading != blank %}
+          <h2 class="fizz-key-features__heading">{{ section.settings.heading | escape }}</h2>
+        {% endif %}
+        {% if section.settings.subheading != blank %}
+          <p class="fizz-key-features__sub">{{ section.settings.subheading | escape }}</p>
+        {% endif %}
+      </header>
+
+      <div class="fizz-key-features__shell">
+        <div class="fizz-key-features__stage" data-fkf-stage aria-hidden="true">
+          <canvas class="fizz-key-features__canvas" data-fkf-canvas width="1080" height="1080"></canvas>
+          <img
+            class="fizz-key-features__poster"
+            data-fkf-poster
+            src="{% if base_override != blank %}{{ base_override }}fizz-kf-seq-{{ poster_pad }}.webp{% else %}{{ poster_file | asset_url }}{% endif %}"
+            alt=""
+            width="1080"
+            height="1080"
+            decoding="async"
+          >
+        </div>
+
+        <div class="fizz-key-features__rail" data-fkf-rail role="list">
+          {% for block in section.blocks %}
+            {% liquid
+              assign fs = block.settings.frame_start
+              assign fe = block.settings.frame_end
+              if fs == blank or fe == blank
+                assign slice = last_frame | plus: 1 | divided_by: feature_count
+                assign fs = forloop.index0 | times: slice
+                if forloop.last
+                  assign fe = last_frame
+                else
+                  assign fe = forloop.index | times: slice | minus: 1
+                endif
+              endif
+            %}
+            <article
+              class="fizz-key-features__card{% if forloop.first %} is-active{% endif %}"
+              data-fkf-card
+              data-index="{{ forloop.index0 }}"
+              data-frame-start="{{ fs }}"
+              data-frame-end="{{ fe }}"
+              role="listitem"
+              {{ block.shopify_attributes }}
+            >
+              <div class="fizz-key-features__card-top">
+                {% if block.settings.tag != blank %}
+                  <span class="fizz-key-features__tag">{{ block.settings.tag | escape }}</span>
+                {% endif %}
+                <span class="fizz-key-features__num" aria-hidden="true">
+                  {{ forloop.index | prepend: '0' | slice: -2, 2 }}
+                </span>
+              </div>
+              {% if block.settings.title != blank %}
+                <h3 class="fizz-key-features__title">{{ block.settings.title | escape }}</h3>
+              {% endif %}
+              {% if block.settings.body != blank %}
+                <div class="fizz-key-features__body">{{ block.settings.body }}</div>
+              {% endif %}
+              {% if block.settings.button_label != blank and block.settings.button_link != blank %}
+                <a class="fizz-key-features__cta" href="{{ block.settings.button_link }}">
+                  {{ block.settings.button_label | escape }}
+                </a>
+              {% endif %}
+            </article>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="application/json" data-fkf-frames>
+    {{ frame_manifest | strip }}
+  </script>
+</section>
+
+<script src="{{ 'fizz-key-features.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Fizz Key Features",
+  "tag": "section",
+  "class": "fizz-key-features-section fizz-section--spaced fizz-section--flush",
+  "settings": [
+    { "type": "header", "content": "Section spacing" },
+    {
+      "type": "select",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "options": [
+        { "value": "flush", "label": "None" },
+        { "value": "compact", "label": "Compact" },
+        { "value": "default", "label": "Default" },
+        { "value": "relaxed", "label": "Relaxed" },
+        { "value": "statement", "label": "Statement" },
+        { "value": "hero", "label": "Hero band" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "flush"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top (custom)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom (custom)",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "full", "label": "Full width" },
+        { "value": "none", "label": "None" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding left (custom)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding right (custom)",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#0e1412"
+    },
+    { "type": "header", "content": "Content" },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Key features"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Built for the sip"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Scroll to assemble the bottle and explore what makes Fizz different."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "default": "features"
+    },
+    { "type": "header", "content": "Scroll & layout" },
+    {
+      "type": "range",
+      "id": "scroll_track_vh",
+      "min": 200,
+      "max": 600,
+      "step": 20,
+      "unit": "vh",
+      "label": "Scroll runway height",
+      "default": 360,
+      "info": "Taller = slower scrub through the sequence."
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Desktop cards rail",
+      "options": [
+        { "value": "right", "label": "Right" },
+        { "value": "left", "label": "Left" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "number",
+      "id": "poster_frame",
+      "label": "Poster frame (reduced motion)",
+      "default": 0,
+      "info": "Frame index 0–120 shown when reduced motion is preferred."
+    },
+    {
+      "type": "color",
+      "id": "glass_tint",
+      "label": "Glass tint",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "sequence_base_url",
+      "label": "Sequence base URL (optional)",
+      "info": "Leave blank to use theme assets. For Shopify Files, paste the CDN folder prefix ending with / so frames resolve as {prefix}fizz-kf-seq-000.webp."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Tag",
+          "default": "Design"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Customizable colorways"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Body",
+          "default": "<p>Pick a finish that matches your kit and let the bottle do the talking.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "number",
+          "id": "frame_start",
+          "label": "Frame start (0–120)",
+          "info": "Leave blank to auto-split the sequence across features."
+        },
+        {
+          "type": "number",
+          "id": "frame_end",
+          "label": "Frame end (0–120)",
+          "info": "Leave blank to auto-split the sequence across features."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Fizz Key Features",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "tag": "Finish",
+            "title": "Customizable colorways",
+            "body": "<p>Match your bottle to your vibe with finishes built for everyday carry.</p>"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "tag": "Seal",
+            "title": "Leak-ready lid",
+            "body": "<p>A secure seal that keeps the sip where it belongs — in the bottle.</p>"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "tag": "Build",
+            "title": "Assembled for the day",
+            "body": "<p>From parts to packed — a bottle system that comes together as you scroll.</p>"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "tag": "Carry",
+            "title": "Ready when you are",
+            "body": "<p>Designed to look sharp on the shelf and travel easy in your bag.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

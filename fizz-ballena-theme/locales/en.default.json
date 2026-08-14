@@ -42,7 +42,11 @@
       "quantity_decrease": "Decrease quantity",
       "quantity_increase": "Increase quantity",
       "view_details": "View details",
-      "media_label": "Media {{ index }}"
+      "media_label": "Media {{ index }}",
+      "zoom": "Zoom image {{ index }}",
+      "lightbox": "Product image gallery",
+      "slide_of": "{{ current }} / {{ total }}",
+      "description": "Description"
     }
   },
   "collections": {

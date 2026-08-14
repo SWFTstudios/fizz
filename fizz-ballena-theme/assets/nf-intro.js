@@ -40,7 +40,7 @@
     this.copy = section.querySelector('[data-nf-intro-copy]');
     this.hint = section.querySelector('[data-nf-intro-hint]');
     this.copyParts = section.querySelectorAll(
-      '.nf-intro__hero-eyebrow, .nf-intro__hero-heading, .nf-intro__hero-sub, .nf-intro__hero-cta'
+      '[data-nf-intro-copy] .nf-intro__hero-eyebrow, [data-nf-intro-copy] .nf-intro__hero-heading, [data-nf-intro-copy] .nf-intro__hero-sub, [data-nf-intro-copy] .nf-intro__hero-cta'
     );
     this.slides = Array.prototype.slice.call(section.querySelectorAll('[data-nf-intro-slide]'));
     this.thumbs = Array.prototype.slice.call(section.querySelectorAll('[data-nf-intro-thumb]'));
@@ -70,6 +70,8 @@
         self.restartAutoplay();
       });
     });
+
+    this.setSlide(0);
 
     if (this.loaderEnabled) {
       this.runLoader(function () {
@@ -181,11 +183,16 @@
     if (!this.slides.length) return;
     this.active = ((index % this.slides.length) + this.slides.length) % this.slides.length;
     var active = this.active;
+    var hasSlideCopy = false;
     this.slides.forEach(function (slide, i) {
-      slide.classList.toggle('is-active', i === active);
+      var isActive = i === active;
+      slide.classList.toggle('is-active', isActive);
+      if (isActive && slide.getAttribute('data-has-slide-copy') === 'true') {
+        hasSlideCopy = true;
+      }
       var video = slide.querySelector('video');
       if (video) {
-        if (i === active) {
+        if (isActive) {
           var p = video.play();
           if (p && p.catch) p.catch(function () {});
         } else {
@@ -193,6 +200,7 @@
         }
       }
     });
+    this.section.classList.toggle('has-slide-copy-active', hasSlideCopy);
     this.thumbs.forEach(function (thumb, i) {
       thumb.classList.toggle('is-active', i === active);
     });

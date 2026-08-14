@@ -48,7 +48,7 @@ Liquid **cannot** include `{% schema %}` from snippets. Pattern:
 2. `assets/bf-section-chrome.css` — layout for chrome layers
 3. Duplicate the canonical settings JSON (see `design/BF-SECTION-CHROME-SCHEMA.json`) into each Ballena content section
 
-## Global horizontal padding (2026-08-06)
+## Global horizontal padding (2026-08-12)
 
 See [`design/GLOBAL-HORIZONTAL-PADDING.md`](GLOBAL-HORIZONTAL-PADDING.md).
 
@@ -57,8 +57,9 @@ See [`design/GLOBAL-HORIZONTAL-PADDING.md`](GLOBAL-HORIZONTAL-PADDING.md).
 | Theme settings / `settings_schema.json` | https://shopify.dev/docs/storefronts/themes/architecture/config/settings-schema-json |
 | `select` string values + `group` | https://shopify.dev/docs/storefronts/themes/architecture/settings/input-settings |
 | Liquid `settings` | https://shopify.dev/docs/api/liquid/objects/settings |
+| Section `visible_if` | https://shopify.dev/docs/storefronts/themes/architecture/settings |
 
-**Storefront:** `--bf-page-pad-x` from Theme settings → Layout → Horizontal padding. BF sections use it for `padding-inline`; content max-width follows `--nf-page-width`. Full-bleed sections (Feature Tabs) override in CSS.
+**Storefront:** `--bf-page-pad-x` switches between mobile/desktop at 750px. BF chrome sections follow theme vertical pad when `use_theme_spacing` is on. Feature Tabs uses the same chrome + pad system (no forced full-bleed).
 
 ## Limitations
 

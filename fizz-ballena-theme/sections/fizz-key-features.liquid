@@ -1,4 +1,5 @@
 {{ 'fizz-key-features.css' | asset_url | stylesheet_tag }}
+{% render 'bf-section-padding', section: section %}
 
 {% liquid
   assign frame_count = 121
@@ -11,7 +12,8 @@
     assign poster = last_frame
   endif
   assign poster_pad = poster | prepend: '000' | slice: -3, 3
-  assign poster_file = 'fizz-kf-seq-' | append: poster_pad | append: '.webp'
+  assign poster_file_mobile = 'fizz-kf-m-' | append: poster_pad | append: '.webp'
+  assign poster_file_desktop = 'fizz-kf-d-' | append: poster_pad | append: '.webp'
   assign layout = section.settings.layout | default: 'split'
   assign glass_tint = section.settings.glass_tint | default: '#ffffff'
   assign scroll_vh = section.settings.scroll_track_vh | default: 360
@@ -27,11 +29,41 @@
   assign cards_pad_y = section.settings.cards_padding_y | default: 24
   assign feature_count = section.blocks.size | at_least: 1
   assign base_override = section.settings.sequence_base_url | strip
+  assign base_override_mobile = section.settings.sequence_base_url_mobile | strip
+  assign base_override_desktop = section.settings.sequence_base_url_desktop | strip
   if base_override != blank
     assign base_last = base_override | slice: -1, 1
     if base_last != '/'
       assign base_override = base_override | append: '/'
     endif
+  endif
+  if base_override_mobile == blank and base_override != blank
+    assign base_override_mobile = base_override
+  endif
+  if base_override_desktop == blank and base_override != blank
+    assign base_override_desktop = base_override
+  endif
+  if base_override_mobile != blank
+    assign base_last = base_override_mobile | slice: -1, 1
+    if base_last != '/'
+      assign base_override_mobile = base_override_mobile | append: '/'
+    endif
+  endif
+  if base_override_desktop != blank
+    assign base_last = base_override_desktop | slice: -1, 1
+    if base_last != '/'
+      assign base_override_desktop = base_override_desktop | append: '/'
+    endif
+  endif
+  if base_override_mobile != blank
+    assign poster_url_mobile = base_override_mobile | append: 'fizz-kf-m-' | append: poster_pad | append: '.webp'
+  else
+    assign poster_url_mobile = poster_file_mobile | asset_url
+  endif
+  if base_override_desktop != blank
+    assign poster_url_desktop = base_override_desktop | append: 'fizz-kf-d-' | append: poster_pad | append: '.webp'
+  else
+    assign poster_url_desktop = poster_file_desktop | asset_url
   endif
 
   assign color_eyebrow = section.settings.color_eyebrow | default: '#1a1f1c'
@@ -41,49 +73,56 @@
   assign color_card_title = section.settings.color_card_title | default: '#0e1412'
   assign color_card_body = section.settings.color_card_body | default: '#3a423e'
 
-  assign vertical = section.settings.padding_vertical | default: 'flush'
-  case vertical
-    when 'flush'
-      assign pad_top = '0'
-      assign pad_bottom = '0'
-    when 'compact'
-      assign pad_top = '2rem'
-      assign pad_bottom = '2rem'
-    when 'default'
-      assign pad_top = '4rem'
-      assign pad_bottom = '4rem'
-    when 'relaxed'
-      assign pad_top = '6rem'
-      assign pad_bottom = '6rem'
-    when 'statement'
-      assign pad_top = '8rem'
-      assign pad_bottom = '8rem'
-    when 'hero'
-      assign pad_top = '0'
-      assign pad_bottom = '0'
-    when 'custom'
-      assign pad_top = section.settings.padding_top | default: 0 | append: 'px'
-      assign pad_bottom = section.settings.padding_bottom | default: 0 | append: 'px'
-    else
-      assign pad_top = '0'
-      assign pad_bottom = '0'
-  endcase
+  assign use_theme_spacing = section.settings.use_theme_spacing
+  if use_theme_spacing == nil
+    assign use_theme_spacing = false
+  endif
 
-  assign horizontal = section.settings.padding_horizontal | default: 'full'
-  case horizontal
-    when 'none'
-      assign pad_left = '0'
-      assign pad_right = '0'
-    when 'full'
-      assign pad_left = '0'
-      assign pad_right = '0'
-    when 'custom'
-      assign pad_left = section.settings.padding_left | default: 0 | append: 'px'
-      assign pad_right = section.settings.padding_right | default: 0 | append: 'px'
-    else
-      assign pad_left = 'clamp(1rem, 4vw, 2.5rem)'
-      assign pad_right = 'clamp(1rem, 4vw, 2.5rem)'
-  endcase
+  unless use_theme_spacing
+    assign vertical = section.settings.padding_vertical | default: 'flush'
+    case vertical
+      when 'flush'
+        assign pad_top = '0'
+        assign pad_bottom = '0'
+      when 'compact'
+        assign pad_top = '2rem'
+        assign pad_bottom = '2rem'
+      when 'default'
+        assign pad_top = '4rem'
+        assign pad_bottom = '4rem'
+      when 'relaxed'
+        assign pad_top = '6rem'
+        assign pad_bottom = '6rem'
+      when 'statement'
+        assign pad_top = '8rem'
+        assign pad_bottom = '8rem'
+      when 'hero'
+        assign pad_top = '0'
+        assign pad_bottom = '0'
+      when 'custom'
+        assign pad_top = section.settings.padding_top | default: 0 | append: 'px'
+        assign pad_bottom = section.settings.padding_bottom | default: 0 | append: 'px'
+      else
+        assign pad_top = '0'
+        assign pad_bottom = '0'
+    endcase
+
+    assign horizontal = section.settings.padding_horizontal | default: 'full'
+    case horizontal
+      when 'none'
+        assign pad_left = '0'
+        assign pad_right = '0'
+      when 'full'
+        assign pad_left = '0'
+        assign pad_right = '0'
+      when 'custom'
+        assign pad_left = section.settings.padding_left | default: 0 | append: 'px'
+        assign pad_right = section.settings.padding_right | default: 0 | append: 'px'
+      else
+        assign pad_left = 'clamp(1rem, 4vw, 2.5rem)'
+        assign pad_right = 'clamp(1rem, 4vw, 2.5rem)'
+    endcase
+  endunless
 
   assign bg_media_opacity = section.settings.background_media_opacity | default: 100 | times: 1.0 | divided_by: 100.0
   assign bg_blur = section.settings.background_blur | default: 0
@@ -99,10 +138,15 @@
 
 {% style %}
   #shopify-section-{{ section.id }} {
-    padding-top: {{ pad_top }};
-    padding-bottom: {{ pad_bottom }};
-    padding-left: {{ pad_left }};
-    padding-right: {{ pad_right }};
+    {%- if use_theme_spacing -%}
+      padding-block: var(--bf-pad-top) var(--bf-pad-bottom);
+      padding-inline: var(--bf-pad-x);
+    {%- else -%}
+      padding-top: {{ pad_top }};
+      padding-bottom: {{ pad_bottom }};
+      padding-left: {{ pad_left }};
+      padding-right: {{ pad_right }};
+    {%- endif -%}
     {%- if section.settings.background_color != blank -%}
     background-color: {{ section.settings.background_color }};
     {%- endif -%}
@@ -111,34 +155,69 @@
   }
 {% endstyle %}
 
-{% capture frame_manifest %}
+{% capture frame_manifest_mobile %}
 [
 {%- for i in (0..49) -%}
   {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
-  {%- if base_override != blank -%}
-    {%- assign frame_url = base_override | append: 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+  {%- if base_override_mobile != blank -%}
+    {%- assign frame_url = base_override_mobile | append: 'fizz-kf-m-' | append: pad | append: '.webp' -%}
   {%- else -%}
-    {%- assign fname = 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+    {%- assign fname = 'fizz-kf-m-' | append: pad | append: '.webp' -%}
     {%- assign frame_url = fname | asset_url -%}
   {%- endif -%}
   {{ frame_url | json }},
 {%- endfor -%}
 {%- for i in (50..99) -%}
   {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
-  {%- if base_override != blank -%}
-    {%- assign frame_url = base_override | append: 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+  {%- if base_override_mobile != blank -%}
+    {%- assign frame_url = base_override_mobile | append: 'fizz-kf-m-' | append: pad | append: '.webp' -%}
   {%- else -%}
-    {%- assign fname = 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+    {%- assign fname = 'fizz-kf-m-' | append: pad | append: '.webp' -%}
     {%- assign frame_url = fname | asset_url -%}
   {%- endif -%}
   {{ frame_url | json }},
 {%- endfor -%}
 {%- for i in (100..120) -%}
   {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
-  {%- if base_override != blank -%}
-    {%- assign frame_url = base_override | append: 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+  {%- if base_override_mobile != blank -%}
+    {%- assign frame_url = base_override_mobile | append: 'fizz-kf-m-' | append: pad | append: '.webp' -%}
   {%- else -%}
-    {%- assign fname = 'fizz-kf-seq-' | append: pad | append: '.webp' -%}
+    {%- assign fname = 'fizz-kf-m-' | append: pad | append: '.webp' -%}
+    {%- assign frame_url = fname | asset_url -%}
+  {%- endif -%}
+  {{ frame_url | json }}{%- unless forloop.last -%},{%- endunless -%}
+{%- endfor -%}
+]
+{% endcapture %}
+
+{% capture frame_manifest_desktop %}
+[
+{%- for i in (0..49) -%}
+  {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
+  {%- if base_override_desktop != blank -%}
+    {%- assign frame_url = base_override_desktop | append: 'fizz-kf-d-' | append: pad | append: '.webp' -%}
+  {%- else -%}
+    {%- assign fname = 'fizz-kf-d-' | append: pad | append: '.webp' -%}
+    {%- assign frame_url = fname | asset_url -%}
+  {%- endif -%}
+  {{ frame_url | json }},
+{%- endfor -%}
+{%- for i in (50..99) -%}
+  {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
+  {%- if base_override_desktop != blank -%}
+    {%- assign frame_url = base_override_desktop | append: 'fizz-kf-d-' | append: pad | append: '.webp' -%}
+  {%- else -%}
+    {%- assign fname = 'fizz-kf-d-' | append: pad | append: '.webp' -%}
+    {%- assign frame_url = fname | asset_url -%}
+  {%- endif -%}
+  {{ frame_url | json }},
+{%- endfor -%}
+{%- for i in (100..120) -%}
+  {%- assign pad = i | prepend: '000' | slice: -3, 3 -%}
+  {%- if base_override_desktop != blank -%}
+    {%- assign frame_url = base_override_desktop | append: 'fizz-kf-d-' | append: pad | append: '.webp' -%}
+  {%- else -%}
+    {%- assign fname = 'fizz-kf-d-' | append: pad | append: '.webp' -%}
     {%- assign frame_url = fname | asset_url -%}
   {%- endif -%}
   {{ frame_url | json }}{%- unless forloop.last -%},{%- endunless -%}
@@ -150,6 +229,7 @@
   class="fizz-key-features fizz-key-features--cards-{{ layout }}"
   id="{{ section.settings.anchor_id | default: 'features' | handle }}"
   data-fizz-key-features
+  data-fkf-mode="desktop"
   data-frame-count="{{ frame_count }}"
   data-feature-count="{{ feature_count }}"
   data-poster-frame="{{ poster }}"
@@ -158,6 +238,7 @@
     --fkf-media-h-desktop: {{ media_vh }}dvh;
     --fkf-media-h-mobile: {{ media_vh_mobile }}dvh;
     --fkf-media-h: {{ media_vh }}dvh;
+    --fkf-aspect: 1600 / 1280;
     --fkf-glass-tint: {{ glass_tint }};
     --fkf-features: {{ feature_count }};
     --fkf-cards-pad-x: {{ cards_pad_x }}px;
@@ -219,14 +300,16 @@
 
       <div class="fizz-key-features__shell">
         <div class="fizz-key-features__stage" data-fkf-stage>
-          <canvas class="fizz-key-features__canvas" data-fkf-canvas width="1080" height="1080" aria-hidden="true"></canvas>
+          <canvas class="fizz-key-features__canvas" data-fkf-canvas width="1600" height="1280" aria-hidden="true"></canvas>
           <img
             class="fizz-key-features__poster"
             data-fkf-poster
-            src="{% if base_override != blank %}{{ base_override }}fizz-kf-seq-{{ poster_pad }}.webp{% else %}{{ poster_file | asset_url }}{% endif %}"
+            data-poster-mobile="{{ poster_url_mobile | escape }}"
+            data-poster-desktop="{{ poster_url_desktop | escape }}"
+            src="{{ poster_url_desktop | escape }}"
             alt=""
-            width="1080"
-            height="1080"
+            width="1600"
+            height="1280"
             decoding="async"
           >
         </div>
@@ -323,8 +406,11 @@
     </div>
   </div>
 
-  <script type="application/json" data-fkf-frames>
-    {{ frame_manifest | strip }}
+  <script type="application/json" data-fkf-frames-mobile>
+    {{ frame_manifest_mobile | strip }}
+  </script>
+  <script type="application/json" data-fkf-frames-desktop>
+    {{ frame_manifest_desktop | strip }}
   </script>
 </section>
 
@@ -338,6 +424,13 @@
   "settings": [
     { "type": "header", "content": "Section spacing" },
     {
+      "type": "checkbox",
+      "id": "use_theme_spacing",
+      "label": "Use global padding",
+      "info": "Uses Theme settings → Layout for desktop and mobile padding. Turn off to use the spacing controls below.",
+      "default": false
+    },
+    {
       "type": "select",
       "id": "padding_vertical",
       "label": "Vertical padding",
@@ -350,7 +443,8 @@
         { "value": "hero", "label": "Hero band" },
         { "value": "custom", "label": "Custom" }
       ],
-      "default": "flush"
+      "default": "flush",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
     },
     {
       "type": "range",
@@ -360,7 +454,8 @@
       "step": 4,
       "unit": "px",
       "label": "Padding top (custom)",
-      "default": 0
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
     },
     {
       "type": "range",
@@ -370,7 +465,8 @@
       "step": 4,
       "unit": "px",
       "label": "Padding bottom (custom)",
-      "default": 0
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
     },
     {
       "type": "select",
@@ -382,7 +478,8 @@
         { "value": "none", "label": "None" },
         { "value": "custom", "label": "Custom" }
       ],
-      "default": "full"
+      "default": "full",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
     },
     {
       "type": "range",
@@ -392,7 +489,8 @@
       "step": 4,
       "unit": "px",
       "label": "Padding left (custom)",
-      "default": 0
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
     },
     {
       "type": "range",
@@ -402,7 +500,85 @@
       "step": 4,
       "unit": "px",
       "label": "Padding right (custom)",
-      "default": 0
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "select",
+      "id": "padding_x",
+      "label": "Horizontal padding (desktop)",
+      "info": "Used when Use global padding is on via the padding snippet overrides.",
+      "options": [
+        { "value": "16px", "label": "16px", "group": "Pixels" },
+        { "value": "20px", "label": "20px", "group": "Pixels" },
+        { "value": "24px", "label": "24px", "group": "Pixels" },
+        { "value": "32px", "label": "32px", "group": "Pixels" },
+        { "value": "40px", "label": "40px", "group": "Pixels" },
+        { "value": "48px", "label": "48px", "group": "Pixels" },
+        { "value": "64px", "label": "64px", "group": "Pixels" },
+        { "value": "1rem", "label": "1rem", "group": "Rem" },
+        { "value": "1.5rem", "label": "1.5rem", "group": "Rem" },
+        { "value": "2rem", "label": "2rem", "group": "Rem" },
+        { "value": "2.5rem", "label": "2.5rem", "group": "Rem" },
+        { "value": "3rem", "label": "3rem", "group": "Rem" },
+        { "value": "4%", "label": "4%", "group": "Percent" },
+        { "value": "5%", "label": "5%", "group": "Percent" },
+        { "value": "6%", "label": "6%", "group": "Percent" },
+        { "value": "8%", "label": "8%", "group": "Percent" },
+        { "value": "10%", "label": "10%", "group": "Percent" },
+        { "value": "0", "label": "Full width", "group": "Full width" }
+      ],
+      "default": "0",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "select",
+      "id": "padding_x_mobile",
+      "label": "Horizontal padding (mobile)",
+      "options": [
+        { "value": "16px", "label": "16px", "group": "Pixels" },
+        { "value": "20px", "label": "20px", "group": "Pixels" },
+        { "value": "24px", "label": "24px", "group": "Pixels" },
+        { "value": "32px", "label": "32px", "group": "Pixels" },
+        { "value": "40px", "label": "40px", "group": "Pixels" },
+        { "value": "48px", "label": "48px", "group": "Pixels" },
+        { "value": "64px", "label": "64px", "group": "Pixels" },
+        { "value": "1rem", "label": "1rem", "group": "Rem" },
+        { "value": "1.5rem", "label": "1.5rem", "group": "Rem" },
+        { "value": "2rem", "label": "2rem", "group": "Rem" },
+        { "value": "2.5rem", "label": "2.5rem", "group": "Rem" },
+        { "value": "3rem", "label": "3rem", "group": "Rem" },
+        { "value": "4%", "label": "4%", "group": "Percent" },
+        { "value": "5%", "label": "5%", "group": "Percent" },
+        { "value": "6%", "label": "6%", "group": "Percent" },
+        { "value": "8%", "label": "8%", "group": "Percent" },
+        { "value": "10%", "label": "10%", "group": "Percent" },
+        { "value": "0", "label": "Full width", "group": "Full width" }
+      ],
+      "default": "0",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
     },
     {
       "type": "color",
@@ -595,7 +771,19 @@
       "type": "text",
       "id": "sequence_base_url",
       "label": "Sequence base URL (optional)",
-      "info": "Leave blank to use theme assets."
+      "info": "Shared CDN folder prefix ending with /. Frames resolve as {prefix}fizz-kf-m-000.webp and {prefix}fizz-kf-d-000.webp. Leave blank to use theme assets."
+    },
+    {
+      "type": "text",
+      "id": "sequence_base_url_mobile",
+      "label": "Mobile sequence base URL (optional)",
+      "info": "Overrides the shared base for mobile frames only (fizz-kf-m-NNN.webp)."
+    },
+    {
+      "type": "text",
+      "id": "sequence_base_url_desktop",
+      "label": "Desktop sequence base URL (optional)",
+      "info": "Overrides the shared base for desktop frames only (fizz-kf-d-NNN.webp)."
     }
   ],
   "blocks": [

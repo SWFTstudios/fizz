@@ -73,10 +73,32 @@
   "
 >
   <div class="nf-header__inner">
-    <a href="{{ routes.root_url }}" class="nf-header__logo" data-nf-over-media aria-label="{{ shop.name | escape }}">
-      {%- if section.settings.logo != blank -%}
+    <a
+      href="{{ routes.root_url }}"
+      class="nf-header__logo{% if section.settings.logo != blank and section.settings.logo_white != blank %} nf-header__logo--dual{% endif %}"
+      data-nf-over-media
+      aria-label="{{ shop.name | escape }}"
+    >
+      {%- if section.settings.logo != blank and section.settings.logo_white != blank -%}
         {{
           section.settings.logo
+          | image_url: width: 360
+          | image_tag: class: 'nf-header__logo-img nf-header__logo-img--regular', widths: '120, 240, 360', sizes: '120px', alt: shop.name
+        }}
+        {{
+          section.settings.logo_white
+          | image_url: width: 360
+          | image_tag: class: 'nf-header__logo-img nf-header__logo-img--white', widths: '120, 240, 360', sizes: '120px', alt: shop.name
+        }}
+      {%- elsif section.settings.logo != blank -%}
+        {{
+          section.settings.logo
+          | image_url: width: 360
+          | image_tag: class: 'nf-header__logo-img', widths: '120, 240, 360', sizes: '120px', alt: shop.name
+        }}
+      {%- elsif section.settings.logo_white != blank -%}
+        {{
+          section.settings.logo_white
           | image_url: width: 360
           | image_tag: class: 'nf-header__logo-img', widths: '120, 240, 360', sizes: '120px', alt: shop.name
         }}
@@ -130,20 +152,31 @@
     var header = document.querySelector('[data-nf-header]');
     if (!header) return;
     var toggle = header.querySelector('[data-nf-menu-toggle]');
+
+    function setNavTop() {
+      var h = Math.round(header.offsetHeight) || 56;
+      document.documentElement.style.setProperty('--nf-nav-top', h + 'px');
+    }
+
     if (toggle) {
       toggle.addEventListener('click', function () {
         var open = header.classList.toggle('is-open');
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
         document.documentElement.classList.toggle('nf-menu-open', open);
+        setNavTop();
       });
       header.querySelectorAll('.nf-header__link').forEach(function (link) {
         link.addEventListener('click', function () {
           header.classList.remove('is-open');
           toggle.setAttribute('aria-expanded', 'false');
           document.documentElement.classList.remove('nf-menu-open');
+          setNavTop();
         });
       });
     }
+
+    setNavTop();
+    window.addEventListener('resize', setNavTop);
 
     var transparentHome = header.getAttribute('data-nf-transparent-home') === 'true';
     var heroPast = !transparentHome;
@@ -300,6 +333,12 @@
       "type": "image_picker",
       "id": "logo",
       "label": "Logo image"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_white",
+      "label": "Logo over hero / white",
+      "info": "Shown while the header sits over homepage hero media. Switches back to the regular logo after scroll."
     },
     {
       "type": "text",

@@ -1,7 +1,7 @@
 .nf-lifestyle-carousel {
   position: relative;
   overflow: hidden;
-  padding-block: clamp(2.5rem, 6vw, 5rem);
+  padding-block: var(--bf-pad-top, clamp(2.5rem, 6vw, 5rem)) var(--bf-pad-bottom, clamp(2.5rem, 6vw, 5rem));
   background: var(--nf-paper, #fff);
   color: var(--nf-ink, #111);
 }
@@ -71,7 +71,7 @@
   width: 100%;
   text-decoration: none;
   color: #fff;
-  border-radius: var(--nflc-radius, 16px);
+  border-radius: var(--nflc-radius, var(--nf-image-radius, 8px));
   outline: none;
 }
 
@@ -82,7 +82,7 @@
 .nf-lifestyle-carousel__media {
   position: relative;
   aspect-ratio: 1 / 1;
-  border-radius: var(--nflc-radius, 16px);
+  border-radius: var(--nflc-radius, var(--nf-image-radius, 8px));
   overflow: hidden;
   background: #d8d4cb;
   box-shadow:

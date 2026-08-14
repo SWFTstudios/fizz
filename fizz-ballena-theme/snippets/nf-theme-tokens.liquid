@@ -60,9 +60,23 @@
     assign btn_link_text = settings.button_link_text
   endif
 
+  assign btn_corner = settings.button_corner_style | default: 'pill'
+  if btn_corner == 'sharp'
+    assign btn_radius = '0px'
+  elsif btn_corner == 'rounded'
+    assign btn_radius = '12px'
+  else
+    assign btn_radius = '999px'
+  endif
+
   assign transition_liquid = accent
   if settings.page_transition_color_mode == 'custom' and settings.page_transition_color != blank
     assign transition_liquid = settings.page_transition_color
+  endif
+
+  assign image_radius = settings.image_corner_radius
+  if image_radius == blank
+    assign image_radius = 8
   endif
 -%}
 <style>
@@ -92,12 +106,30 @@
 
     --nf-page-width: {{ settings.page_width }}px;
     --nf-gutter: {{ settings.gutter }}px;
-    --bf-page-pad-x: {% if settings.horizontal_padding == '0' %}0{% else %}max(var(--nf-gutter), {{ settings.horizontal_padding | default: '5%' }}){% endif %};
-    --nf-btn-radius: {{ settings.button_radius }}px;
+    --bf-page-pad-x-desktop: {% if settings.horizontal_padding == '0' %}0{% else %}max(var(--nf-gutter), {{ settings.horizontal_padding | default: '5%' }}){% endif %};
+    --bf-page-pad-x-mobile: {% if settings.horizontal_padding_mobile == '0' %}0{% else %}max(var(--nf-gutter), {{ settings.horizontal_padding_mobile | default: '16px' }}){% endif %};
+    --bf-page-pad-x: var(--bf-page-pad-x-mobile);
+    --bf-section-pad-top-desktop: {{ settings.section_padding_top | default: 80 }}px;
+    --bf-section-pad-bottom-desktop: {{ settings.section_padding_bottom | default: 80 }}px;
+    --bf-section-pad-top-mobile: {{ settings.section_padding_top_mobile | default: 48 }}px;
+    --bf-section-pad-bottom-mobile: {{ settings.section_padding_bottom_mobile | default: 48 }}px;
+    --bf-section-pad-top: var(--bf-section-pad-top-mobile);
+    --bf-section-pad-bottom: var(--bf-section-pad-bottom-mobile);
+    --nf-btn-radius: {{ btn_radius }};
+    --nf-image-radius: {{ image_radius }}px;
+    --nf-pdp-card-radius: var(--nf-image-radius);
     --nf-radius-lg: 32px;
     --nf-radius-xl: 48px;
     --nf-soft-shadow: 0 10px 32px rgba(var(--nf-ink-rgb), 0.08), 0 2px 8px rgba(var(--nf-ink-rgb), 0.04);
     --nf-soft-shadow-sm: 0 4px 14px rgba(var(--nf-ink-rgb), 0.06);
     --nf-soft-inset: inset 3px 3px 8px rgba(var(--nf-ink-rgb), 0.06), inset -2px -2px 6px rgba(255, 255, 255, 0.65);
+  }
+
+  @media (min-width: 750px) {
+    :root {
+      --bf-page-pad-x: var(--bf-page-pad-x-desktop);
+      --bf-section-pad-top: var(--bf-section-pad-top-desktop);
+      --bf-section-pad-bottom: var(--bf-section-pad-bottom-desktop);
+    }
   }
 </style>

@@ -39,6 +39,8 @@
       "unavailable": "Unavailable",
       "from_price_html": "From {{ price }}",
       "quantity": "Quantity",
+      "quantity_decrease": "Decrease quantity",
+      "quantity_increase": "Increase quantity",
       "view_details": "View details",
       "media_label": "Media {{ index }}"
     }
@@ -55,11 +57,17 @@
       "empty": "Your cart is empty",
       "continue_shopping": "Continue shopping",
       "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "tax": "Tax",
+      "total": "Total",
+      "at_checkout": "At checkout",
       "checkout": "Checkout",
       "update": "Update cart",
       "remove": "Remove",
       "taxes_and_shipping_at_checkout": "Taxes and shipping calculated at checkout",
-      "quantity_label": "Quantity for {{ title }}"
+      "quantity_label": "Quantity for {{ title }}",
+      "quantity_decrease": "Decrease quantity for {{ title }}",
+      "quantity_increase": "Increase quantity for {{ title }}"
     }
   },
   "footer": {

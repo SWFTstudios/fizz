@@ -6,8 +6,11 @@
 {%- liquid
   assign show_swatches = show_swatches | default: true
   assign show_quick_add = show_quick_add | default: false
-  assign media_ratio = media_ratio | default: 'auto'
-  assign media_fit = media_fit | default: 'contain'
+  assign media_fit = media_fit | default: 'cover'
+  assign media_ratio = media_ratio | default: '4 / 5'
+  if media_fit == 'cover' and media_ratio == 'auto'
+    assign media_ratio = '4 / 5'
+  endif
   assign featured = product.featured_media
   assign color_option = blank
   for option in product.options_with_values

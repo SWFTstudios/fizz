@@ -1,0 +1,32 @@
+---
+description: Multi-theme workspace ops — confirm target theme, scope assets, isolate CSS/JS
+alwaysApply: true
+---
+
+# Shopify workspace operations
+
+## Confirm target theme first
+
+Before any edit or `shopify theme push`:
+
+1. Identify the theme folder (`fizz-neofizz-theme`, `fizz-ballena-theme`, etc.).
+2. Read that theme’s `INSTRUCTIONS.md` for live/preview theme ids.
+3. Never push Ballena (or other) work to live NeoFizz (`#189109174557`) without an explicit user ask — and never the reverse by accident.
+
+## Section-scoped assets
+
+- Load CSS/JS from the section (`stylesheet_tag` / deferred script) when possible.
+- Avoid `layout/theme.liquid` changes unless required.
+- Namespace new NeoFizz work with `nf-` prefixes (Ballena-specific: `bf-`; July14: `j14-`).
+- No unscoped global CSS/JS that restyles unrelated sections.
+
+## Settings stability
+
+- Keep section setting **ids** stable when only changing labels, info, or range bounds.
+- Renaming an id resets merchant Theme Editor values.
+
+## Isolation
+
+- Scope CSS variables to `#shopify-section-{{ section.id }}` or a unique section class.
+- Decorative overlays that sit over neighbors: `pointer-events: none`.
+- Do not edit adjacent sections’ CSS to “make room” for a divider/overlay.

@@ -1,8 +1,8 @@
-<section class="nf-cart">
+<section class="nf-cart nf-cart--soft">
   <h1 class="nf-heading nf-cart__title">{{ 'cart.general.title' | t }}</h1>
 
   {%- if cart.item_count > 0 -%}
-    {% form 'cart', cart, class: 'nf-cart__form' %}
+    {% form 'cart', cart, class: 'nf-cart__form', id: 'nf-cart-form' %}
       <ul class="nf-cart__items">
         {%- for item in cart.items -%}
           <li class="nf-cart__item">
@@ -21,14 +21,33 @@
                 <label class="nf-visually-hidden" for="Qty-{{ item.index | plus: 1 }}">
                   {{ 'cart.general.quantity_label' | t: title: item.product.title }}
                 </label>
-                <input
-                  id="Qty-{{ item.index | plus: 1 }}"
-                  class="nf-input nf-cart__qty"
-                  type="number"
-                  name="updates[]"
-                  value="{{ item.quantity }}"
-                  min="0"
-                >
+                <div class="nf-stepper nf-cart__stepper" data-nf-stepper data-nf-cart-stepper>
+                  <button
+                    type="button"
+                    class="nf-stepper__btn"
+                    data-nf-stepper-dec
+                    aria-label="{{ 'cart.general.quantity_decrease' | t: title: item.product.title }}"
+                  >
+                    −
+                  </button>
+                  <input
+                    id="Qty-{{ item.index | plus: 1 }}"
+                    class="nf-input nf-cart__qty nf-stepper__input"
+                    type="number"
+                    name="updates[]"
+                    value="{{ item.quantity }}"
+                    min="0"
+                    data-nf-qty
+                  >
+                  <button
+                    type="button"
+                    class="nf-stepper__btn"
+                    data-nf-stepper-inc
+                    aria-label="{{ 'cart.general.quantity_increase' | t: title: item.product.title }}"
+                  >
+                    +
+                  </button>
+                </div>
                 <a class="nf-cart__remove" href="{{ item.url_to_remove }}">{{ 'cart.general.remove' | t }}</a>
               </div>
             </div>
@@ -38,17 +57,71 @@
       </ul>
 
       <div class="nf-cart__summary">
-        <p class="nf-cart__subtotal">
-          <span>{{ 'cart.general.subtotal' | t }}</span>
-          <span>{{ cart.total_price | money }}</span>
-        </p>
+        <div class="nf-cart__summary-rows">
+          <p class="nf-cart__row">
+            <span>{{ 'cart.general.subtotal' | t }}</span>
+            <span>{{ cart.total_price | money }}</span>
+          </p>
+          <p class="nf-cart__row">
+            <span>{{ 'cart.general.shipping' | t }}</span>
+            <span>{{ 'cart.general.at_checkout' | t }}</span>
+          </p>
+          <p class="nf-cart__row">
+            <span>{{ 'cart.general.tax' | t }}</span>
+            <span>{{ 'cart.general.at_checkout' | t }}</span>
+          </p>
+          <p class="nf-cart__row nf-cart__row--total">
+            <span>{{ 'cart.general.total' | t }}</span>
+            <span>{{ cart.total_price | money }}</span>
+          </p>
+        </div>
         <p class="nf-cart__note">{{ 'cart.general.taxes_and_shipping_at_checkout' | t }}</p>
         <div class="nf-cart__actions">
-          <button type="submit" name="update" class="nf-btn nf-btn--ghost">{{ 'cart.general.update' | t }}</button>
-          <button type="submit" name="checkout" class="nf-btn nf-btn--accent">{{ 'cart.general.checkout' | t }}</button>
+          <button type="submit" name="update" class="nf-btn nf-btn--ghost nf-cart__update">{{ 'cart.general.update' | t }}</button>
+          <button type="submit" name="checkout" class="nf-btn nf-btn--accent nf-cart__checkout">{{ 'cart.general.checkout' | t }}</button>
         </div>
       </div>
     {% endform %}
+
+    <script>
+      (function () {
+        var form = document.getElementById('nf-cart-form');
+        if (!form) return;
+        var updateBtn = form.querySelector('[name="update"]');
+        function submitUpdate() {
+          if (updateBtn) {
+            updateBtn.click();
+            return;
+          }
+          form.submit();
+        }
+        form.querySelectorAll('[data-nf-cart-stepper]').forEach(function (stepper) {
+          var input = stepper.querySelector('[data-nf-qty]');
+          var dec = stepper.querySelector('[data-nf-stepper-dec]');
+          var inc = stepper.querySelector('[data-nf-stepper-inc]');
+          if (!input) return;
+          function setQty(value) {
+            var next = parseInt(value, 10);
+            if (isNaN(next) || next < 0) next = 0;
+            input.value = String(next);
+            submitUpdate();
+          }
+          if (dec) {
+            dec.addEventListener('click', function () {
+              setQty((parseInt(input.value, 10) || 0) - 1);
+            });
+          }
+          if (inc) {
+            inc.addEventListener('click', function () {
+              setQty((parseInt(input.value, 10) || 0) + 1);
+            });
+          }
+          input.addEventListener('change', function () {
+            setQty(input.value);
+          });
+        });
+      })();
+    </script>
   {%- else -%}
     <div class="nf-cart__empty">
       <p>{{ 'cart.general.empty' | t }}</p>

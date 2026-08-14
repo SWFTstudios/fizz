@@ -1,0 +1,29 @@
+---
+description: Patterns for NF-prefixed sections and assets (scoped vars, stable settings, seamless loops)
+globs: "**/sections/nf-*.liquid,**/assets/nf-*.css,**/assets/nf-*.js"
+alwaysApply: false
+---
+
+# NF section patterns
+
+## Liquid / schema
+
+- Put instance CSS vars on `#shopify-section-{{ section.id }}` via `{% style %}`.
+- Prefer section-local `stylesheet_tag` + deferred script.
+- Keep setting **ids** when only changing labels/info/`max`/`min`.
+- Range settings: numeric `min` / `max` / `default` only ([docs](https://shopify.dev/docs/storefronts/themes/architecture/settings/input-settings)).
+
+## CSS
+
+- Prefix all selectors with the section namespace (e.g. `.nf-water-wave`).
+- Decorative full-bleed overlays: `pointer-events: none`; keep z-index below header (~50).
+- Overlap into neighbors: negative margin on the section class + scoped `overflow: visible` / `z-index` on the Shopify section id — never global `.shopify-section`.
+
+## JS
+
+- Query only this section’s `data-*` roots; do not mutate other sections.
+- CSS `-50%` seamless loops require the drawn tile to be **periodic over half the track width**.
+
+## Ship
+
+Content-safe push only the changed section + assets (`--only` + `--nodelete`). Merchants add/configure the section in the Theme Editor.

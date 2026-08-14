@@ -1,7 +1,7 @@
 <!doctype html>
 <html
   lang="{{ request.locale.iso_code }}"
-  class="nf-html{% unless settings.motion_enabled %} nf-no-motion{% endunless %}"
+  class="nf-html{% if settings.motion_enabled == false %} nf-no-motion{% endif %}"
   data-nf-transitions="{% if settings.page_transitions %}true{% else %}false{% endif %}"
   data-nf-transition-style="{{ settings.page_transition_style | default: 'melt' }}"
   data-nf-transition-intensity="{{ settings.page_transition_intensity | default: 100 }}"

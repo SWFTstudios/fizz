@@ -1,0 +1,56 @@
+{% doc %}
+  Emits scoped padding CSS variables for a section.
+  When use_theme_spacing is true (default), reads Theme settings → Layout.
+  When false, uses section override settings (desktop + mobile, X and Y).
+  @param {object} section - The section object
+  @param {boolean} [horizontal_only] - If true, only set --bf-pad-x (header pill)
+  @example
+  {% render 'bf-section-padding', section: section %}
+{% enddoc %}
+{%- liquid
+  assign use_theme_spacing = section.settings.use_theme_spacing
+  if use_theme_spacing == nil
+    assign use_theme_spacing = true
+  endif
+  assign horizontal_only = horizontal_only | default: false
+
+  assign pad_t = section.settings.padding_top | default: 80
+  assign pad_b = section.settings.padding_bottom | default: 80
+  assign pad_t_m = section.settings.padding_top_mobile | default: pad_t
+  assign pad_b_m = section.settings.padding_bottom_mobile | default: pad_b
+
+  assign pad_x = section.settings.padding_x | default: settings.horizontal_padding | default: '5%'
+  assign pad_x_m = section.settings.padding_x_mobile | default: settings.horizontal_padding_mobile | default: '16px'
+-%}
+{% style %}
+  #shopify-section-{{ section.id }} {
+    {% if use_theme_spacing %}
+      {% unless horizontal_only %}
+        --bf-pad-top: var(--bf-section-pad-top, 48px);
+        --bf-pad-bottom: var(--bf-section-pad-bottom, 48px);
+      {% endunless %}
+      --bf-pad-x: var(--bf-page-pad-x, max(var(--nf-gutter, 16px), 5%));
+    {% else %}
+      {% unless horizontal_only %}
+        --bf-pad-top: {{ pad_t_m }}px;
+        --bf-pad-bottom: {{ pad_b_m }}px;
+        --bf-pad-top-desktop: {{ pad_t }}px;
+        --bf-pad-bottom-desktop: {{ pad_b }}px;
+      {% endunless %}
+      --bf-pad-x: {% if pad_x_m == '0' %}0{% else %}max(var(--nf-gutter, 16px), {{ pad_x_m }}){% endif %};
+      --bf-pad-x-desktop: {% if pad_x == '0' %}0{% else %}max(var(--nf-gutter, 16px), {{ pad_x }}){% endif %};
+    {% endif %}
+  }
+
+  {% unless use_theme_spacing %}
+    @media (min-width: 750px) {
+      #shopify-section-{{ section.id }} {
+        {% unless horizontal_only %}
+          --bf-pad-top: var(--bf-pad-top-desktop);
+          --bf-pad-bottom: var(--bf-pad-bottom-desktop);
+        {% endunless %}
+        --bf-pad-x: var(--bf-pad-x-desktop);
+      }
+    }
+  {% endunless %}
+{% endstyle %}

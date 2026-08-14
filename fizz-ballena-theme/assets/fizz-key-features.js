@@ -1,11 +1,17 @@
 /**
  * Fizz Key Features — native scroll scrub + feature cards.
+ * Dual mobile/desktop frame sequences switch at max-width 1099px.
  * Uses rAF progress (same pattern as nf-scroll How-to); no GSAP scrub.
  */
 (function () {
   "use strict";
 
   var FRAME_PAD = 8;
+  var MOBILE_MQ = "(max-width: 1099px)";
+  var SIZE = {
+    mobile: { w: 1080, h: 1922 },
+    desktop: { w: 1600, h: 1280 },
+  };
   var instances = [];
 
   function clamp(v, min, max) {
@@ -16,8 +22,12 @@
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
-  function parseFrames(root) {
-    var el = root.querySelector("[data-fkf-frames]");
+  function isMobileViewport() {
+    return window.matchMedia(MOBILE_MQ).matches;
+  }
+
+  function parseFramesEl(root, selector) {
+    var el = root.querySelector(selector);
     if (!el) return [];
     try {
       var data = JSON.parse(el.textContent || "[]");
@@ -34,13 +44,21 @@
     this.canvas = root.querySelector("[data-fkf-canvas]");
     this.poster = root.querySelector("[data-fkf-poster]");
     this.cards = Array.prototype.slice.call(root.querySelectorAll("[data-fkf-card]"));
-    this.urls = parseFrames(root);
-    this.frameCount = this.urls.length || parseInt(root.getAttribute("data-frame-count") || "121", 10);
+    this.urlsMobile = parseFramesEl(root, "[data-fkf-frames-mobile]");
+    this.urlsDesktop = parseFramesEl(root, "[data-fkf-frames-desktop]");
+    if (!this.urlsMobile.length && !this.urlsDesktop.length) {
+      var legacy = parseFramesEl(root, "[data-fkf-frames]");
+      this.urlsMobile = legacy;
+      this.urlsDesktop = legacy;
+    }
     this.posterFrame = parseInt(root.getAttribute("data-poster-frame") || "0", 10) || 0;
-    this.images = new Array(this.frameCount);
+    this.images = [];
     this.loaded = {};
+    this.urls = [];
+    this.frameCount = parseInt(root.getAttribute("data-frame-count") || "121", 10);
     this.current = -1;
     this.activeCard = -1;
+    this.mode = null;
     this.ctx = this.canvas ? this.canvas.getContext("2d") : null;
     this.destroyed = false;
     this._onScroll = null;
@@ -49,9 +67,11 @@
     this._loadQueue = [];
     this._loading = 0;
 
-    if (!this.track || !this.urls.length) return;
+    var initialUrls = isMobileViewport() ? this.urlsMobile : this.urlsDesktop;
+    if (!this.track || !initialUrls.length) return;
 
     if (prefersReducedMotion()) {
+      this.applyMode(isMobileViewport() ? "mobile" : "desktop", true);
       this.root.classList.add("is-reduced");
       this.cards.forEach(function (card) {
         card.classList.add("is-in");
@@ -62,12 +82,50 @@
     }
 
     this.bindCards();
-    this.preloadAround(this.posterFrame, 6);
-    this.drawFrame(this.posterFrame);
+    this.applyMode(isMobileViewport() ? "mobile" : "desktop", true);
     this.root.classList.add("is-ready");
     this.setActiveCard(0);
     this.initScrub();
   }
+
+  KeyFeatures.prototype.applyMode = function (mode, force) {
+    if (!force && mode === this.mode) return;
+    this.mode = mode;
+    this.urls = mode === "mobile" ? this.urlsMobile : this.urlsDesktop;
+    this.frameCount =
+      this.urls.length ||
+      parseInt(this.root.getAttribute("data-frame-count") || "121", 10);
+    this.images = new Array(this.frameCount);
+    this.loaded = {};
+    this._loadQueue = [];
+    this._loading = 0;
+
+    var size = SIZE[mode] || SIZE.desktop;
+    if (this.canvas) {
+      this.canvas.width = size.w;
+      this.canvas.height = size.h;
+    }
+
+    this.root.setAttribute("data-fkf-mode", mode);
+    this.root.style.setProperty("--fkf-aspect", size.w + " / " + size.h);
+
+    if (this.poster) {
+      var posterSrc =
+        mode === "mobile"
+          ? this.poster.getAttribute("data-poster-mobile")
+          : this.poster.getAttribute("data-poster-desktop");
+      if (posterSrc) {
+        this.poster.src = posterSrc;
+      }
+      this.poster.width = size.w;
+      this.poster.height = size.h;
+    }
+
+    var frame = this.current >= 0 ? this.current : this.posterFrame;
+    this.current = -1;
+    this.preloadAround(frame, 6);
+    this.drawFrame(frame);
+  };
 
   KeyFeatures.prototype.showPosterOnly = function () {
     if (this.poster) this.poster.style.opacity = "1";
@@ -125,7 +183,7 @@
 
     // Only nudge the horizontal card sheet when the beat changes — never
     // scrollIntoView (that fights page scroll and makes scrub feel glitchy).
-    if (indexChanged && window.matchMedia("(max-width: 1099px)").matches) {
+    if (indexChanged && window.matchMedia(MOBILE_MQ).matches) {
       this.scrollCardSheetTo(index);
     }
   };
@@ -290,6 +348,10 @@
     this._render = function () {
       self._ticking = false;
       if (self.destroyed || !self.track) return;
+      var nextMode = isMobileViewport() ? "mobile" : "desktop";
+      if (nextMode !== self.mode) {
+        self.applyMode(nextMode, false);
+      }
       var frame = Math.round(self.progressToFrame(self.trackProgress()));
       if (frame !== self.current) {
         self.drawFrame(frame);
