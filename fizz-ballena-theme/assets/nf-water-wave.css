@@ -8,7 +8,7 @@
 
 .nf-water-wave {
   position: relative;
-  z-index: 5;
+  z-index: 10;
   width: 100%;
   height: var(--nf-wave-height, 40px);
   pointer-events: none;

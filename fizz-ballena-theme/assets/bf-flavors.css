@@ -12,7 +12,7 @@
 }
 
 .bf-flavors__video {
-  border-radius: 1rem;
+  border-radius: var(--nf-image-radius, 8px);
   overflow: hidden;
   aspect-ratio: 4 / 3;
   background: #0e1412;
@@ -45,7 +45,7 @@
 }
 
 .bf-flavors__card-media {
-  border-radius: 1rem;
+  border-radius: var(--nf-image-radius, 8px);
   overflow: hidden;
   aspect-ratio: 3 / 4;
 }

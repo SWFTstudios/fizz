@@ -7,7 +7,6 @@
   grid-template-columns: auto 1fr auto;
   gap: 0.75rem;
   align-items: center;
-  padding-inline: max(1rem, var(--bf-page-pad-x, 24px));
 }
 
 .bf-social__track {
@@ -35,7 +34,7 @@
   width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  border-radius: 0.85rem;
+  border-radius: var(--nf-image-radius, 8px);
   display: block;
 }
 

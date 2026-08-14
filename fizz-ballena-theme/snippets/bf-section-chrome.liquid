@@ -6,8 +6,6 @@
   {% render 'bf-section-chrome', section: section %}
 {% enddoc %}
 {%- liquid
-  assign pad_t = section.settings.padding_top | default: 80
-  assign pad_b = section.settings.padding_bottom | default: 80
   assign mar_t = section.settings.margin_top | default: 0
   assign mar_b = section.settings.margin_bottom | default: 0
   assign h_size = section.settings.heading_font_size | default: 48
@@ -29,10 +27,9 @@
   endif
 -%}
 {{ 'bf-section-chrome.css' | asset_url | stylesheet_tag }}
+{% render 'bf-section-padding', section: section %}
 {% style %}
   #shopify-section-{{ section.id }} {
-    --bf-pad-top: {{ pad_t }}px;
-    --bf-pad-bottom: {{ pad_b }}px;
     --bf-margin-top: {{ mar_t }}px;
     --bf-margin-bottom: {{ mar_b }}px;
     --bf-heading-size: {{ h_size }}px;

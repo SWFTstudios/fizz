@@ -140,8 +140,8 @@
       {
         "type": "select",
         "id": "horizontal_padding",
-        "label": "Horizontal padding",
-        "info": "Side inset for section content. Full width = edge to edge. Mobile never goes below Page gutter unless Full width.",
+        "label": "Horizontal padding (desktop)",
+        "info": "Side inset for BF section content at 750px+. Full width = edge to edge. Never goes below Page gutter unless Full width.",
         "options": [
           { "value": "16px", "label": "16px", "group": "Pixels" },
           { "value": "20px", "label": "20px", "group": "Pixels" },
@@ -163,6 +163,77 @@
           { "value": "0", "label": "Full width", "group": "Full width" }
         ],
         "default": "5%"
+      },
+      {
+        "type": "select",
+        "id": "horizontal_padding_mobile",
+        "label": "Horizontal padding (mobile)",
+        "info": "Side inset below 750px. Full width = edge to edge. Never goes below Page gutter unless Full width.",
+        "options": [
+          { "value": "16px", "label": "16px", "group": "Pixels" },
+          { "value": "20px", "label": "20px", "group": "Pixels" },
+          { "value": "24px", "label": "24px", "group": "Pixels" },
+          { "value": "32px", "label": "32px", "group": "Pixels" },
+          { "value": "40px", "label": "40px", "group": "Pixels" },
+          { "value": "48px", "label": "48px", "group": "Pixels" },
+          { "value": "64px", "label": "64px", "group": "Pixels" },
+          { "value": "1rem", "label": "1rem", "group": "Rem" },
+          { "value": "1.5rem", "label": "1.5rem", "group": "Rem" },
+          { "value": "2rem", "label": "2rem", "group": "Rem" },
+          { "value": "2.5rem", "label": "2.5rem", "group": "Rem" },
+          { "value": "3rem", "label": "3rem", "group": "Rem" },
+          { "value": "4%", "label": "4%", "group": "Percent" },
+          { "value": "5%", "label": "5%", "group": "Percent" },
+          { "value": "6%", "label": "6%", "group": "Percent" },
+          { "value": "8%", "label": "8%", "group": "Percent" },
+          { "value": "10%", "label": "10%", "group": "Percent" },
+          { "value": "0", "label": "Full width", "group": "Full width" }
+        ],
+        "default": "16px"
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "label": "Section padding top (desktop)",
+        "info": "Default vertical padding at 750px+ for sections that use global padding.",
+        "min": 0,
+        "max": 200,
+        "step": 4,
+        "unit": "px",
+        "default": 80
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "label": "Section padding bottom (desktop)",
+        "info": "Default vertical padding at 750px+ for sections that use global padding.",
+        "min": 0,
+        "max": 200,
+        "step": 4,
+        "unit": "px",
+        "default": 80
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "label": "Section padding top (mobile)",
+        "info": "Default vertical padding below 750px for sections that use global padding.",
+        "min": 0,
+        "max": 200,
+        "step": 4,
+        "unit": "px",
+        "default": 48
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "label": "Section padding bottom (mobile)",
+        "info": "Default vertical padding below 750px for sections that use global padding.",
+        "min": 0,
+        "max": 200,
+        "step": 4,
+        "unit": "px",
+        "default": 48
       }
     ]
   },
@@ -292,6 +363,22 @@
         "id": "bottle_product",
         "label": "Default bottle product",
         "info": "Used by the colorways carousel and pairing links when a section does not set its own product."
+      }
+    ]
+  },
+  {
+    "name": "Images",
+    "settings": [
+      {
+        "type": "range",
+        "id": "image_corner_radius",
+        "label": "Image corner radius",
+        "min": 0,
+        "max": 48,
+        "step": 2,
+        "unit": "px",
+        "default": 8,
+        "info": "Applies to product, collection, hero, and content images site-wide."
       }
     ]
   },

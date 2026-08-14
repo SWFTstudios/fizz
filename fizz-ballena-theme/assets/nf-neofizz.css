@@ -87,13 +87,13 @@
   flex: 0 0 auto;
   height: var(--nf-hero-media-end-h, 45vh);
   min-height: 0;
-  border-radius: 20px;
+  border-radius: var(--nf-image-radius, 8px);
   pointer-events: none;
   user-select: none;
 }
 @media (min-width: 1100px) {
   .nf-hero__media-frame {
-    border-radius: var(--nf-radius-xl, 48px);
+    border-radius: var(--nf-image-radius, 8px);
   }
 }
 /* Full-bleed media behind copy (NeoLeaf absolute inset-0 -z-10) */
@@ -537,7 +537,8 @@
 }
 
 .nf-story-section {
-  padding: clamp(3rem, 8vw, 7rem) 0;
+  padding-block: var(--bf-pad-top, clamp(3rem, 8vw, 7rem)) var(--bf-pad-bottom, clamp(3rem, 8vw, 7rem));
+  padding-inline: 0;
   background: var(--nf-paper);
 }
 .nf-story__grid { display: grid; gap: 2rem; }
@@ -560,7 +561,7 @@
   max-width: 42ch;
 }
 .nf-story__media-frame {
-  border-radius: var(--nf-radius-lg, 32px);
+  border-radius: var(--nf-image-radius, 8px);
   overflow: hidden;
   background: var(--nf-dark);
   aspect-ratio: 4 / 5;
@@ -579,7 +580,8 @@
   background: var(--nf-dark);
   color: var(--nf-dark-text);
   border-radius: var(--nf-radius-xl, 48px) var(--nf-radius-xl, 48px) 0 0;
-  padding: clamp(3rem, 7vw, 6rem) 0 clamp(2.5rem, 5vw, 4rem);
+  padding-block: var(--bf-pad-top, clamp(3rem, 7vw, 6rem)) var(--bf-pad-bottom, clamp(2.5rem, 5vw, 4rem));
+  padding-inline: 0;
   margin-top: -1.5rem;
 }
 .nf-bento__eyebrow { color: var(--nf-accent); opacity: 1; }
@@ -597,7 +599,7 @@
   display: grid;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--nf-radius-lg, 32px);
+  border-radius: var(--nf-image-radius, 8px);
   overflow: hidden;
   min-height: 240px;
 }
@@ -644,7 +646,8 @@
 }
 
 .nf-features-section {
-  padding: clamp(3rem, 8vw, 7rem) 0;
+  padding-block: var(--bf-pad-top, clamp(3rem, 8vw, 7rem)) var(--bf-pad-bottom, clamp(3rem, 8vw, 7rem));
+  padding-inline: 0;
   background: var(--nf-paper);
 }
 .nf-features__heading {
@@ -662,7 +665,7 @@
 }
 .nf-features__media {
   position: relative;
-  border-radius: var(--nf-radius-lg, 32px);
+  border-radius: var(--nf-image-radius, 8px);
   overflow: hidden;
   aspect-ratio: 3 / 4;
   background: var(--nf-surface);

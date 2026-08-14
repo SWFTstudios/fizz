@@ -1,0 +1,24 @@
+---
+description: Avoid redundant sections — search first; mirror NeoFizz/Ballena twins
+alwaysApply: true
+---
+
+# No redundant Shopify sections
+
+## Before creating a new section or asset
+
+1. Search the **active** theme for an existing `nf-*` / `bf-*` / `j14-*` section or shared pattern that already does the job.
+2. Prefer extending the existing section with settings over copy-paste under a new name.
+3. If NeoFizz and Ballena already share a feature (same filenames under each theme), **update both** or document intentional divergence in the theme `design/` notes — do not fork silently.
+
+## Twin themes
+
+When editing shared files such as `nf-water-wave.*`:
+
+- Apply the same change in `fizz-neofizz-theme/` and `fizz-ballena-theme/` unless the user scopes to one theme.
+- Keep identical filenames and APIs so merchants and agents can reason once.
+
+## Do not
+
+- Scaffold a near-duplicate “new” divider/carousel/hero when one already exists.
+- Push only one twin and leave the other stale without saying so.

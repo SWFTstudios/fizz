@@ -1,3 +1,18 @@
+{% render 'bf-section-padding', section: section %}
+{% style %}
+  /* bf-section-padding-apply */
+  #shopify-section-{{ section.id }} .nf-product {
+    padding-block: var(--bf-pad-top, 0) var(--bf-pad-bottom, 0);
+    padding-inline: var(--bf-pad-x, var(--bf-page-pad-x, 0));
+  }
+  {%- if section.settings.dark_surface -%}
+  #shopify-section-{{ section.id }} {
+    background: var(--nf-dark);
+    color: var(--nf-dark-text);
+  }
+  {%- endif -%}
+{% endstyle %}
+
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
   capture color_slug
@@ -33,17 +48,29 @@
   if badge_label == blank and product.tags contains 'bestseller'
     assign badge_label = 'Bestseller'
   endif
+  assign enable_lightbox = section.settings.enable_lightbox
+  if enable_lightbox == nil
+    assign enable_lightbox = true
+  endif
+  assign dark_surface = section.settings.dark_surface
+  if dark_surface == nil
+    assign dark_surface = true
+  endif
+  assign lightbox_index = -1
+  assign thumb_ratio = section.settings.thumb_media_ratio | default: '1 / 1'
 -%}
 <section
-  class="nf-product nf-product--soft nf-product--fit-{{ media_fit }} nf-product--gallery-{{ gallery_mode }} nf-product--layout-{{ desktop_layout }}{% if show_thumbs %} nf-product--thumbs nf-product--thumbs-grid{% endif %}{% if thumbs_mobile %} nf-product--thumbs-mobile{% endif %}"
+  class="nf-product nf-product--soft nf-product--fit-{{ media_fit }} nf-product--gallery-{{ gallery_mode }} nf-product--layout-{{ desktop_layout }}{% if show_thumbs %} nf-product--thumbs{% endif %}{% if thumbs_mobile %} nf-product--thumbs-mobile{% endif %}{% if dark_surface %} nf-product--dark{% endif %}{% if enable_lightbox %} nf-product--lightbox{% endif %}"
   data-nf-product
   data-gallery-mode="{{ gallery_mode }}"
+  data-enable-lightbox="{{ enable_lightbox }}"
   data-stage-mode="{{ section.settings.stage_mode }}"
   style="
     --pdp-stage-bg: {{ stage_bg }};
     --pdp-stage-bg-end: {{ stage_bg_end }};
     --pdp-stage-text: {{ stage_text }};
     --nf-pdp-media-ratio: {{ mobile_ratio }};
+    --nf-pdp-thumb-ratio: {{ thumb_ratio }};
   "
 >
   <div class="nf-product__layout">
@@ -55,17 +82,31 @@
         <div class="nf-product__media-rail" data-nf-media-rail>
           {%- if media_count > 0 -%}
             {%- for media in product.media -%}
+              {%- liquid
+                if media.media_type == 'image'
+                  assign lightbox_index = lightbox_index | plus: 1
+                endif
+              -%}
               <div
                 class="nf-product__media{% if forloop.first %} is-active{% endif %}"
                 data-media-id="{{ media.id }}"
                 data-media-index="{{ forloop.index0 }}"
+                data-media-type="{{ media.media_type }}"
+                {% if media.media_type == 'image' %}data-lightbox-index="{{ lightbox_index }}"{% endif %}
               >
                 {%- case media.media_type -%}
                   {%- when 'video' -%}
+                    <span class="nf-product__media-badge" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5v9l8-4.5-8-4.5z"/></svg>
+                    </span>
                     {{ media | video_tag: image_size: '1080x', controls: true, playsinline: true, class: 'nf-product__media-el' }}
                   {%- when 'external_video' -%}
+                    <span class="nf-product__media-badge" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5v9l8-4.5-8-4.5z"/></svg>
+                    </span>
                     {{ media | external_video_tag: class: 'nf-product__media-el' }}
                   {%- when 'model' -%}
+                    <span class="nf-product__media-badge nf-product__media-badge--model" aria-hidden="true">3D</span>
                     {{ media | model_viewer_tag: class: 'nf-product__media-el' }}
                   {%- else -%}
                     {%- liquid
@@ -76,17 +117,39 @@
                       assign focal = media.preview_image.presentation.focal_point | default: 'center'
                       assign media_style = 'object-position: ' | append: focal
                     -%}
-                    {{
-                      media
-                      | image_url: width: 1400
-                      | image_tag:
-                        class: 'nf-product__media-el',
-                        loading: media_loading,
-                        sizes: '(min-width: 750px) 55vw, 100vw',
-                        widths: '540, 720, 1080, 1400',
-                        alt: media.alt,
-                        style: media_style
-                    }}
+                    {%- if enable_lightbox -%}
+                      <button
+                        type="button"
+                        class="nf-product__zoom"
+                        data-nf-lightbox-open
+                        data-lightbox-index="{{ lightbox_index }}"
+                        aria-label="{{ 'products.product.zoom' | t: index: forloop.index }}"
+                      >
+                        {{
+                          media
+                          | image_url: width: 1400
+                          | image_tag:
+                            class: 'nf-product__media-el',
+                            loading: media_loading,
+                            sizes: '(min-width: 750px) 55vw, 100vw',
+                            widths: '540, 720, 1080, 1400',
+                            alt: media.alt,
+                            style: media_style
+                        }}
+                      </button>
+                    {%- else -%}
+                      {{
+                        media
+                        | image_url: width: 1400
+                        | image_tag:
+                          class: 'nf-product__media-el',
+                          loading: media_loading,
+                          sizes: '(min-width: 750px) 55vw, 100vw',
+                          widths: '540, 720, 1080, 1400',
+                          alt: media.alt,
+                          style: media_style
+                      }}
+                    {%- endif -%}
                   {%- endcase -%}
               </div>
             {%- endfor -%}
@@ -105,11 +168,11 @@
         </div>
 
         {%- if gallery_mode == 'slider' and show_arrows and media_count > 1 -%}
-          <button type="button" class="nf-product__arrow nf-product__arrow--prev" data-nf-gallery-prev aria-label="Previous image">
-            <span aria-hidden="true">&larr;</span>
+          <button type="button" class="nf-product__arrow nf-product__arrow--prev" data-nf-gallery-prev aria-label="{{ 'general.accessibility.previous' | t }}">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M11 4L6 9l5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
-          <button type="button" class="nf-product__arrow nf-product__arrow--next" data-nf-gallery-next aria-label="Next image">
-            <span aria-hidden="true">&rarr;</span>
+          <button type="button" class="nf-product__arrow nf-product__arrow--next" data-nf-gallery-next aria-label="{{ 'general.accessibility.next' | t }}">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M7 4l5 5-5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         {%- endif -%}
       </div>
@@ -146,6 +209,55 @@
             ></button>
           {%- endfor -%}
         </div>
+      {%- endif -%}
+
+      {%- if enable_lightbox and lightbox_index >= 0 -%}
+        <dialog
+          class="nf-product-lightbox"
+          data-nf-lightbox
+          data-lightbox-group="product-{{ product.id }}"
+          aria-label="{{ 'products.product.lightbox' | t }}"
+        >
+          <button type="button" class="nf-product-lightbox__close" data-nf-lightbox-close aria-label="{{ 'general.accessibility.close' | t }}">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+          </button>
+          {%- if lightbox_index > 0 -%}
+            <button type="button" class="nf-product-lightbox__arrow nf-product-lightbox__arrow--prev" data-nf-lightbox-prev aria-label="{{ 'general.accessibility.previous' | t }}">
+              <svg width="22" height="22" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M11 4L6 9l5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="nf-product-lightbox__arrow nf-product-lightbox__arrow--next" data-nf-lightbox-next aria-label="{{ 'general.accessibility.next' | t }}">
+              <svg width="22" height="22" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M7 4l5 5-5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          {%- endif -%}
+          <div class="nf-product-lightbox__viewport">
+            {%- assign lb_idx = -1 -%}
+            {%- for media in product.media -%}
+              {%- if media.media_type == 'image' -%}
+                {%- assign lb_idx = lb_idx | plus: 1 -%}
+                <figure
+                  class="nf-product-lightbox__slide{% if lb_idx == 0 %} is-active{% endif %}"
+                  data-nf-lightbox-slide
+                  data-lightbox-index="{{ lb_idx }}"
+                  {% unless lb_idx == 0 %}hidden{% endunless %}
+                >
+                  {{
+                    media
+                    | image_url: width: 2048
+                    | image_tag:
+                      class: 'nf-product-lightbox__img',
+                      loading: 'lazy',
+                      sizes: '100vw',
+                      widths: '1080, 1440, 2048',
+                      alt: media.alt
+                  }}
+                </figure>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          <p class="nf-product-lightbox__counter" data-nf-lightbox-counter aria-live="polite">
+            {{ 'products.product.slide_of' | t: current: 1, total: lightbox_index | plus: 1 }}
+          </p>
+        </dialog>
       {%- endif -%}
     </div>
 
@@ -345,17 +457,53 @@
         </ul>
       {%- endif -%}
 
-      {%- if section.settings.show_description and product.description != blank -%}
-        <div class="nf-product__description nf-rte">{{ product.description }}</div>
-      {%- endif -%}
-
-      {%- if section.blocks.size > 0 -%}
+      {%- liquid
+        assign show_product_description = false
+        if section.settings.show_description and product.description != blank
+          assign show_product_description = true
+        endif
+        assign has_accordion_blocks = false
+        for block in section.blocks
+          if block.type == 'accordion'
+            assign has_accordion_blocks = true
+          endif
+        endfor
+        assign description_heading = section.settings.description_heading
+        if description_heading == blank
+          assign description_heading = 'products.product.description' | t
+        endif
+      -%}
+      {%- if show_product_description or has_accordion_blocks -%}
         <div class="nf-product__accordions">
+          {%- if show_product_description -%}
+            <details class="nf-accordion" open>
+              <summary class="nf-accordion__summary">{{ description_heading | escape }}</summary>
+              <div class="nf-accordion__body nf-rte">{{ product.description }}</div>
+            </details>
+          {%- endif -%}
           {%- for block in section.blocks -%}
             {%- if block.type == 'accordion' -%}
               <details class="nf-accordion" {{ block.shopify_attributes }}>
                 <summary class="nf-accordion__summary">{{ block.settings.title | escape }}</summary>
-                <div class="nf-accordion__body nf-rte">{{ block.settings.body }}</div>
+                <div class="nf-accordion__body">
+                  {%- if block.settings.image != blank -%}
+                    <div class="nf-accordion__media">
+                      {{
+                        block.settings.image
+                        | image_url: width: 1200
+                        | image_tag:
+                          class: 'nf-accordion__img',
+                          loading: 'lazy',
+                          widths: '480, 720, 960, 1200',
+                          sizes: '(min-width: 750px) 40vw, 92vw',
+                          alt: block.settings.image.alt
+                      }}
+                    </div>
+                  {%- endif -%}
+                  {%- if block.settings.body != blank -%}
+                    <div class="nf-rte">{{ block.settings.body }}</div>
+                  {%- endif -%}
+                </div>
               </details>
             {%- endif -%}
           {%- endfor -%}
@@ -368,258 +516,18 @@
 <script type="application/json" data-nf-product-json>
   {{ product.variants | json }}
 </script>
-<script>
-  (function () {
-    var section = document.querySelector('[data-nf-product]');
-    if (!section) return;
-    var jsonEl = document.querySelector('[data-nf-product-json]');
-    var variants = jsonEl ? JSON.parse(jsonEl.textContent) : [];
-    var idInput = section.querySelector('[data-nf-variant-id]');
-    var priceCurrent = section.querySelector('[data-nf-price-current]');
-    var priceCompare = section.querySelector('[data-nf-price-compare]');
-    var atc = section.querySelector('[data-nf-atc]');
-    var atcLabel = section.querySelector('[data-nf-atc-label]');
-    var wayLabel = section.querySelector('[data-nf-way-label]');
-    var stage = section.querySelector('[data-nf-pdp-stage]');
-    var rail = section.querySelector('[data-nf-media-rail]');
-    var fallback = section.querySelector('[data-nf-fallback-bottle]');
-    var slides = Array.prototype.slice.call(section.querySelectorAll('.nf-product__media'));
-    var galleryMode = section.dataset.galleryMode || 'slider';
-    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var moneyFormat = {{ shop.money_format | json }};
-    var soldOutText = {{ 'products.product.sold_out' | t | json }};
-    var addText = {{ section.settings.atc_label | default: 'Add to cart' | json }};
-    var unavailableText = {{ 'products.product.unavailable' | t | json }};
-    var index = 0;
-
-    function formatMoney(cents) {
-      var value = (cents / 100).toFixed(2);
-      return moneyFormat.replace(/\{\{\s*amount[^}]*\}\}/, value);
-    }
-
-    function selectedOptions() {
-      return Array.prototype.map.call(section.querySelectorAll('[data-nf-option]'), function (fieldset) {
-        var checked = fieldset.querySelector('input:checked');
-        return checked ? checked.value : null;
-      });
-    }
-
-    function setIndex(next) {
-      if (!slides.length) return;
-      index = ((next % slides.length) + slides.length) % slides.length;
-      var mediaId = slides[index].dataset.mediaId;
-      showMedia(mediaId, true);
-    }
-
-    function syncSliderTransform() {
-      if (!rail || galleryMode !== 'slider') return;
-      rail.style.transition = reduceMotion ? 'none' : 'transform 0.35s ease';
-      rail.style.transform = 'translateX(-' + index * 100 + '%)';
-    }
-
-    function showMedia(mediaId, fromIndex) {
-      if (!mediaId && mediaId !== 0) return;
-      var found = -1;
-      slides.forEach(function (media, i) {
-        var active = media.dataset.mediaId === String(mediaId);
-        media.classList.toggle('is-active', active);
-        if (active) found = i;
-      });
-      if (found > -1) index = found;
-
-      section.querySelectorAll('[data-nf-thumb]').forEach(function (thumb) {
-        var on = thumb.dataset.mediaId === String(mediaId);
-        thumb.classList.toggle('is-active', on);
-        thumb.setAttribute('aria-current', on ? 'true' : 'false');
-      });
-      section.querySelectorAll('[data-nf-dot]').forEach(function (dot) {
-        var on = dot.dataset.mediaId === String(mediaId);
-        dot.classList.toggle('is-active', on);
-        dot.setAttribute('aria-current', on ? 'true' : 'false');
-      });
-
-      if (!fromIndex && found > -1) {
-        /* keep index in sync when colorway jumps to a media id */
-      }
-      syncSliderTransform();
-    }
-
-    function stageFromSwatch(id) {
-      var swatch = section.querySelector('[data-nf-swatch][data-variant-id="' + id + '"]');
-      if (!swatch || !stage) return;
-      if (swatch.dataset.bg) stage.style.setProperty('--pdp-stage-bg', swatch.dataset.bg);
-      if (swatch.dataset.bgEnd) stage.style.setProperty('--pdp-stage-bg-end', swatch.dataset.bgEnd);
-      if (swatch.dataset.text) stage.style.setProperty('--pdp-stage-text', swatch.dataset.text);
-      if (fallback && swatch.dataset.fallbackSrc) fallback.src = swatch.dataset.fallbackSrc;
-      if (wayLabel && swatch.dataset.name) wayLabel.textContent = swatch.dataset.name;
-      section.querySelectorAll('[data-nf-swatch]').forEach(function (btn) {
-        btn.classList.toggle('is-active', btn.dataset.variantId === String(id));
-      });
-    }
-
-    function applyVariant(match, meta) {
-      if (!match && !meta) return;
-      var id = match ? match.id : meta.variantId;
-      var price = match ? match.price : meta.price;
-      var compare = match ? match.compare_at_price : meta.compare;
-      var available = match ? match.available : meta.available === true || meta.available === 'true';
-      var mediaId = match && match.featured_media ? match.featured_media.id : meta && meta.mediaId;
-
-      if (idInput) idInput.value = id;
-      if (priceCurrent) priceCurrent.textContent = formatMoney(price);
-      if (priceCompare) {
-        if (compare && compare > price) {
-          priceCompare.textContent = formatMoney(compare);
-          priceCompare.hidden = false;
-        } else {
-          priceCompare.hidden = true;
-        }
-      }
-      if (atc) atc.disabled = !available;
-      if (atcLabel) atcLabel.textContent = available ? addText : soldOutText;
-      if (mediaId) showMedia(mediaId);
-      if (meta) {
-        if (wayLabel && meta.name) wayLabel.textContent = meta.name;
-        if (stage) {
-          if (meta.bg) stage.style.setProperty('--pdp-stage-bg', meta.bg);
-          if (meta.bgEnd) stage.style.setProperty('--pdp-stage-bg-end', meta.bgEnd);
-          if (meta.text) stage.style.setProperty('--pdp-stage-text', meta.text);
-        }
-        if (fallback && meta.fallbackSrc) fallback.src = meta.fallbackSrc;
-        section.querySelectorAll('[data-nf-swatch]').forEach(function (btn) {
-          btn.classList.toggle('is-active', btn.dataset.variantId === String(id));
-        });
-      } else {
-        stageFromSwatch(id);
-      }
-      var url = new URL(window.location.href);
-      url.searchParams.set('variant', id);
-      window.history.replaceState({}, '', url);
-    }
-
-    function onOptionChange() {
-      var opts = selectedOptions();
-      if (!opts.length) return;
-      var match = variants.find(function (variant) {
-        return variant.options.every(function (value, i) {
-          return value === opts[i];
-        });
-      });
-      if (!match) {
-        if (atc) atc.disabled = true;
-        if (atcLabel) atcLabel.textContent = unavailableText;
-        return;
-      }
-      applyVariant(match, null);
-    }
-
-    section.querySelectorAll('[data-nf-option-input]').forEach(function (input) {
-      input.addEventListener('change', onOptionChange);
-    });
-    section.querySelectorAll('[data-nf-thumb]').forEach(function (thumb) {
-      thumb.addEventListener('click', function () {
-        showMedia(thumb.dataset.mediaId);
-      });
-    });
-    section.querySelectorAll('[data-nf-dot]').forEach(function (dot) {
-      dot.addEventListener('click', function () {
-        showMedia(dot.dataset.mediaId);
-      });
-    });
-    var prevBtn = section.querySelector('[data-nf-gallery-prev]');
-    var nextBtn = section.querySelector('[data-nf-gallery-next]');
-    if (prevBtn) prevBtn.addEventListener('click', function () { setIndex(index - 1); });
-    if (nextBtn) nextBtn.addEventListener('click', function () { setIndex(index + 1); });
-
-    section.querySelectorAll('[data-nf-swatch]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var options;
-        try {
-          options = JSON.parse(btn.dataset.options || '[]');
-        } catch (err) {
-          options = [];
-        }
-        section.querySelectorAll('[data-nf-option]').forEach(function (fieldset, i) {
-          var input = fieldset.querySelector('input[value="' + CSS.escape(options[i] || '') + '"]');
-          if (input) input.checked = true;
-        });
-        applyVariant(null, {
-          variantId: btn.dataset.variantId,
-          price: parseInt(btn.dataset.price, 10),
-          compare: parseInt(btn.dataset.compare, 10),
-          available: btn.dataset.available,
-          mediaId: btn.dataset.mediaId,
-          name: btn.dataset.name,
-          bg: btn.dataset.bg,
-          bgEnd: btn.dataset.bgEnd,
-          text: btn.dataset.text,
-          fallbackSrc: btn.dataset.fallbackSrc
-        });
-      });
-    });
-
-    /* Touch / pointer swipe for slider */
-    if (galleryMode === 'slider' && stage && slides.length > 1) {
-      var startX = 0;
-      var deltaX = 0;
-      var dragging = false;
-      stage.addEventListener('pointerdown', function (e) {
-        if (e.target.closest('button, a, video, model-viewer')) return;
-        dragging = true;
-        startX = e.clientX;
-        deltaX = 0;
-        stage.setPointerCapture(e.pointerId);
-        if (rail) rail.style.transition = 'none';
-      });
-      stage.addEventListener('pointermove', function (e) {
-        if (!dragging || !rail) return;
-        deltaX = e.clientX - startX;
-        var pct = (deltaX / stage.offsetWidth) * 100;
-        rail.style.transform = 'translateX(calc(-' + index * 100 + '% + ' + pct + '%))';
-      });
-      function endDrag() {
-        if (!dragging) return;
-        dragging = false;
-        if (Math.abs(deltaX) > 48) {
-          setIndex(index + (deltaX < 0 ? 1 : -1));
-        } else {
-          syncSliderTransform();
-        }
-        deltaX = 0;
-      }
-      stage.addEventListener('pointerup', endDrag);
-      stage.addEventListener('pointercancel', endDrag);
-    }
-
-    syncSliderTransform();
-
-    section.querySelectorAll('[data-nf-stepper]').forEach(function (stepper) {
-      var input = stepper.querySelector('[data-nf-qty], .nf-stepper__input');
-      var dec = stepper.querySelector('[data-nf-stepper-dec]');
-      var inc = stepper.querySelector('[data-nf-stepper-inc]');
-      if (!input) return;
-      function clampQty(value) {
-        var min = parseInt(input.getAttribute('min') || '1', 10);
-        var next = parseInt(value, 10);
-        if (isNaN(next) || next < min) next = min;
-        input.value = String(next);
-      }
-      if (dec) {
-        dec.addEventListener('click', function () {
-          clampQty((parseInt(input.value, 10) || 1) - 1);
-        });
-      }
-      if (inc) {
-        inc.addEventListener('click', function () {
-          clampQty((parseInt(input.value, 10) || 1) + 1);
-        });
-      }
-      input.addEventListener('change', function () {
-        clampQty(input.value);
-      });
-    });
-  })();
+<script type="application/json" data-nf-product-config>
+  {
+    "moneyFormat": {{ shop.money_format | json }},
+    "soldOutText": {{ 'products.product.sold_out' | t | json }},
+    "addText": {{ section.settings.atc_label | default: 'Add to cart' | json }},
+    "unavailableText": {{ 'products.product.unavailable' | t | json }},
+    "enableLightbox": {{ enable_lightbox | json }},
+    "galleryMode": {{ gallery_mode | json }},
+    "slideOfTemplate": {{ 'products.product.slide_of' | t | json }}
+  }
 </script>
+<script src="{{ 'nf-product.js' | asset_url }}" defer></script>
 
 {% schema %}
 {
@@ -682,6 +590,19 @@
       "default": true
     },
     {
+      "type": "select",
+      "id": "thumb_media_ratio",
+      "label": "Thumbnail aspect ratio",
+      "options": [
+        { "value": "1 / 1", "label": "Square 1:1" },
+        { "value": "4 / 5", "label": "Portrait 4:5" },
+        { "value": "3 / 4", "label": "Portrait 3:4" },
+        { "value": "4 / 3", "label": "Landscape 4:3" }
+      ],
+      "default": "1 / 1",
+      "visible_if": "{{ section.settings.show_thumbnails }}"
+    },
+    {
       "type": "checkbox",
       "id": "thumbnails_on_mobile",
       "label": "Show thumbnails on mobile",
@@ -694,6 +615,20 @@
       "label": "Show previous / next arrows",
       "default": true,
       "visible_if": "{{ section.settings.gallery_mode == 'slider' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_lightbox",
+      "label": "Enable image lightbox",
+      "default": true,
+      "info": "Click an image to open a full-screen zoom gallery. Videos and 3D models stay in the slider."
+    },
+    {
+      "type": "checkbox",
+      "id": "dark_surface",
+      "label": "Dark page background",
+      "default": true,
+      "info": "Inverts the product section to the theme dark color. Header and related products stay light."
     },
     {
       "type": "select",
@@ -770,10 +705,272 @@
       "default": true
     },
     {
+      "type": "text",
+      "id": "description_heading",
+      "label": "Description heading",
+      "default": "Description",
+      "visible_if": "{{ section.settings.show_description }}"
+    },
+    {
       "type": "checkbox",
       "id": "show_dynamic_checkout",
       "label": "Show dynamic checkout button",
       "default": false
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_theme_spacing",
+      "label": "Use global padding",
+      "info": "Uses Theme settings \u2192 Layout for desktop and mobile padding. Turn off to set unique padding below.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top (desktop)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom (desktop)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 48,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 48,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "select",
+      "id": "padding_x",
+      "label": "Horizontal padding (desktop)",
+      "info": "Side inset at 750px+. Full width = edge to edge.",
+      "options": [
+        {
+          "value": "16px",
+          "label": "16px",
+          "group": "Pixels"
+        },
+        {
+          "value": "20px",
+          "label": "20px",
+          "group": "Pixels"
+        },
+        {
+          "value": "24px",
+          "label": "24px",
+          "group": "Pixels"
+        },
+        {
+          "value": "32px",
+          "label": "32px",
+          "group": "Pixels"
+        },
+        {
+          "value": "40px",
+          "label": "40px",
+          "group": "Pixels"
+        },
+        {
+          "value": "48px",
+          "label": "48px",
+          "group": "Pixels"
+        },
+        {
+          "value": "64px",
+          "label": "64px",
+          "group": "Pixels"
+        },
+        {
+          "value": "1rem",
+          "label": "1rem",
+          "group": "Rem"
+        },
+        {
+          "value": "1.5rem",
+          "label": "1.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2rem",
+          "label": "2rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2.5rem",
+          "label": "2.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "3rem",
+          "label": "3rem",
+          "group": "Rem"
+        },
+        {
+          "value": "4%",
+          "label": "4%",
+          "group": "Percent"
+        },
+        {
+          "value": "5%",
+          "label": "5%",
+          "group": "Percent"
+        },
+        {
+          "value": "6%",
+          "label": "6%",
+          "group": "Percent"
+        },
+        {
+          "value": "8%",
+          "label": "8%",
+          "group": "Percent"
+        },
+        {
+          "value": "10%",
+          "label": "10%",
+          "group": "Percent"
+        },
+        {
+          "value": "0",
+          "label": "Full width",
+          "group": "Full width"
+        }
+      ],
+      "default": "5%",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "select",
+      "id": "padding_x_mobile",
+      "label": "Horizontal padding (mobile)",
+      "info": "Side inset below 750px. Full width = edge to edge.",
+      "options": [
+        {
+          "value": "16px",
+          "label": "16px",
+          "group": "Pixels"
+        },
+        {
+          "value": "20px",
+          "label": "20px",
+          "group": "Pixels"
+        },
+        {
+          "value": "24px",
+          "label": "24px",
+          "group": "Pixels"
+        },
+        {
+          "value": "32px",
+          "label": "32px",
+          "group": "Pixels"
+        },
+        {
+          "value": "40px",
+          "label": "40px",
+          "group": "Pixels"
+        },
+        {
+          "value": "48px",
+          "label": "48px",
+          "group": "Pixels"
+        },
+        {
+          "value": "64px",
+          "label": "64px",
+          "group": "Pixels"
+        },
+        {
+          "value": "1rem",
+          "label": "1rem",
+          "group": "Rem"
+        },
+        {
+          "value": "1.5rem",
+          "label": "1.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2rem",
+          "label": "2rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2.5rem",
+          "label": "2.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "3rem",
+          "label": "3rem",
+          "group": "Rem"
+        },
+        {
+          "value": "4%",
+          "label": "4%",
+          "group": "Percent"
+        },
+        {
+          "value": "5%",
+          "label": "5%",
+          "group": "Percent"
+        },
+        {
+          "value": "6%",
+          "label": "6%",
+          "group": "Percent"
+        },
+        {
+          "value": "8%",
+          "label": "8%",
+          "group": "Percent"
+        },
+        {
+          "value": "10%",
+          "label": "10%",
+          "group": "Percent"
+        },
+        {
+          "value": "0",
+          "label": "Full width",
+          "group": "Full width"
+        }
+      ],
+      "default": "16px",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
     }
   ],
   "blocks": [
@@ -808,7 +1005,14 @@
           "type": "richtext",
           "id": "body",
           "label": "Body",
-          "default": "<p>Add product details here.</p>"
+          "default": "<p>Add product details here.</p>",
+          "info": "Connect a product metafield with the dynamic source icon. Theme rich text cannot include images \u2014 use Image below."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Optional. Shown in the dropdown. Connect a file metafield with the dynamic source icon."
         }
       ]
     },

@@ -1,5 +1,6 @@
 {{ 'nf-water-wave.css' | asset_url | stylesheet_tag }}
 
+{% render 'bf-section-padding', section: section %}
 {%- liquid
   assign fill_color = section.settings.fill_color
   if fill_color == blank
@@ -17,6 +18,9 @@
     --nf-wave-height: {{ wave_height }}px;
     --nf-wave-duration: {{ duration }}s;
     --nf-wave-overlap: {{ overlap }}px;
+    position: relative;
+    z-index: 10;
+    overflow: visible;
   }
 {% endstyle %}
 
@@ -77,11 +81,12 @@
       "type": "range",
       "id": "height",
       "min": 16,
-      "max": 80,
+      "max": 160,
       "step": 2,
       "unit": "px",
       "label": "Wave height",
-      "default": 40
+      "default": 40,
+      "info": "Taller waves look best with enough Overlap so the crest can cover adjacent section edges."
     },
     {
       "type": "range",
@@ -90,19 +95,275 @@
       "max": 20,
       "step": 1,
       "unit": "s",
-      "label": "Loop duration",
-      "default": 5
+      "label": "Speed",
+      "default": 5,
+      "info": "Seconds per full loop. Lower = faster."
     },
     {
       "type": "range",
       "id": "overlap",
       "min": 0,
-      "max": 24,
+      "max": 64,
       "step": 1,
       "unit": "px",
       "label": "Overlap into adjacent sections",
       "default": 8,
-      "info": "Pulls the wave into neighboring sections for a flush seam."
+      "info": "Pulls the wave into neighboring sections so the crest can cover their edges. Higher values increase the overlap."
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_theme_spacing",
+      "label": "Use global padding",
+      "info": "Uses Theme settings \u2192 Layout for desktop and mobile padding. Turn off to set unique padding below.",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top (desktop)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom (desktop)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "select",
+      "id": "padding_x",
+      "label": "Horizontal padding (desktop)",
+      "info": "Side inset at 750px+. Full width = edge to edge.",
+      "options": [
+        {
+          "value": "16px",
+          "label": "16px",
+          "group": "Pixels"
+        },
+        {
+          "value": "20px",
+          "label": "20px",
+          "group": "Pixels"
+        },
+        {
+          "value": "24px",
+          "label": "24px",
+          "group": "Pixels"
+        },
+        {
+          "value": "32px",
+          "label": "32px",
+          "group": "Pixels"
+        },
+        {
+          "value": "40px",
+          "label": "40px",
+          "group": "Pixels"
+        },
+        {
+          "value": "48px",
+          "label": "48px",
+          "group": "Pixels"
+        },
+        {
+          "value": "64px",
+          "label": "64px",
+          "group": "Pixels"
+        },
+        {
+          "value": "1rem",
+          "label": "1rem",
+          "group": "Rem"
+        },
+        {
+          "value": "1.5rem",
+          "label": "1.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2rem",
+          "label": "2rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2.5rem",
+          "label": "2.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "3rem",
+          "label": "3rem",
+          "group": "Rem"
+        },
+        {
+          "value": "4%",
+          "label": "4%",
+          "group": "Percent"
+        },
+        {
+          "value": "5%",
+          "label": "5%",
+          "group": "Percent"
+        },
+        {
+          "value": "6%",
+          "label": "6%",
+          "group": "Percent"
+        },
+        {
+          "value": "8%",
+          "label": "8%",
+          "group": "Percent"
+        },
+        {
+          "value": "10%",
+          "label": "10%",
+          "group": "Percent"
+        },
+        {
+          "value": "0",
+          "label": "Full width",
+          "group": "Full width"
+        }
+      ],
+      "default": "0",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "select",
+      "id": "padding_x_mobile",
+      "label": "Horizontal padding (mobile)",
+      "info": "Side inset below 750px. Full width = edge to edge.",
+      "options": [
+        {
+          "value": "16px",
+          "label": "16px",
+          "group": "Pixels"
+        },
+        {
+          "value": "20px",
+          "label": "20px",
+          "group": "Pixels"
+        },
+        {
+          "value": "24px",
+          "label": "24px",
+          "group": "Pixels"
+        },
+        {
+          "value": "32px",
+          "label": "32px",
+          "group": "Pixels"
+        },
+        {
+          "value": "40px",
+          "label": "40px",
+          "group": "Pixels"
+        },
+        {
+          "value": "48px",
+          "label": "48px",
+          "group": "Pixels"
+        },
+        {
+          "value": "64px",
+          "label": "64px",
+          "group": "Pixels"
+        },
+        {
+          "value": "1rem",
+          "label": "1rem",
+          "group": "Rem"
+        },
+        {
+          "value": "1.5rem",
+          "label": "1.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2rem",
+          "label": "2rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2.5rem",
+          "label": "2.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "3rem",
+          "label": "3rem",
+          "group": "Rem"
+        },
+        {
+          "value": "4%",
+          "label": "4%",
+          "group": "Percent"
+        },
+        {
+          "value": "5%",
+          "label": "5%",
+          "group": "Percent"
+        },
+        {
+          "value": "6%",
+          "label": "6%",
+          "group": "Percent"
+        },
+        {
+          "value": "8%",
+          "label": "8%",
+          "group": "Percent"
+        },
+        {
+          "value": "10%",
+          "label": "10%",
+          "group": "Percent"
+        },
+        {
+          "value": "0",
+          "label": "Full width",
+          "group": "Full width"
+        }
+      ],
+      "default": "0",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
     }
   ],
   "presets": [

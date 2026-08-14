@@ -57,7 +57,7 @@
   position: relative;
   scroll-snap-align: start;
   aspect-ratio: 560 / 700;
-  border-radius: 0.5em;
+  border-radius: var(--nf-image-radius, 8px);
   overflow: hidden;
   color: #f8f2e5;
   isolation: isolate;

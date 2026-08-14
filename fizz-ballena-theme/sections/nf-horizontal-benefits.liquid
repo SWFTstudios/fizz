@@ -1,4 +1,5 @@
 {{ 'nf-horizontal-benefits.css' | asset_url | stylesheet_tag }}
+{% render 'bf-section-padding', section: section %}
 
 {% liquid
   assign card_width = section.settings.card_width | default: 420
@@ -6,8 +7,6 @@
   assign card_radius = section.settings.card_radius | default: 20
   assign overlay_opacity = section.settings.overlay_opacity | default: 45
   assign scroll_speed_pct = section.settings.scroll_speed | default: 100
-  assign pad_top = section.settings.padding_top | default: 0
-  assign pad_bottom = section.settings.padding_bottom | default: 0
   assign default_orientation = section.settings.card_orientation | default: 'portrait'
   assign default_ratio = section.settings.card_ratio | default: '3/4'
   assign color_eyebrow = section.settings.color_eyebrow | default: '#8a948c'
@@ -15,6 +14,15 @@
   assign color_lead = section.settings.color_lead | default: '#3a423e'
   assign color_card_title = section.settings.color_card_title | default: '#ffffff'
   assign color_card_body = section.settings.color_card_body | default: 'rgba(255,255,255,0.88)'
+  assign bg_media_opacity = section.settings.background_media_opacity | default: 100 | times: 1.0 | divided_by: 100.0
+  assign has_bg_image = false
+  if section.settings.background_image != blank
+    assign has_bg_image = true
+  endif
+  assign has_bg_video = false
+  if section.settings.background_video != blank or section.settings.background_video_url != blank
+    assign has_bg_video = true
+  endif
   assign show_head = false
   if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.subheading != blank
     assign show_head = true
@@ -49,6 +57,16 @@
   endif
 %}
 
+{% style %}
+  #shopify-section-{{ section.id }} {
+    position: relative;
+    z-index: 1;
+    {%- if section.settings.background_color != blank -%}
+    background-color: {{ section.settings.background_color }};
+    {%- endif -%}
+  }
+{% endstyle %}
+
 <section
   class="nf-hbenefits"
   id="{{ section.settings.anchor_id | default: 'benefits-scroll' | handle }}"
@@ -65,13 +83,43 @@
     --nf-hben-lead: {{ color_lead }};
     --nf-hben-card-title: {{ color_card_title }};
     --nf-hben-card-body: {{ color_card_body }};
-    --nf-hben-pad-top: {{ pad_top }}px;
-    --nf-hben-pad-bottom: {{ pad_bottom }}px;
+    --nf-hben-bg-opacity: {{ bg_media_opacity }};
   "
   aria-label="{{ section.settings.heading | default: 'Benefits' | escape }}"
 >
   <div class="nf-hbenefits__track" data-nf-hben-track>
     <div class="nf-hbenefits__sticky" data-nf-hben-sticky>
+      {%- if has_bg_image or has_bg_video -%}
+        <div class="nf-hbenefits__bg" aria-hidden="true">
+          {%- if has_bg_image -%}
+            <div class="nf-hbenefits__bg-image">
+              {{
+                section.settings.background_image
+                | image_url: width: 2880
+                | image_tag:
+                  class: 'nf-hbenefits__bg-media',
+                  loading: 'lazy',
+                  sizes: '100vw',
+                  widths: '720, 1080, 1440, 1920, 2880',
+                  alt: ''
+              }}
+            </div>
+          {%- endif -%}
+          {%- if has_bg_video -%}
+            <div class="nf-hbenefits__bg-video">
+              {%- render 'nf-media',
+                video: section.settings.background_video,
+                video_url: section.settings.background_video_url,
+                class: 'nf-hbenefits__bg-media',
+                alt: '',
+                loading: 'lazy',
+                sizes: '100vw',
+                autoplay: true
+              -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
       {% if show_head %}
         <div class="nf-hbenefits__head nf-container">
           {% if section.settings.eyebrow != blank %}
@@ -335,24 +383,149 @@
       "content": "Spacing"
     },
     {
+      "type": "checkbox",
+      "id": "use_theme_spacing",
+      "label": "Use global padding",
+      "info": "Uses Theme settings → Layout for desktop and mobile padding. Turn off to set unique padding below.",
+      "default": true
+    },
+    {
       "type": "range",
       "id": "padding_top",
-      "label": "Padding top",
+      "label": "Padding top (desktop)",
       "min": 0,
-      "max": 120,
+      "max": 200,
       "step": 4,
       "unit": "px",
-      "default": 0
+      "default": 80,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
     },
     {
       "type": "range",
       "id": "padding_bottom",
-      "label": "Padding bottom",
+      "label": "Padding bottom (desktop)",
       "min": 0,
-      "max": 120,
+      "max": 200,
       "step": 4,
       "unit": "px",
-      "default": 0
+      "default": 80,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 48,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 48,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "select",
+      "id": "padding_x",
+      "label": "Horizontal padding (desktop)",
+      "info": "Side inset at 750px+. Full width = edge to edge.",
+      "options": [
+        { "value": "16px", "label": "16px", "group": "Pixels" },
+        { "value": "20px", "label": "20px", "group": "Pixels" },
+        { "value": "24px", "label": "24px", "group": "Pixels" },
+        { "value": "32px", "label": "32px", "group": "Pixels" },
+        { "value": "40px", "label": "40px", "group": "Pixels" },
+        { "value": "48px", "label": "48px", "group": "Pixels" },
+        { "value": "64px", "label": "64px", "group": "Pixels" },
+        { "value": "1rem", "label": "1rem", "group": "Rem" },
+        { "value": "1.5rem", "label": "1.5rem", "group": "Rem" },
+        { "value": "2rem", "label": "2rem", "group": "Rem" },
+        { "value": "2.5rem", "label": "2.5rem", "group": "Rem" },
+        { "value": "3rem", "label": "3rem", "group": "Rem" },
+        { "value": "4%", "label": "4%", "group": "Percent" },
+        { "value": "5%", "label": "5%", "group": "Percent" },
+        { "value": "6%", "label": "6%", "group": "Percent" },
+        { "value": "8%", "label": "8%", "group": "Percent" },
+        { "value": "10%", "label": "10%", "group": "Percent" },
+        { "value": "0", "label": "Full width", "group": "Full width" }
+      ],
+      "default": "5%",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "select",
+      "id": "padding_x_mobile",
+      "label": "Horizontal padding (mobile)",
+      "info": "Side inset below 750px. Full width = edge to edge.",
+      "options": [
+        { "value": "16px", "label": "16px", "group": "Pixels" },
+        { "value": "20px", "label": "20px", "group": "Pixels" },
+        { "value": "24px", "label": "24px", "group": "Pixels" },
+        { "value": "32px", "label": "32px", "group": "Pixels" },
+        { "value": "40px", "label": "40px", "group": "Pixels" },
+        { "value": "48px", "label": "48px", "group": "Pixels" },
+        { "value": "64px", "label": "64px", "group": "Pixels" },
+        { "value": "1rem", "label": "1rem", "group": "Rem" },
+        { "value": "1.5rem", "label": "1.5rem", "group": "Rem" },
+        { "value": "2rem", "label": "2rem", "group": "Rem" },
+        { "value": "2.5rem", "label": "2.5rem", "group": "Rem" },
+        { "value": "3rem", "label": "3rem", "group": "Rem" },
+        { "value": "4%", "label": "4%", "group": "Percent" },
+        { "value": "5%", "label": "5%", "group": "Percent" },
+        { "value": "6%", "label": "6%", "group": "Percent" },
+        { "value": "8%", "label": "8%", "group": "Percent" },
+        { "value": "10%", "label": "10%", "group": "Percent" },
+        { "value": "0", "label": "Full width", "group": "Full width" }
+      ],
+      "default": "16px",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f7f5f0"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background video",
+      "info": "Shopify Files MP4. Autoplay is muted and looped."
+    },
+    {
+      "type": "video_url",
+      "id": "background_video_url",
+      "label": "Background video URL",
+      "accept": ["youtube", "vimeo"],
+      "info": "Used when no Shopify-hosted video is set."
+    },
+    {
+      "type": "range",
+      "id": "background_media_opacity",
+      "label": "Background media opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
     }
   ],
   "blocks": [

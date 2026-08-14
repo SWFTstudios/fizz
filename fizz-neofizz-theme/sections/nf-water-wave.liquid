@@ -17,6 +17,9 @@
     --nf-wave-height: {{ wave_height }}px;
     --nf-wave-duration: {{ duration }}s;
     --nf-wave-overlap: {{ overlap }}px;
+    position: relative;
+    z-index: 10;
+    overflow: visible;
   }
 {% endstyle %}
 
@@ -77,11 +80,12 @@
       "type": "range",
       "id": "height",
       "min": 16,
-      "max": 80,
+      "max": 160,
       "step": 2,
       "unit": "px",
       "label": "Wave height",
-      "default": 40
+      "default": 40,
+      "info": "Taller waves look best with enough Overlap so the crest can cover adjacent section edges."
     },
     {
       "type": "range",
@@ -90,19 +94,20 @@
       "max": 20,
       "step": 1,
       "unit": "s",
-      "label": "Loop duration",
-      "default": 5
+      "label": "Speed",
+      "default": 5,
+      "info": "Seconds per full loop. Lower = faster."
     },
     {
       "type": "range",
       "id": "overlap",
       "min": 0,
-      "max": 24,
+      "max": 64,
       "step": 1,
       "unit": "px",
       "label": "Overlap into adjacent sections",
       "default": 8,
-      "info": "Pulls the wave into neighboring sections for a flush seam."
+      "info": "Pulls the wave into neighboring sections so the crest can cover their edges. Higher values increase the overlap."
     }
   ],
   "presets": [

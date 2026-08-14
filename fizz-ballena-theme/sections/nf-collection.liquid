@@ -1,3 +1,16 @@
+{% render 'bf-section-padding', section: section %}
+{% style %}
+  /* bf-section-padding-apply */
+  {%- if section.settings.use_theme_spacing -%}
+    #shopify-section-{{ section.id }} .nf-collection {
+      --nf-collection-pad-y: var(--bf-pad-top, {{ section.settings.padding_y | default: 48 }}px);
+    }
+  {%- endif -%}
+  #shopify-section-{{ section.id }} .nf-collection__body {
+    padding-inline: var(--bf-pad-x, var(--bf-page-pad-x, var(--nf-gutter)));
+  }
+{% endstyle %}
+
 {%- comment -%}
   Collection page — hero, editorial benefits, product grid.
   Surfaces + type inherit active Theme style / colorway tokens.
@@ -6,13 +19,20 @@
 {%- liquid
   assign products_per_page = section.settings.products_per_page | default: 12
   assign hero_mode = section.settings.hero_mode | default: 'surface'
+  assign card_media_fit = section.settings.card_media_fit | default: 'cover'
+  assign card_ratio = section.settings.card_media_ratio | default: '4 / 5'
+  if card_media_fit == 'cover' and card_ratio == 'auto'
+    assign card_ratio = '4 / 5'
+  endif
 -%}
 
 <section
   class="nf-collection"
   data-nf-collection
   style="
-    --nf-collection-pad-y: {{ section.settings.padding_y }}px;
+    {%- unless section.settings.use_theme_spacing -%}
+      --nf-collection-pad-y: {{ section.settings.padding_y }}px;
+    {%- endunless -%}
     --nf-collection-gap: {{ section.settings.grid_gap }}px;
     --nf-collection-hero-min: {{ section.settings.hero_min_height }}vh;
   "
@@ -81,7 +101,8 @@
                 product: product,
                 show_swatches: section.settings.show_swatches,
                 show_quick_add: section.settings.show_quick_add,
-                media_ratio: section.settings.card_media_ratio
+                media_ratio: card_ratio,
+                media_fit: card_media_fit
               %}
             </li>
           {%- endfor -%}
@@ -197,16 +218,27 @@
     },
     {
       "type": "select",
+      "id": "card_media_fit",
+      "label": "Card media fit",
+      "options": [
+        { "value": "cover", "label": "Cover (fill frame)" },
+        { "value": "contain", "label": "Contain (packshot)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
       "id": "card_media_ratio",
       "label": "Card media ratio",
       "options": [
-        { "value": "3 / 4", "label": "Portrait 3:4" },
         { "value": "4 / 5", "label": "Portrait 4:5" },
-        { "value": "1 / 1", "label": "Square" },
-        { "value": "auto", "label": "Natural (contain bottles)" }
+        { "value": "1 / 1", "label": "Square 1:1" },
+        { "value": "3 / 4", "label": "Portrait 3:4" },
+        { "value": "16 / 10", "label": "Landscape 16:10" },
+        { "value": "auto", "label": "Natural (contain only)" }
       ],
-      "default": "auto",
-      "info": "Use Natural for warped bottle PNGs so they are not cropped."
+      "default": "4 / 5",
+      "info": "Natural works with Contain fit for bottle packshots. Cover uses 4:5 when Natural is selected."
     },
     {
       "type": "checkbox",
@@ -235,6 +267,261 @@
       "unit": "px",
       "label": "Body vertical padding",
       "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_theme_spacing",
+      "label": "Use global padding",
+      "info": "Uses Theme settings \u2192 Layout for desktop and mobile padding. Turn off to set unique padding below.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top (desktop)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom (desktop)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 48,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 48,
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "select",
+      "id": "padding_x",
+      "label": "Horizontal padding (desktop)",
+      "info": "Side inset at 750px+. Full width = edge to edge.",
+      "options": [
+        {
+          "value": "16px",
+          "label": "16px",
+          "group": "Pixels"
+        },
+        {
+          "value": "20px",
+          "label": "20px",
+          "group": "Pixels"
+        },
+        {
+          "value": "24px",
+          "label": "24px",
+          "group": "Pixels"
+        },
+        {
+          "value": "32px",
+          "label": "32px",
+          "group": "Pixels"
+        },
+        {
+          "value": "40px",
+          "label": "40px",
+          "group": "Pixels"
+        },
+        {
+          "value": "48px",
+          "label": "48px",
+          "group": "Pixels"
+        },
+        {
+          "value": "64px",
+          "label": "64px",
+          "group": "Pixels"
+        },
+        {
+          "value": "1rem",
+          "label": "1rem",
+          "group": "Rem"
+        },
+        {
+          "value": "1.5rem",
+          "label": "1.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2rem",
+          "label": "2rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2.5rem",
+          "label": "2.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "3rem",
+          "label": "3rem",
+          "group": "Rem"
+        },
+        {
+          "value": "4%",
+          "label": "4%",
+          "group": "Percent"
+        },
+        {
+          "value": "5%",
+          "label": "5%",
+          "group": "Percent"
+        },
+        {
+          "value": "6%",
+          "label": "6%",
+          "group": "Percent"
+        },
+        {
+          "value": "8%",
+          "label": "8%",
+          "group": "Percent"
+        },
+        {
+          "value": "10%",
+          "label": "10%",
+          "group": "Percent"
+        },
+        {
+          "value": "0",
+          "label": "Full width",
+          "group": "Full width"
+        }
+      ],
+      "default": "5%",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
+    },
+    {
+      "type": "select",
+      "id": "padding_x_mobile",
+      "label": "Horizontal padding (mobile)",
+      "info": "Side inset below 750px. Full width = edge to edge.",
+      "options": [
+        {
+          "value": "16px",
+          "label": "16px",
+          "group": "Pixels"
+        },
+        {
+          "value": "20px",
+          "label": "20px",
+          "group": "Pixels"
+        },
+        {
+          "value": "24px",
+          "label": "24px",
+          "group": "Pixels"
+        },
+        {
+          "value": "32px",
+          "label": "32px",
+          "group": "Pixels"
+        },
+        {
+          "value": "40px",
+          "label": "40px",
+          "group": "Pixels"
+        },
+        {
+          "value": "48px",
+          "label": "48px",
+          "group": "Pixels"
+        },
+        {
+          "value": "64px",
+          "label": "64px",
+          "group": "Pixels"
+        },
+        {
+          "value": "1rem",
+          "label": "1rem",
+          "group": "Rem"
+        },
+        {
+          "value": "1.5rem",
+          "label": "1.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2rem",
+          "label": "2rem",
+          "group": "Rem"
+        },
+        {
+          "value": "2.5rem",
+          "label": "2.5rem",
+          "group": "Rem"
+        },
+        {
+          "value": "3rem",
+          "label": "3rem",
+          "group": "Rem"
+        },
+        {
+          "value": "4%",
+          "label": "4%",
+          "group": "Percent"
+        },
+        {
+          "value": "5%",
+          "label": "5%",
+          "group": "Percent"
+        },
+        {
+          "value": "6%",
+          "label": "6%",
+          "group": "Percent"
+        },
+        {
+          "value": "8%",
+          "label": "8%",
+          "group": "Percent"
+        },
+        {
+          "value": "10%",
+          "label": "10%",
+          "group": "Percent"
+        },
+        {
+          "value": "0",
+          "label": "Full width",
+          "group": "Full width"
+        }
+      ],
+      "default": "16px",
+      "visible_if": "{{ section.settings.use_theme_spacing == false }}"
     }
   ],
   "blocks": [
