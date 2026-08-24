@@ -3,6 +3,7 @@
 
   var instances = new WeakMap();
   var EDGE = 4;
+  var END_RESET_MS = 500;
 
   function prefersReducedMotion() {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -16,6 +17,7 @@
   function destroy(root) {
     var record = instances.get(root);
     if (!record) return;
+    if (record.clearEndReset) record.clearEndReset();
     if (record.onScroll) {
       record.track.removeEventListener('scroll', record.onScroll);
     }
@@ -89,6 +91,32 @@
     if (!track) return;
 
     var vertical = root.getAttribute('data-bf-about-layout') === 'vertical';
+    var resetTimer = null;
+
+    function clearEndReset() {
+      if (resetTimer) {
+        window.clearTimeout(resetTimer);
+        resetTimer = null;
+      }
+    }
+
+    function isAtEnd() {
+      var max = track.scrollWidth - track.clientWidth;
+      return max <= EDGE || track.scrollLeft >= max - EDGE;
+    }
+
+    function scrollToStart() {
+      var behavior = prefersReducedMotion() ? 'auto' : 'smooth';
+      track.scrollTo({ left: 0, behavior: behavior });
+    }
+
+    function scheduleEndReset() {
+      clearEndReset();
+      resetTimer = window.setTimeout(function () {
+        resetTimer = null;
+        if (isAtEnd()) scrollToStart();
+      }, END_RESET_MS);
+    }
 
     function updateProgress() {
       if (!progress) return;
@@ -102,7 +130,10 @@
 
     function onScroll() {
       updateProgress();
-      if (!vertical) updateSideVisibility(root, track);
+      if (vertical) return;
+      updateSideVisibility(root, track);
+      if (isAtEnd()) scheduleEndReset();
+      else clearEndReset();
     }
 
     function step(dir) {
@@ -112,6 +143,11 @@
       if (vertical) {
         var amountY = card ? card.getBoundingClientRect().height + gap : track.clientHeight * 0.8;
         track.scrollBy({ top: dir * amountY, behavior: behavior });
+        return;
+      }
+      if (dir > 0 && isAtEnd()) {
+        clearEndReset();
+        scrollToStart();
         return;
       }
       var amount = card ? card.getBoundingClientRect().width + gap : track.clientWidth * 0.8;
@@ -138,6 +174,7 @@
       onScroll: onScroll,
       onResize: onResize,
       btnHandlers: btnHandlers,
+      clearEndReset: clearEndReset,
     });
   }
 
