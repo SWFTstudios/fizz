@@ -1,4 +1,8 @@
-/* Fizz Key Features — full-bleed scrub, positioned glass cards */
+/* Fizz Key Features — sticky pin + glass cards over the sequence */
+
+.fizz-key-features-section {
+  overflow: visible;
+}
 
 .fizz-key-features {
   --fkf-nav-offset: var(--nf-nav-top, 56px);
@@ -8,6 +12,11 @@
   --fkf-aspect: 1600 / 1280;
   --fkf-cards-pad-x: 16px;
   --fkf-cards-pad-y: 24px;
+  --fkf-cards-share: 40%;
+  --fkf-split-gap: 12px;
+  --fkf-glass-blur: 16px;
+  --fkf-card-gradient: transparent;
+  --fkf-card-gradient-opacity: 0;
   --fkf-glass-bg: color-mix(in srgb, var(--fkf-glass-tint, #fff) 22%, transparent);
   --fkf-glass-bg-active: color-mix(in srgb, var(--fkf-glass-tint, #fff) 36%, transparent);
   --fkf-glass-border: color-mix(in srgb, var(--fkf-glass-tint, #fff) 42%, transparent);
@@ -81,7 +90,6 @@
   border: 0;
 }
 
-/* Absolute under nav, above sequence — bubbles pass behind text */
 .fizz-key-features__head {
   position: absolute;
   z-index: 6;
@@ -184,6 +192,20 @@
   display: none;
 }
 
+html.shopify-design-mode .fizz-key-features__track,
+.fizz-key-features.is-reduced .fizz-key-features__track {
+  height: auto !important;
+}
+
+html.shopify-design-mode .fizz-key-features__sticky,
+.fizz-key-features.is-reduced .fizz-key-features__sticky {
+  position: relative;
+  top: auto;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+
 .fizz-key-features__cards-layer {
   z-index: 5;
   min-width: 0;
@@ -193,6 +215,8 @@
 }
 
 .fizz-key-features__card {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -200,21 +224,38 @@
   border-radius: 1.1rem;
   border: 1px solid var(--fkf-glass-border);
   background: var(--fkf-glass-bg);
-  -webkit-backdrop-filter: blur(16px) saturate(1.2);
-  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--fkf-glass-blur, 16px)) saturate(1.2);
+  backdrop-filter: blur(var(--fkf-glass-blur, 16px)) saturate(1.2);
   box-shadow: 0 10px 30px rgb(0 0 0 / 0.14);
   transform: translateY(120%);
   opacity: 0;
   pointer-events: none;
   transition:
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.4s ease,
-    background 0.28s ease,
-    box-shadow 0.28s ease;
+    transform 0.22s ease,
+    opacity 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    max-height 0.22s ease;
   max-height: 5rem;
   overflow: hidden;
   width: min(100%, 22rem);
   box-sizing: border-box;
+}
+
+.fizz-key-features__card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background: var(--fkf-card-gradient, transparent);
+  opacity: var(--fkf-card-gradient-opacity, 0);
+}
+
+.fizz-key-features__card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .fizz-key-features__card.is-in {
@@ -311,18 +352,21 @@
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
+
+  .fizz-key-features__card::before {
+    display: none;
+  }
 }
 
-/* —— Phone / tablet: full-bleed stage + overlaid snap sheet ——
-   Cards sit on top of the bottle (absolute bottom) so the size slider
-   can grow the sequence without being crushed by a second grid row. */
+/* Phone / tablet: keep the pin. Bottle in the top band, cards in the bottom band. */
 @media (max-width: 1099px) {
   .fizz-key-features {
     --fkf-media-h: var(--fkf-media-h-mobile);
   }
 
   .fizz-key-features__head {
-    max-width: calc(100% - 1.5rem);
+    max-width: none;
+    right: max(1rem, env(safe-area-inset-right));
   }
 
   .fizz-key-features__shell {
@@ -335,15 +379,22 @@
     position: absolute;
     inset: 0;
     z-index: 1;
+    height: auto;
+    padding-top: var(--fkf-nav-offset);
+    padding-bottom: calc(var(--fkf-cards-share) + var(--fkf-split-gap));
+    align-items: flex-start;
   }
 
   .fizz-key-features__canvas,
   .fizz-key-features__poster {
-    width: auto;
     height: var(--fkf-media-h);
     max-width: 100%;
-    max-height: calc(100dvh - var(--fkf-nav-offset));
+    max-height: calc(100% - 0.5rem);
     aspect-ratio: var(--fkf-aspect, 1080 / 1922);
+  }
+
+  .fizz-key-features__poster {
+    top: var(--fkf-nav-offset);
   }
 
   .fizz-key-features__cards-layer {
@@ -352,50 +403,85 @@
     right: 0;
     bottom: 0;
     z-index: 5;
-    display: flex;
-    flex-direction: row;
-    gap: 0.65rem;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
+    height: var(--fkf-cards-share);
+    display: block;
+    overflow: hidden;
     padding: var(--fkf-cards-pad-y) var(--fkf-cards-pad-x);
-    /* Keep page vertical scroll from being stolen by the sheet */
-    touch-action: pan-x;
+    touch-action: pan-y;
+    perspective: 900px;
   }
 
-  .fizz-key-features__card {
-    flex: 0 0 min(88%, 20rem);
-    scroll-snap-align: center;
-    max-height: none;
-    height: auto;
-    /* Shorter transitions — less paint during scrub */
-    transition:
-      opacity 0.25s ease,
-      background 0.2s ease,
-      box-shadow 0.2s ease;
+  .fizz-key-features:not(.is-reduced) .fizz-key-features__card {
+    position: absolute;
+    left: var(--fkf-cards-pad-x);
+    right: var(--fkf-cards-pad-x);
+    top: 50%;
+    width: auto;
+    max-width: none;
+    max-height: min(58%, 11.5rem);
+    margin: 0;
+    transform: translate3d(0, var(--fkf-wheel-y, 0px), 0) scale(var(--fkf-wheel-scale, 0.86)) translateY(-50%);
+    opacity: var(--fkf-wheel-opacity, 0);
+    z-index: var(--fkf-wheel-z, 0);
+    pointer-events: none;
+    transition: none;
+    overflow: hidden;
+    will-change: transform, opacity;
+  }
+
+  .fizz-key-features:not(.is-reduced) .fizz-key-features__card.is-in,
+  .fizz-key-features:not(.is-reduced) .fizz-key-features__card.is-past,
+  .fizz-key-features:not(.is-reduced) .fizz-key-features__card.is-active {
+    transform: translate3d(0, var(--fkf-wheel-y, 0px), 0) scale(var(--fkf-wheel-scale, 0.86)) translateY(-50%);
+    pointer-events: auto;
+  }
+
+  .fizz-key-features:not(.is-reduced) .fizz-key-features__card.is-in,
+  .fizz-key-features:not(.is-reduced) .fizz-key-features__card.is-past {
+    max-height: 4.4rem;
+    opacity: var(--fkf-wheel-opacity, 0.45);
+  }
+
+  .fizz-key-features:not(.is-reduced) .fizz-key-features__card.is-active {
+    max-height: min(58%, 11.5rem);
+    opacity: var(--fkf-wheel-opacity, 1);
+    overflow: hidden;
+  }
+
+  .fizz-key-features.is-reduced .fizz-key-features__cards-layer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    perspective: none;
+  }
+
+  .fizz-key-features.is-reduced .fizz-key-features__card {
+    position: relative;
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: none;
+    top: auto;
+    left: auto;
+    right: auto;
     transform: none;
+    max-height: 2.8rem;
     opacity: 0.55;
   }
 
-  .fizz-key-features__card.is-in,
-  .fizz-key-features__card.is-past,
-  .fizz-key-features__card.is-active {
-    max-height: none;
-    transform: none;
-  }
-
-  .fizz-key-features__card.is-in {
+  .fizz-key-features.is-reduced .fizz-key-features__card.is-in {
     opacity: 0.8;
+    max-height: 2.8rem;
   }
 
-  .fizz-key-features__card.is-past {
+  .fizz-key-features.is-reduced .fizz-key-features__card.is-past {
     opacity: 0.5;
+    max-height: 2.6rem;
   }
 
-  .fizz-key-features__card.is-active {
+  .fizz-key-features.is-reduced .fizz-key-features__card.is-active {
     opacity: 1;
+    max-height: min(70%, 12rem);
   }
 
   .fizz-key-features__sub {
@@ -423,7 +509,6 @@
   }
 }
 
-/* —— Desktop: full-bleed stage + absolute card positions —— */
 @media (min-width: 1100px) {
   .fizz-key-features {
     --fkf-media-h: var(--fkf-media-h-desktop);

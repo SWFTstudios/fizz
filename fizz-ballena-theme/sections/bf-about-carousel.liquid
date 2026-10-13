@@ -1,14 +1,124 @@
 {{ 'bf-about-carousel.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign nav_icon = section.settings.nav_icon_color | default: '#03090D'
+  assign nav_border = section.settings.nav_border_color | default: '#03090D'
+  assign nav_border_op = section.settings.nav_border_opacity | default: 13 | times: 1.0 | divided_by: 100.0
+  assign nav_track = section.settings.nav_track_color | default: '#03090D'
+  assign nav_track_op = section.settings.nav_track_opacity | default: 20 | times: 1.0 | divided_by: 100.0
+  assign nav_progress = section.settings.nav_progress_color | default: '#03090D'
+  assign nav_focus = section.settings.nav_focus_color | default: '#6b9fd4'
+  assign nav_border_a = nav_border | color_modify: 'alpha', nav_border_op
+  assign nav_track_a = nav_track | color_modify: 'alpha', nav_track_op
+  assign card_width = section.settings.card_width | default: 360
+  assign card_gap = section.settings.card_gap | default: 14
+  assign card_radius = section.settings.card_radius | default: 8
+  assign default_orientation = section.settings.card_orientation | default: 'portrait'
+  assign default_ratio = section.settings.card_ratio | default: '4/5'
+  assign color_eyebrow = section.settings.eyebrow_color | default: '#8a948c'
+  assign show_head = false
+  if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.subheading != blank
+    assign show_head = true
+  endif
+-%}
+
+{% liquid
+  assign def_parts = default_ratio | split: '/'
+  assign def_w = def_parts[0] | plus: 0
+  assign def_h = def_parts[1] | plus: 0
+  if def_w < 1
+    assign def_w = 4
+  endif
+  if def_h < 1
+    assign def_h = 5
+  endif
+
+  if default_orientation == 'square'
+    assign default_aspect = '1 / 1'
+  elsif default_orientation == 'landscape'
+    if def_h > def_w
+      assign default_aspect = def_h | append: ' / ' | append: def_w
+    else
+      assign default_aspect = def_w | append: ' / ' | append: def_h
+    endif
+  else
+    if def_w > def_h
+      assign default_aspect = def_h | append: ' / ' | append: def_w
+    else
+      assign default_aspect = def_w | append: ' / ' | append: def_h
+    endif
+  endif
+%}
+{% style %}
+  #shopify-section-{{ section.id }} .bf-about {
+    --bf-about-nav-icon: {{ nav_icon }};
+    --bf-about-nav-border: {{ nav_border_a }};
+    --bf-about-nav-track: {{ nav_track_a }};
+    --bf-about-nav-progress: {{ nav_progress }};
+    --bf-about-nav-focus: {{ nav_focus }};
+    --bf-about-card-w: {{ card_width }}px;
+    --bf-about-card-gap: {{ card_gap }}px;
+    --bf-about-card-ratio: {{ default_aspect }};
+    --bf-about-card-radius: {{ card_radius }}px;
+  }
+  #shopify-section-{{ section.id }} .bf-about__navigation {
+    border-color: {{ nav_border_a }};
+  }
+  #shopify-section-{{ section.id }} .bf-about__nav-btn {
+    color: {{ nav_icon }};
+  }
+  #shopify-section-{{ section.id }} .bf-about__nav-btn:focus-visible {
+    outline-color: {{ nav_focus }};
+  }
+  #shopify-section-{{ section.id }} .bf-about__progress {
+    background-color: {{ nav_track_a }};
+  }
+  #shopify-section-{{ section.id }} .bf-about__progress-bar {
+    background-color: {{ nav_progress }};
+  }
+{% endstyle %}
 <section
-  class="bf-section bf-about"
+  class="bf-section bf-about{% if section.settings.layout == 'vertical' %} bf-about--vertical{% endif %}"
   id="{{ section.settings.anchor_id | default: 'about' | handle }}"
   data-bf-about
+  data-bf-about-layout="{{ section.settings.layout | default: 'horizontal' }}"
+  style="
+    --bf-about-nav-icon: {{ nav_icon }};
+    --bf-about-nav-border: {{ nav_border_a }};
+    --bf-about-nav-track: {{ nav_track_a }};
+    --bf-about-nav-progress: {{ nav_progress }};
+    --bf-about-nav-focus: {{ nav_focus }};
+    --bf-about-card-w: {{ card_width }}px;
+    --bf-about-card-gap: {{ card_gap }}px;
+    --bf-about-card-ratio: {{ default_aspect }};
+    --bf-about-card-radius: {{ card_radius }}px;
+    --bf-about-eyebrow: {{ color_eyebrow }};
+  "
 >
   {% render 'bf-section-chrome', section: section %}
 
+  <button
+    type="button"
+    class="bf-about__side-btn bf-about__side-btn--prev"
+    data-bf-about-prev
+    aria-label="Previous"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button
+    type="button"
+    class="bf-about__side-btn bf-about__side-btn--next"
+    data-bf-about-next
+    aria-label="Next"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
   <div class="bf-about__wrap">
-    {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
+    {%- if show_head -%}
       <header class="bf-about__intro">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="nf-eyebrow bf-about__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
         {%- if section.settings.heading != blank -%}
           <h2 class="bf-section__heading bf-about__heading">{{ section.settings.heading | escape }}</h2>
         {%- endif -%}
@@ -22,15 +132,61 @@
       <div class="bf-about__track" data-bf-about-track>
         {%- for block in section.blocks -%}
           {%- if block.type == 'card' -%}
-            {%- assign card_url = block.settings.url | default: '#' -%}
-            <article class="bf-about__card" {{ block.shopify_attributes }}>
+            {% liquid
+              assign card_url = block.settings.url | default: '#'
+              assign use_custom = block.settings.use_custom_size
+              assign b_width = card_width
+              assign b_orientation = default_orientation
+              assign b_ratio = default_ratio
+              if use_custom
+                assign b_width = block.settings.card_width | default: card_width
+                assign b_orientation = block.settings.card_orientation | default: default_orientation
+                assign b_ratio = block.settings.card_ratio | default: default_ratio
+              endif
+
+              assign b_parts = b_ratio | split: '/'
+              assign b_w = b_parts[0] | plus: 0
+              assign b_h = b_parts[1] | plus: 0
+              if b_w < 1
+                assign b_w = 4
+              endif
+              if b_h < 1
+                assign b_h = 5
+              endif
+
+              if b_orientation == 'square'
+                assign b_aspect = '1 / 1'
+              elsif b_orientation == 'landscape'
+                if b_h > b_w
+                  assign b_aspect = b_h | append: ' / ' | append: b_w
+                else
+                  assign b_aspect = b_w | append: ' / ' | append: b_h
+                endif
+              else
+                if b_w > b_h
+                  assign b_aspect = b_h | append: ' / ' | append: b_w
+                else
+                  assign b_aspect = b_w | append: ' / ' | append: b_h
+                endif
+              endif
+
+              assign b_radius = card_radius
+              if block.settings.use_custom_radius
+                assign b_radius = block.settings.card_radius | default: card_radius
+              endif
+            %}
+            <article
+              class="bf-about__card"
+              style="--bf-about-card-w: {{ b_width }}px; --bf-about-card-ratio: {{ b_aspect }}; --bf-about-card-radius: {{ b_radius }}px;"
+              {{ block.shopify_attributes }}
+            >
               <div class="bf-about__card-media" aria-hidden="true">
                 {%- render 'nf-media',
                   image: block.settings.image,
                   asset: block.settings.asset,
                   alt: block.settings.title,
                   class: 'bf-about__card-img',
-                  sizes: '(min-width: 900px) 28vw, 80vw',
+                  sizes: '(min-width: 900px) 420px, 80vw',
                   loading: 'lazy'
                 -%}
               </div>
@@ -91,6 +247,11 @@
     },
     {
       "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow"
+    },
+    {
+      "type": "text",
       "id": "heading",
       "label": "Heading",
       "info": "Leave blank for Ballena-style image cards with no section title."
@@ -101,14 +262,119 @@
       "label": "Subheading"
     },
     {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "horizontal",
+          "label": "Horizontal scroll"
+        },
+        {
+          "value": "vertical",
+          "label": "Vertical grid (2 + peek)"
+        }
+      ],
+      "default": "horizontal",
+      "info": "Vertical shows two cards with a third peeking. Horizontal is the default carousel."
+    },
+    {
       "type": "header",
-      "content": "Section chrome — spacing"
+      "content": "Card defaults"
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "label": "Card width",
+      "min": 280,
+      "max": 720,
+      "step": 10,
+      "unit": "px",
+      "default": 360
+    },
+    {
+      "type": "select",
+      "id": "card_orientation",
+      "label": "Orientation",
+      "options": [
+        {
+          "value": "portrait",
+          "label": "Portrait"
+        },
+        {
+          "value": "landscape",
+          "label": "Landscape"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        }
+      ],
+      "default": "portrait"
+    },
+    {
+      "type": "select",
+      "id": "card_ratio",
+      "label": "Aspect ratio",
+      "info": "Combined with orientation. Square always uses 1:1.",
+      "options": [
+        {
+          "value": "3/4",
+          "label": "3:4"
+        },
+        {
+          "value": "4/5",
+          "label": "4:5"
+        },
+        {
+          "value": "2/3",
+          "label": "2:3"
+        },
+        {
+          "value": "1/1",
+          "label": "1:1"
+        },
+        {
+          "value": "4/3",
+          "label": "4:3"
+        },
+        {
+          "value": "16/9",
+          "label": "16:9"
+        }
+      ],
+      "default": "4/5"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Card gap",
+      "min": 8,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card radius",
+      "info": "Applies to every card unless a card uses a custom radius.",
+      "min": 0,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Section chrome \u2014 spacing"
     },
     {
       "type": "checkbox",
       "id": "use_theme_spacing",
       "label": "Use global padding",
-      "info": "Uses Theme settings → Layout for desktop and mobile padding. Turn off to set unique padding below.",
+      "info": "Uses Theme settings \u2192 Layout for desktop and mobile padding. Turn off to set unique padding below.",
       "default": true
     },
     {
@@ -376,28 +642,67 @@
       "default": 0
     },
     {
+      "type": "checkbox",
+      "id": "use_theme_type",
+      "label": "Use global type",
+      "info": "Uses Theme settings \u2192 Typography for heading and body size. Turn off to set unique sizes below.",
+      "default": true
+    },
+    {
       "type": "header",
-      "content": "Section chrome — typography"
+      "content": "Heading \u2014 desktop"
     },
     {
       "type": "range",
       "id": "heading_font_size",
-      "label": "Heading font size",
+      "label": "Heading size (desktop)",
       "min": 16,
       "max": 96,
       "step": 1,
       "unit": "px",
-      "default": 40
+      "default": 40,
+      "visible_if": "{{ section.settings.use_theme_type == false }}"
     },
     {
       "type": "range",
-      "id": "body_font_size",
-      "label": "Body font size",
-      "min": 12,
-      "max": 32,
+      "id": "heading_padding_top",
+      "label": "Heading padding top (desktop)",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "heading_padding_bottom",
+      "label": "Heading padding bottom (desktop)",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height",
+      "label": "Heading line height (desktop)",
+      "min": 80,
+      "max": 160,
+      "step": 1,
+      "unit": "%",
+      "default": 115
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing",
+      "label": "Heading letter spacing (desktop)",
+      "min": -4,
+      "max": 4,
       "step": 1,
       "unit": "px",
-      "default": 16
+      "default": 0,
+      "info": "0 keeps stylesheet tracking."
     },
     {
       "type": "select",
@@ -429,6 +734,97 @@
     },
     {
       "type": "select",
+      "id": "heading_text_transform",
+      "label": "Heading transform",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "uppercase",
+          "label": "Uppercase"
+        },
+        {
+          "value": "lowercase",
+          "label": "Lowercase"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "header",
+      "content": "Heading \u2014 mobile"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size_mobile",
+      "label": "Heading size (mobile)",
+      "min": 0,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop.",
+      "visible_if": "{{ section.settings.use_theme_type == false }}"
+    },
+    {
+      "type": "range",
+      "id": "heading_padding_top_mobile",
+      "label": "Heading padding top (mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "range",
+      "id": "heading_padding_bottom_mobile",
+      "label": "Heading padding bottom (mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_mobile",
+      "label": "Heading line height (mobile)",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "%",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_mobile",
+      "label": "Heading letter spacing (mobile)",
+      "min": -4,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = same as desktop."
+    },
+    {
+      "type": "range",
+      "id": "body_font_size",
+      "label": "Body font size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16,
+      "visible_if": "{{ section.settings.use_theme_type == false }}"
+    },
+    {
+      "type": "select",
       "id": "body_font_weight",
       "label": "Body font weight",
       "options": [
@@ -457,6 +853,12 @@
     },
     {
       "type": "color",
+      "id": "eyebrow_color",
+      "label": "Eyebrow color",
+      "default": "#8a948c"
+    },
+    {
+      "type": "color",
       "id": "heading_color",
       "label": "Heading color",
       "default": "#03090D"
@@ -464,12 +866,12 @@
     {
       "type": "color",
       "id": "body_color",
-      "label": "Body color",
+      "label": "Subheading color",
       "default": "#03090D"
     },
     {
       "type": "header",
-      "content": "Section chrome — background"
+      "content": "Section chrome \u2014 background"
     },
     {
       "type": "color",
@@ -517,6 +919,60 @@
       "step": 1,
       "unit": "%",
       "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Carousel controls"
+    },
+    {
+      "type": "color",
+      "id": "nav_icon_color",
+      "label": "Arrow color",
+      "default": "#03090D"
+    },
+    {
+      "type": "color",
+      "id": "nav_border_color",
+      "label": "Border color",
+      "default": "#03090D"
+    },
+    {
+      "type": "range",
+      "id": "nav_border_opacity",
+      "label": "Border opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "nav_track_color",
+      "label": "Progress track",
+      "default": "#03090D"
+    },
+    {
+      "type": "range",
+      "id": "nav_track_opacity",
+      "label": "Progress track opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "nav_progress_color",
+      "label": "Progress fill",
+      "default": "#03090D"
+    },
+    {
+      "type": "color",
+      "id": "nav_focus_color",
+      "label": "Focus ring",
+      "default": "#6b9fd4"
     }
   ],
   "blocks": [
@@ -528,13 +984,13 @@
           "type": "text",
           "id": "title",
           "label": "Title",
-          "default": "Shop Bottles"
+          "default": "The bottle"
         },
         {
           "type": "textarea",
           "id": "body",
           "label": "Description",
-          "default": "Ways to gather beyond the table"
+          "default": "Fizz lives in your bag, not on the counter."
         },
         {
           "type": "text",
@@ -557,6 +1013,102 @@
           "id": "asset",
           "label": "Theme asset fallback",
           "default": "nf-lifestyle-story-01.jpg"
+        },
+        {
+          "type": "header",
+          "content": "Corners"
+        },
+        {
+          "type": "checkbox",
+          "id": "use_custom_radius",
+          "label": "Use custom radius for this card",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "card_radius",
+          "label": "Card radius",
+          "min": 0,
+          "max": 64,
+          "step": 2,
+          "unit": "px",
+          "default": 8,
+          "visible_if": "{{ block.settings.use_custom_radius == true }}"
+        },
+        {
+          "type": "header",
+          "content": "Size override"
+        },
+        {
+          "type": "checkbox",
+          "id": "use_custom_size",
+          "label": "Use custom size for this card",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "card_width",
+          "label": "Card width",
+          "min": 280,
+          "max": 720,
+          "step": 10,
+          "unit": "px",
+          "default": 360,
+          "visible_if": "{{ block.settings.use_custom_size == true }}"
+        },
+        {
+          "type": "select",
+          "id": "card_orientation",
+          "label": "Orientation",
+          "options": [
+            {
+              "value": "portrait",
+              "label": "Portrait"
+            },
+            {
+              "value": "landscape",
+              "label": "Landscape"
+            },
+            {
+              "value": "square",
+              "label": "Square"
+            }
+          ],
+          "default": "portrait",
+          "visible_if": "{{ block.settings.use_custom_size == true }}"
+        },
+        {
+          "type": "select",
+          "id": "card_ratio",
+          "label": "Aspect ratio",
+          "options": [
+            {
+              "value": "3/4",
+              "label": "3:4"
+            },
+            {
+              "value": "4/5",
+              "label": "4:5"
+            },
+            {
+              "value": "2/3",
+              "label": "2:3"
+            },
+            {
+              "value": "1/1",
+              "label": "1:1"
+            },
+            {
+              "value": "4/3",
+              "label": "4:3"
+            },
+            {
+              "value": "16/9",
+              "label": "16:9"
+            }
+          ],
+          "default": "4/5",
+          "visible_if": "{{ block.settings.use_custom_size == true }}"
         }
       ]
     }
@@ -568,9 +1120,9 @@
         {
           "type": "card",
           "settings": {
-            "title": "Shop Bottles",
-            "body": "Built for the way you move",
-            "link_label": "Explore more",
+            "title": "The Bottle",
+            "body": "Fizz lives in your bag, not on the counter.",
+            "link_label": "Shop",
             "url": "/collections/all",
             "asset": "nf-lifestyle-story-01.jpg"
           }
@@ -578,27 +1130,42 @@
         {
           "type": "card",
           "settings": {
-            "title": "How it works",
-            "body": "Fill. Twist. Fizz.",
+            "title": "How It Works",
+            "body": "Fill. Push. Drink.",
             "link_label": "Explore more",
-            "url": "/#features",
+            "url": "/pages/how-it-works",
             "asset": "nf-lifestyle-how-01.jpg"
           }
         },
         {
           "type": "card",
           "settings": {
-            "title": "Refill",
-            "body": "Passed along, meant to be shared",
+            "title": "The Charge",
+            "body": "One pod. Sixty fizzes. Swap when you\u2019re empty, not thirsty.",
+            "link_label": "Explore more",
+            "url": "/pages/charge",
+            "asset": "nf-lifestyle-story-02.jpg"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "title": "The Flavor",
+            "body": "Optional drops. Bubbles first \u2014 taste if you want.",
             "link_label": "Explore more",
             "url": "/collections/all",
-            "asset": "nf-lifestyle-story-02.jpg"
+            "asset": "nf-lifestyle-hero-02.jpg"
           }
         }
       ],
       "settings": {
         "heading": "",
         "subheading": "",
+        "card_width": 360,
+        "card_orientation": "portrait",
+        "card_ratio": "4/5",
+        "card_gap": 14,
+        "card_radius": 8,
         "background_color": "#F8F2E5",
         "padding_top": 80,
         "padding_bottom": 80
